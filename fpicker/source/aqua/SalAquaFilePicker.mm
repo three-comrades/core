@@ -107,14 +107,14 @@ SalAquaFilePicker::~SalAquaFilePicker()
 
 
 void SAL_CALL SalAquaFilePicker::addFilePickerListener( const uno::Reference<XFilePickerListener>& xListener )
-    throw( uno::RuntimeException )
+    /*throw( uno::RuntimeException )*/
 {
     SolarMutexGuard aGuard;
     m_xListener = xListener;
 }
 
 void SAL_CALL SalAquaFilePicker::removeFilePickerListener( const uno::Reference<XFilePickerListener>& )
-    throw( uno::RuntimeException )
+    /*throw( uno::RuntimeException )*/
 {
     SolarMutexGuard aGuard;
     m_xListener.clear();
@@ -124,13 +124,15 @@ void SAL_CALL SalAquaFilePicker::removeFilePickerListener( const uno::Reference<
 
 // XExecutableDialog functions
 
-void SAL_CALL SalAquaFilePicker::setTitle( const rtl::OUString& aTitle ) throw( uno::RuntimeException )
+void SAL_CALL SalAquaFilePicker::setTitle( const rtl::OUString& aTitle )
+    /*throw( uno::RuntimeException )*/
 {
     SolarMutexGuard aGuard;
     implsetTitle(aTitle);
 }
 
-sal_Int16 SAL_CALL SalAquaFilePicker::execute() throw( uno::RuntimeException )
+sal_Int16 SAL_CALL SalAquaFilePicker::execute()
+    /*throw( uno::RuntimeException )*/
 {
     SolarMutexGuard aGuard;
 
@@ -204,9 +206,10 @@ sal_Int16 SAL_CALL SalAquaFilePicker::execute() throw( uno::RuntimeException )
             break;
 
         default:
-            throw uno::RuntimeException(
+            /**throw uno::RuntimeException(
                       "The dialog returned with an unknown result!", 
-                      static_cast<XFilePicker*>( static_cast<XFilePicker3*>( this ) ));
+                      static_cast<XFilePicker*>( static_cast<XFilePicker3*>( this ) ));**/
+            retVal = ExecutableDialogResults::CANCEL;
             break;
     }
 
@@ -219,7 +222,8 @@ sal_Int16 SAL_CALL SalAquaFilePicker::execute() throw( uno::RuntimeException )
 // XFilePicker functions
 
 
-void SAL_CALL SalAquaFilePicker::setMultiSelectionMode( sal_Bool /* bMode */ ) throw( uno::RuntimeException )
+void SAL_CALL SalAquaFilePicker::setMultiSelectionMode( sal_Bool /* bMode */ )
+//throw( uno::RuntimeException )
 {
     SolarMutexGuard aGuard;
 
@@ -229,7 +233,7 @@ void SAL_CALL SalAquaFilePicker::setMultiSelectionMode( sal_Bool /* bMode */ ) t
 }
 
 void SAL_CALL SalAquaFilePicker::setDefaultName( const rtl::OUString& aName )
-throw( uno::RuntimeException )
+/*throw( uno::RuntimeException )*/
 {
     SolarMutexGuard aGuard;
 
@@ -237,21 +241,23 @@ throw( uno::RuntimeException )
 }
 
 void SAL_CALL SalAquaFilePicker::setDisplayDirectory( const rtl::OUString& rDirectory )
-throw( lang::IllegalArgumentException, uno::RuntimeException )
+/*throw( lang::IllegalArgumentException, uno::RuntimeException )*/
 {
     SolarMutexGuard aGuard;
 
     implsetDisplayDirectory(rDirectory);
 }
 
-rtl::OUString SAL_CALL SalAquaFilePicker::getDisplayDirectory() throw( uno::RuntimeException )
+rtl::OUString SAL_CALL SalAquaFilePicker::getDisplayDirectory()
+/*throw( uno::RuntimeException )*/
 {
     rtl::OUString retVal = implgetDisplayDirectory();
 
     return retVal;
 }
 
-uno::Sequence<rtl::OUString> SAL_CALL SalAquaFilePicker::getFiles() throw( uno::RuntimeException )
+uno::Sequence<rtl::OUString> SAL_CALL SalAquaFilePicker::getFiles()
+/*throw( uno::RuntimeException )*/
 {
     uno::Sequence< rtl::OUString > aSelectedFiles = getSelectedFiles();
     // multiselection doesn't really work with getFiles
@@ -262,7 +268,8 @@ uno::Sequence<rtl::OUString> SAL_CALL SalAquaFilePicker::getFiles() throw( uno::
     return aSelectedFiles;
 }
 
-uno::Sequence<rtl::OUString> SAL_CALL SalAquaFilePicker::getSelectedFiles() throw( uno::RuntimeException, std::exception )
+uno::Sequence<rtl::OUString> SAL_CALL SalAquaFilePicker::getSelectedFiles()
+/*throw( uno::RuntimeException, std::exception )*/
 {
     SolarMutexGuard aGuard;
 
@@ -332,7 +339,7 @@ uno::Sequence<rtl::OUString> SAL_CALL SalAquaFilePicker::getSelectedFiles() thro
 
 
 void SAL_CALL SalAquaFilePicker::appendFilter( const rtl::OUString& aTitle, const rtl::OUString& aFilter )
-throw( lang::IllegalArgumentException, uno::RuntimeException )
+    /*throw( lang::IllegalArgumentException, uno::RuntimeException )*/
 {
     SolarMutexGuard aGuard;
 
@@ -342,7 +349,7 @@ throw( lang::IllegalArgumentException, uno::RuntimeException )
 }
 
 void SAL_CALL SalAquaFilePicker::setCurrentFilter( const rtl::OUString& aTitle )
-throw( lang::IllegalArgumentException, uno::RuntimeException )
+    /*throw( lang::IllegalArgumentException, uno::RuntimeException )*/
 {
     SolarMutexGuard aGuard;
 
@@ -353,7 +360,8 @@ throw( lang::IllegalArgumentException, uno::RuntimeException )
     updateSaveFileNameExtension();
 }
 
-rtl::OUString SAL_CALL SalAquaFilePicker::getCurrentFilter() throw( uno::RuntimeException )
+rtl::OUString SAL_CALL SalAquaFilePicker::getCurrentFilter()
+    /*throw( uno::RuntimeException )*/
 {
     SolarMutexGuard aGuard;
 
@@ -368,7 +376,7 @@ rtl::OUString SAL_CALL SalAquaFilePicker::getCurrentFilter() throw( uno::Runtime
 
 
 void SAL_CALL SalAquaFilePicker::appendFilterGroup( const rtl::OUString& sGroupTitle, const uno::Sequence<beans::StringPair>& aFilters )
-throw( lang::IllegalArgumentException, uno::RuntimeException )
+    /*throw( lang::IllegalArgumentException, uno::RuntimeException )*/
 {
     SolarMutexGuard aGuard;
 
@@ -383,7 +391,7 @@ throw( lang::IllegalArgumentException, uno::RuntimeException )
 
 
 void SAL_CALL SalAquaFilePicker::setValue( sal_Int16 nControlId, sal_Int16 nControlAction, const uno::Any& rValue )
-throw( uno::RuntimeException )
+    /*throw( uno::RuntimeException )*/
 {
     SolarMutexGuard aGuard;
 
@@ -395,7 +403,7 @@ throw( uno::RuntimeException )
 }
 
 uno::Any SAL_CALL SalAquaFilePicker::getValue( sal_Int16 nControlId, sal_Int16 nControlAction )
-throw( uno::RuntimeException )
+    /*throw( uno::RuntimeException )*/
 {
     uno::Any aValue = m_pControlHelper->getValue(nControlId, nControlAction);
 
@@ -403,13 +411,13 @@ throw( uno::RuntimeException )
 }
 
 void SAL_CALL SalAquaFilePicker::enableControl( sal_Int16 nControlId, sal_Bool bEnable )
-throw( uno::RuntimeException )
+    /*throw( uno::RuntimeException )*/
 {
     m_pControlHelper->enableControl(nControlId, bEnable);
 }
 
 void SAL_CALL SalAquaFilePicker::setLabel( sal_Int16 nControlId, const ::rtl::OUString& aLabel )
-throw( uno::RuntimeException )
+    /*throw( uno::RuntimeException )*/
 {
     SolarMutexGuard aGuard;
 
@@ -418,7 +426,7 @@ throw( uno::RuntimeException )
 }
 
 rtl::OUString SAL_CALL SalAquaFilePicker::getLabel( sal_Int16 nControlId )
-throw( uno::RuntimeException )
+    /*throw( uno::RuntimeException )*/
 {
     return m_pControlHelper->getLabel(nControlId);
 }
@@ -429,22 +437,24 @@ throw( uno::RuntimeException )
 
 
 void SAL_CALL SalAquaFilePicker::initialize( const uno::Sequence<uno::Any>& aArguments )
-throw( uno::Exception, uno::RuntimeException )
+    /*throw( uno::Exception, uno::RuntimeException )*/
 {
     SolarMutexGuard aGuard;
 
     // parameter checking
     uno::Any aAny;
     if( 0 == aArguments.getLength() )
-        throw lang::IllegalArgumentException("no arguments",
-                                             static_cast<XFilePicker*>( static_cast<XFilePicker3*>(this) ), 1 );
+        return;
+        /**throw lang::IllegalArgumentException("no arguments",
+                                             static_cast<XFilePicker*>( static_cast<XFilePicker3*>(this) ), 1 );**/
 
     aAny = aArguments[0];
 
     if( ( aAny.getValueType() != ::cppu::UnoType<sal_Int16>::get() ) &&
         (aAny.getValueType() != ::cppu::UnoType<sal_Int8>::get() ) )
-        throw lang::IllegalArgumentException("invalid argument type",
-                                             static_cast<XFilePicker*>( static_cast<XFilePicker3*>(this) ), 1 );
+        return;
+        /**throw lang::IllegalArgumentException("invalid argument type",
+                                             static_cast<XFilePicker*>( static_cast<XFilePicker3*>(this) ), 1 );**/
 
     sal_Int16 templateId = -1;
     aAny >>= templateId;
@@ -485,9 +495,10 @@ throw( uno::Exception, uno::RuntimeException )
             m_nDialogType = NAVIGATIONSERVICES_SAVE;
             break;
         default:
-            throw lang::IllegalArgumentException("Unknown template",
+            return;
+            /**throw lang::IllegalArgumentException("Unknown template",
                                                  static_cast<XFilePicker*>( static_cast<XFilePicker3*>(this) ),
-                                                 1 );
+                                                 1 );**/
     }
 
     m_pControlHelper->initialize(templateId);
@@ -500,7 +511,8 @@ throw( uno::Exception, uno::RuntimeException )
 // XCancellable
 
 
-void SAL_CALL SalAquaFilePicker::cancel() throw( uno::RuntimeException )
+void SAL_CALL SalAquaFilePicker::cancel()
+    /*throw( uno::RuntimeException )*/
 {
     SolarMutexGuard aGuard;
 
@@ -514,7 +526,8 @@ void SAL_CALL SalAquaFilePicker::cancel() throw( uno::RuntimeException )
 // XEventListener
 
 
-void SAL_CALL SalAquaFilePicker::disposing( const lang::EventObject& aEvent ) throw( uno::RuntimeException )
+void SAL_CALL SalAquaFilePicker::disposing( const lang::EventObject& aEvent )
+    /*throw( uno::RuntimeException )*/
 {
     SolarMutexGuard aGuard;
 
@@ -530,7 +543,7 @@ void SAL_CALL SalAquaFilePicker::disposing( const lang::EventObject& aEvent ) th
 
 
 rtl::OUString SAL_CALL SalAquaFilePicker::getImplementationName()
-throw( uno::RuntimeException )
+    /*throw( uno::RuntimeException )*/
 {
     rtl::OUString retVal( FILE_PICKER_IMPL_NAME );
 
@@ -538,13 +551,13 @@ throw( uno::RuntimeException )
 }
 
 sal_Bool SAL_CALL SalAquaFilePicker::supportsService( const rtl::OUString& sServiceName )
-throw( uno::RuntimeException )
+    /*throw( uno::RuntimeException )*/
 {
     return cppu::supportsService(this, sServiceName);
 }
 
 uno::Sequence<rtl::OUString> SAL_CALL SalAquaFilePicker::getSupportedServiceNames()
-throw( uno::RuntimeException )
+    /*throw( uno::RuntimeException )*/
 {
     return FilePicker_getSupportedServiceNames();
 }
