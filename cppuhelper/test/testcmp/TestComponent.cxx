@@ -26,7 +26,7 @@
 
 #include <osl/thread.h>
 
-#include <cppuhelper/implbase1.hxx>
+#include <cppuhelper/implbase.hxx>
 #include <cppuhelper/implementationentry.hxx>
 #include <cppuhelper/supportsservice.hxx>
 
@@ -55,7 +55,7 @@ using namespace ::com::sun::star;
 #endif
 
 
-class TestComponent: public cppu::WeakImplHelper1<lang::XServiceInfo>
+class TestComponent: public cppu::WeakImplHelper <lang::XServiceInfo>
 {
     rtl::OUString m_implName;
 
@@ -126,17 +126,17 @@ rtl::OUString SAL_CALL TestComponent::getImplementationName()
 
 void SAL_CALL TestComponent::acquire() throw ()
 {
-     cppu::WeakImplHelper1<lang::XServiceInfo>::acquire();
+     cppu::WeakImplHelper<lang::XServiceInfo>::acquire();
 }
 
 void SAL_CALL TestComponent::release() throw ()
 {
-    cppu::WeakImplHelper1<lang::XServiceInfo>::release();
+    cppu::WeakImplHelper<lang::XServiceInfo>::release();
 }
 
 uno::Any SAL_CALL TestComponent::queryInterface(uno::Type const & rType ) throw (css::uno::RuntimeException)
 {
-    return cppu::WeakImplHelper1<lang::XServiceInfo>::queryInterface(rType);
+    return cppu::WeakImplHelper<lang::XServiceInfo>::queryInterface(rType);
 }
 
 sal_Bool SAL_CALL TestComponent::supportsService(rtl::OUString const & ServiceName)

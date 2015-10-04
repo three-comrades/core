@@ -41,7 +41,7 @@
 #include <com/sun/star/sdb/XParametersSupplier.hpp>
 #include <com/sun/star/sdb/XRowsChangeBroadcaster.hpp>
 
-#include <cppuhelper/compbase12.hxx>
+#include <cppuhelper/compbase.hxx>
 #include <comphelper/interfacecontainer2.hxx>
 #include <connectivity/paramwrapper.hxx>
 #include <connectivity/FValue.hxx>
@@ -49,7 +49,7 @@
 
 namespace dbaccess
 {
-    typedef ::cppu::WeakAggComponentImplHelper12    <   css::sdb::XResultSetAccess
+    typedef ::cppu::WeakAggComponentImplHelper      <   css::sdb::XResultSetAccess
                                                     ,   css::sdb::XRowSetApproveBroadcaster
                                                     ,   css::sdb::XRowsChangeBroadcaster
                                                     ,   css::sdbcx::XDeleteRows
