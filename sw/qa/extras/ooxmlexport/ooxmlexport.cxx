@@ -100,6 +100,8 @@ DECLARE_OOXMLEXPORT_TEST(testSdtAlias, "sdt-alias.docx")
     assertXPath(pXmlDoc, "/w:document/w:body/w:sdt/w:sdtPr/w:alias", "val", "Subtitle");
 }
 
+#if ! ( defined( MACOSX ) && ( MACOSX_SDK_VERSION < 1060 ) )
+
 DECLARE_OOXMLEXPORT_TEST(testSdtDateCharformat, "sdt-date-charformat.docx")
 {
     if (xmlDocPtr pXmlDoc = parseExport())
@@ -110,6 +112,8 @@ DECLARE_OOXMLEXPORT_TEST(testSdtDateCharformat, "sdt-date-charformat.docx")
         assertXPath(pXmlDoc, "/w:document/w:body/w:p/w:sdt/w:sdtPr/w:alias", 1);
     }
 }
+
+#endif
 
 DECLARE_OOXMLEXPORT_TEST(testFooterBodyDistance, "footer-body-distance.docx")
 {
@@ -156,12 +160,16 @@ DECLARE_OOXMLEXPORT_TEST(testfdo80897 , "fdo80897.docx")
 }
 
 
+#if !( defined(MACOSX) && (MACOSX_SDK_VERSION < 1060) )
+
 DECLARE_OOXMLEXPORT_TEST(testFdo80997, "fdo80997.docx")
 {
     // The problem was that the DOCX exporter not able to export text behind textbox, if textbox has a wrap property.
     uno::Reference< text::XTextRange > xParagraph = getParagraph( 1 );
     uno::Reference< text::XTextRange > xText = getRun( xParagraph, 1, " text");
 }
+
+#endif
 
 DECLARE_OOXMLEXPORT_TEST(testFdo80902, "fdo80902.docx")
 {
@@ -253,6 +261,8 @@ DECLARE_OOXMLEXPORT_TEST(testEmptyAnnotationMark, "empty-annotation-mark.docx")
     }
 }
 
+#if ! ( defined( MACOSX ) && ( MACOSX_SDK_VERSION < 1060 ) )
+
 DECLARE_OOXMLEXPORT_TEST(testDropdownInCell, "dropdown-in-cell.docx")
 {
     // First problem: table was missing from the document, this was 0.
@@ -268,6 +278,8 @@ DECLARE_OOXMLEXPORT_TEST(testDropdownInCell, "dropdown-in-cell.docx")
     uno::Reference<text::XTextRangeCompare> xTextRangeCompare(xCell, uno::UNO_QUERY);
     CPPUNIT_ASSERT_EQUAL(sal_Int16(0), xTextRangeCompare->compareRegionStarts(xAnchor, xCell));
 }
+
+#endif
 
 DECLARE_OOXMLEXPORT_TEST(testTableAlignment, "table-alignment.docx")
 {
@@ -390,6 +402,8 @@ DECLARE_OOXMLEXPORT_TEST(testRot270Flipv, "rot270-flipv.docx")
     }
 }
 
+#if !( defined(MACOSX) && (MACOSX_SDK_VERSION < 1060) )
+
 DECLARE_OOXMLEXPORT_TEST(testMsoPosition, "bnc884615-mso-position.docx")
 {
     if(xmlDocPtr doc = parseExport("word/footer1.xml"))
@@ -426,6 +440,8 @@ DECLARE_OOXMLEXPORT_TEST(testMsoPosition, "bnc884615-mso-position.docx")
         CPPUNIT_ASSERT( style3.indexOf( ";mso-position-vertical-relative:page" ) >= 0 );
     }
 }
+
+#endif
 
 DECLARE_OOXMLEXPORT_TEST(testWpsCharColor, "wps-char-color.docx")
 {
@@ -635,6 +651,8 @@ DECLARE_OOXMLEXPORT_TEST(testOoxmlNumListZHCN, "numlist-zhcn.odt")
     assertXPath ( pXmlDoc, "/w:numbering/w:abstractNum[1]/w:lvl[1]/w:numFmt","val","chineseCountingThousand" );
 }
 
+#if ! ( defined( MACOSX ) && ( MACOSX_SDK_VERSION < 1060 ) )
+
 DECLARE_OOXMLEXPORT_TEST(testOOxmlOutlineNumberTypes, "outline-number-types.odt")
 {
     if (xmlDocPtr pXmlDoc = parseExport("word/numbering.xml"))
@@ -666,6 +684,8 @@ DECLARE_OOXMLEXPORT_TEST(testOOxmlOutlineNumberTypes, "outline-number-types.odt"
         assertXPath(pXmlDoc, "/w:numbering/w:abstractNum[3]/w:lvl[7]/w:numFmt", "val", "decimal");
     }
 }
+
+#endif
 
 DECLARE_OOXMLEXPORT_TEST(testNumParentStyle, "num-parent-style.docx")
 {

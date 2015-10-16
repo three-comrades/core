@@ -585,6 +585,8 @@ DECLARE_OOXMLEXPORT_TEST(test76317, "test76317.docx")
 
 #endif
 
+#if !( defined(MACOSX) && (MACOSX_SDK_VERSION < 1060) )
+
 DECLARE_OOXMLEXPORT_TEST(fdo76591, "fdo76591.docx")
 {
     xmlDocPtr pXmlDoc = parseExport("word/document.xml");
@@ -592,6 +594,8 @@ DECLARE_OOXMLEXPORT_TEST(fdo76591, "fdo76591.docx")
         return;
     assertXPath(pXmlDoc, "/w:document[1]/w:body[1]/w:p[1]/w:r[3]/mc:AlternateContent[1]/mc:Choice[1]/w:drawing[1]/wp:anchor[1]", "relativeHeight", "3");
 }
+
+#endif
 
 DECLARE_OOXMLEXPORT_TEST(test76317_2K10, "test76317_2K10.docx")
 {
@@ -610,6 +614,8 @@ DECLARE_OOXMLEXPORT_TEST(testFDO77122, "LinkedTextBoxes.docx")
     assertXPath(pXmlDoc, "//wps:linkedTxbx[1]", "id", "1");
 }
 
+#if !( defined(MACOSX) && (MACOSX_SDK_VERSION < 1060) )
+
 DECLARE_OOXMLEXPORT_TEST(test76734_2K7, "test76734_2K7.docx")
 {
     xmlDocPtr pXmlDoc = parseExport("word/document.xml");
@@ -625,6 +631,8 @@ DECLARE_OOXMLEXPORT_TEST(test77219, "test77219.docx")
         return;
     assertXPath(pXmlDoc, "/w:document[1]/w:body[1]/w:p[6]/w:r[1]/mc:AlternateContent[1]/mc:Choice[1]/w:drawing[1]/wp:anchor[1]", "behindDoc", "1");
 }
+
+#endif
 
 DECLARE_OOXMLEXPORT_TEST(testPresetShape, "preset-shape.docx")
 {
@@ -659,6 +667,8 @@ DECLARE_OOXMLEXPORT_TEST(testSdtAndShapeOverlapping,"ShapeOverlappingWithSdt.doc
       assertXPath(pXmlDoc, "/w:document/w:body/w:p/w:sdt[1]/w:sdtContent[1]/w:r[1]/w:t[1]");
 }
 
+#if !( defined(MACOSX) && (MACOSX_SDK_VERSION < 1060) )
+
 DECLARE_OOXMLEXPORT_TEST(testLockedCanvas, "fdo78658.docx")
 {
     xmlDocPtr pXmlDoc = parseExport("word/document.xml");
@@ -667,6 +677,8 @@ DECLARE_OOXMLEXPORT_TEST(testLockedCanvas, "fdo78658.docx")
     // Checking for lockedCanvas tag
     assertXPath(pXmlDoc, "/w:document/w:body/w:p/w:r/mc:AlternateContent/mc:Choice/w:drawing/wp:inline/a:graphic/a:graphicData/lc:lockedCanvas", 1);
 }
+
+#endif
 
 DECLARE_OOXMLEXPORT_TEST(fdo78474, "fdo78474.docx")
 {
@@ -713,6 +725,8 @@ DECLARE_OOXMLEXPORT_TEST(testRubyHyperlink, "rubyhyperlink.fodt")
     // test that export doesn't assert with overlapping ruby / hyperlink attr
 }
 
+#if !( defined(MACOSX) && (MACOSX_SDK_VERSION < 1060) )
+
 DECLARE_OOXMLEXPORT_TEST(testfdo78300,"fdo78300.docx")
 {
     xmlDocPtr pXmlDoc = parseExport("word/document.xml");
@@ -722,6 +736,8 @@ DECLARE_OOXMLEXPORT_TEST(testfdo78300,"fdo78300.docx")
                 "/w:document/w:body/w:r[1]/mc:AlternateContent/mc:Choice/w:drawing[1]/wp:anchor/a:graphic/a:graphicData/wps:wsp/wps:txbx/w:txbxContent/w:p[1]/w:r[1]/w:drawing[1]",
                 0);
 }
+
+#endif
 
 DECLARE_OOXMLEXPORT_TEST(testWordArtWithinDraingtool, "testWordArtWithinDraingtool.docx")
 {
@@ -896,6 +912,8 @@ DECLARE_OOXMLEXPORT_TEST(testfdo79591, "fdo79591.docx")
     assertXPath(pXmlDoc, "/w:document/w:body/w:p/w:r/mc:AlternateContent/mc:Fallback/w:pict/v:shape", "ID", "");
 }
 
+#if !( defined(MACOSX) && (MACOSX_SDK_VERSION < 1060) )
+
 DECLARE_OOXMLEXPORT_TEST(testBnc884615, "bnc884615.docx")
 {
     // The problem was that the shape in the header wasn't in the background.
@@ -912,6 +930,8 @@ DECLARE_OOXMLEXPORT_TEST(testFdo80894, "TextFrameRotation.docx")
     assertXPath(pXmlDoc, "/w:document/w:body/w:p[1]/w:r[2]/mc:AlternateContent/mc:Choice/w:drawing/wp:anchor/a:graphic/a:graphicData/wps:wsp/wps:spPr/a:xfrm",
     "rot","16200000");
 }
+
+#endif
 
 DECLARE_OOXMLEXPORT_TEST(testfdo80895, "fdo80895.docx")
 {
@@ -1005,6 +1025,8 @@ DECLARE_OOXMLEXPORT_TEST(testExportAdjustmentValue, "tdf91429.docx")
 
     assertXPath(pXmlDoc,"/w:document/w:body/w:p/w:r[1]/mc:AlternateContent/mc:Choice/w:drawing/wp:anchor/a:graphic/a:graphicData/wps:wsp/wps:spPr/a:prstGeom/a:avLst/a:gd", "fmla", "val 50000");
 }
+
+#if !( defined(MACOSX) && (MACOSX_SDK_VERSION < 1060) )
 
 DECLARE_OOXMLEXPORT_TEST(testTextVerticalAdjustment, "tdf36117_verticalAdjustment.docx")
 {
@@ -1125,6 +1147,8 @@ DECLARE_OOXMLEXPORT_TEST(testFlipAndRotateCustomShape, "flip_and_rotate.odt")
     assertXPath(pXmlDoc, "//a:custGeom/a:pathLst/a:path/a:lnTo[3]/a:pt", "y", "1701");
 #endif
 }
+
+#endif
 
 #endif
 

@@ -109,7 +109,9 @@ public:
     void testBnc870233_2();
     void testN828390_4();
     void testN828390_5();
+#if ! ( defined( MACOSX ) && ( MACOSX_SDK_VERSION < 1070 ) )
     void testMediaEmbedding();
+#endif
     void testFdo71961();
     void testFdo84043();
     void testN828390();
@@ -137,14 +139,18 @@ public:
     void testParaMarginAndindentation();
     void testTransparentBackground();
     void testExportTransitionsPPTX();
+#if ! ( defined( MACOSX ) && ( MACOSX_SDK_VERSION == 1050 ) )
     void testDatetimeFieldNumberFormat();
     void testDatetimeFieldNumberFormatPPTX();
+#endif
     void testSlideNumberField();
     void testSlideNumberFieldPPTX();
     void testSlideCountField();
     void testSlideNameField();
     void testExtFileField();
+#if ! ( defined( MACOSX ) && ( MACOSX_SDK_VERSION == 1050 ) )
     void testAuthorField();
+#endif
 
     void testFdo90607();
     void testTdf91378();
@@ -165,7 +171,9 @@ public:
     CPPUNIT_TEST(testBnc870233_2);
     CPPUNIT_TEST(testN828390_4);
     CPPUNIT_TEST(testN828390_5);
+#if ! ( defined( MACOSX ) && ( MACOSX_SDK_VERSION < 1070 ) )
     CPPUNIT_TEST(testMediaEmbedding);
+#endif
     CPPUNIT_TEST(testFdo71961);
     CPPUNIT_TEST(testFdo84043);
     CPPUNIT_TEST(testN828390);
@@ -203,14 +211,18 @@ public:
 
     CPPUNIT_TEST(testExportTransitionsPPTX);
     CPPUNIT_TEST(testTdf92527);
+#if ! ( defined( MACOSX ) && ( MACOSX_SDK_VERSION == 1050 ) )
     CPPUNIT_TEST(testDatetimeFieldNumberFormat);
     CPPUNIT_TEST(testDatetimeFieldNumberFormatPPTX);
+#endif
     CPPUNIT_TEST(testSlideNumberField);
     CPPUNIT_TEST(testSlideNumberFieldPPTX);
     CPPUNIT_TEST(testSlideCountField);
     CPPUNIT_TEST(testSlideNameField);
     CPPUNIT_TEST(testExtFileField);
+#if ! ( defined( MACOSX ) && ( MACOSX_SDK_VERSION == 1050 ) )
     CPPUNIT_TEST(testAuthorField);
+#endif
     CPPUNIT_TEST(testTdf99224);
 
     CPPUNIT_TEST_SUITE_END();
@@ -444,6 +456,8 @@ void SdExportTest::testTransparentBackground()
     xDocShRef->DoClose();
 }
 
+#if ! ( defined( MACOSX ) && ( MACOSX_SDK_VERSION < 1070 ) )
+
 void SdExportTest::testMediaEmbedding()
 {
     if (!OpenGLWrapper::isVCLOpenGLEnabled())
@@ -478,6 +492,8 @@ void SdExportTest::testMediaEmbedding()
 
     xDocShRef->DoClose();
 }
+
+#endif
 
 void SdExportTest::testFdo84043()
 {
@@ -1553,6 +1569,8 @@ void SdExportTest::testTdf92527()
     xDocShRef->DoClose();
 }
 
+#if ! ( defined( MACOSX ) && ( MACOSX_SDK_VERSION == 1050 ) )
+
 namespace {
 
 void matchNumberFormat( int nPage, uno::Reference< text::XTextField > xField)
@@ -1614,6 +1632,8 @@ void SdExportTest::testDatetimeFieldNumberFormatPPTX()
 
     xDocShRef->DoClose();
 }
+
+#endif
 
 void SdExportTest::testSlideNumberField()
 {
@@ -1696,6 +1716,8 @@ void SdExportTest::testExtFileField()
     xDocShRef->DoClose();
 }
 
+#if ! ( defined( MACOSX ) && ( MACOSX_SDK_VERSION == 1050 ) )
+
 void SdExportTest::testAuthorField()
 {
     ::sd::DrawDocShellRef xDocShRef = loadURL(m_directories.getURLFromSrc("/sd/qa/unit/data/odp/author_field.odp"), ODP);
@@ -1707,6 +1729,8 @@ void SdExportTest::testAuthorField()
 
     xDocShRef->DoClose();
 }
+
+#endif
 
 void SdExportTest::testTdf99224()
 {
