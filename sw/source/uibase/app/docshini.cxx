@@ -569,7 +569,7 @@ bool  SwDocShell::Load( SfxMedium& rMedium )
         UpdateFontList();
         InitDrawModelAndDocShell(this, m_pDoc ? m_pDoc->getIDocumentDrawModelAccess().GetDrawModel() : nullptr);
 
-        SetError( nErr, OSL_LOG_PREFIX );
+        SAL_WARN( "sw.ui", "error on load: " << nErr );
         bRet = !IsError( nErr );
 
         if (bRet && !m_pDoc->IsInLoadAsynchron() &&
@@ -591,9 +591,10 @@ bool  SwDocShell::LoadFrom( SfxMedium& rMedium )
     if (m_pDoc)
         RemoveLink();
 
-    AddLink();      // set Link and update Data!!
+    AddLink();  // set link and update data
 
     do {        // middle check loop
+
         sal_uInt32 nErr = ERR_SWG_READ_ERROR;
         OUString aStreamName = "styles.xml";
         uno::Reference < container::XNameAccess > xAccess( rMedium.GetStorage(), uno::UNO_QUERY );
@@ -615,10 +616,10 @@ bool  SwDocShell::LoadFrom( SfxMedium& rMedium )
         }
         else
         {
-            OSL_FAIL("Code removed!");
+            OSL_FAIL( "Code removed" );
         }
 
-        SetError( nErr, OSL_LOG_PREFIX );
+        SAL_WARN( "sw.ui", "error on load: " << nErr );
         bRet = !IsError( nErr );
 
     } while( false );

@@ -725,10 +725,8 @@ namespace
                                         xContext, xStorageDoc )
                                 ,   UNO_QUERY_THROW );
             }
-            catch (const Exception&)
-            {
-                DBG_UNHANDLED_EXCEPTION();
-            }
+            catch ( ... )
+            { DBG_UNHANDLED_EXCEPTION(); }
         }
         return _rxContainer;
     }
@@ -748,9 +746,9 @@ Reference< XLibraryContainer > SfxObjectShell::GetDialogContainer()
             return pBasMgr->GetDialogLibraryContainer().get();
     }
     catch (const css::ucb::ContentCreationException& e)
-    {
-        SAL_WARN("sfx.doc", "caught exception " << e.Message);
-    }
+    { SAL_WARN( "sfx.doc", "caught exception " << e.Message ); }
+    catch ( ... )
+    { SAL_WARN( "sfx.doc", "caught exception" ); }
 
     SAL_WARN("sfx.doc", "SfxObjectShell::GetDialogContainer: falling back to the application - is this really expected here?");
 #endif
@@ -772,9 +770,9 @@ Reference< XLibraryContainer > SfxObjectShell::GetBasicContainer()
                 return pBasMgr->GetScriptLibraryContainer().get();
         }
         catch (const css::ucb::ContentCreationException& e)
-        {
-            SAL_WARN("sfx.doc", "caught exception " << e.Message);
-        }
+        { SAL_WARN( "sfx.doc", "caught exception " << e.Message ); }
+        catch ( ... )
+        { SAL_WARN( "sfx.doc", "caught exception" ); }
     }
     SAL_WARN("sfx.doc", "SfxObjectShell::GetBasicContainer: falling back to the application - is this really expected here?");
 #endif

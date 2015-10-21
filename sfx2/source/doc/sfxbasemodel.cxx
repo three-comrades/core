@@ -1509,8 +1509,7 @@ void SAL_CALL SfxBaseModel::storeSelf( const    Sequence< beans::PropertyValue >
               && aSeqArgs[nInd].Name != "FailOnWarning"
               && aSeqArgs[nInd].Name != "CheckIn" )
             {
-                m_pData->m_pObjectShell->AddLog( OSL_LOG_PREFIX "unexpected parameter for storeSelf, might be no problem if SaveAs is executed." );
-                m_pData->m_pObjectShell->StoreLog();
+                SAL_WARN( "sfx.doc", "unexpected parameter for storeSelf, might be no problem if SaveAs is executed" );
 
                 OUString aMessage( "Unexpected MediaDescriptor parameter: "  );
                 aMessage += aSeqArgs[nInd].Name;
@@ -3146,15 +3145,17 @@ void SfxBaseModel::postEvent_Impl( const OUString& aName, const Reference< frame
     if ( impl_isDisposed() )
         return;
 
-    DBG_ASSERT( !aName.isEmpty(), "Empty event name!" );
-    if (aName.isEmpty())
+    if ( aName.isEmpty() )
+    {
+        SAL_WARN( "sfx.doc", "event name is empty" );
         return;
+    }
 
     ::cppu::OInterfaceContainerHelper* pIC =
         m_pData->m_aInterfaceContainer.getContainer( cppu::UnoType<document::XDocumentEventListener>::get());
     if ( pIC )
     {
-        SAL_INFO("sfx.doc", "SfxDocumentEvent: " + aName);
+        SAL_WARN( "sfx.doc", "SfxDocumentEvent: " + aName );
 
         document::DocumentEvent aDocumentEvent( static_cast<frame::XModel*>(this), aName, xController, Any() );
 
@@ -3167,7 +3168,7 @@ void SfxBaseModel::postEvent_Impl( const OUString& aName, const Reference< frame
     pIC = m_pData->m_aInterfaceContainer.getContainer( cppu::UnoType<document::XEventListener>::get());
     if ( pIC )
     {
-        SAL_INFO("sfx.doc", "SfxEvent: " + aName);
+        SAL_WARN( "sfx.doc", "SfxEvent: " + aName );
 
         document::EventObject aEvent( static_cast<frame::XModel*>(this), aName );
 
@@ -3729,6 +3730,8 @@ void SAL_CALL SfxBaseModel::storeToStorage( const Reference< embed::XStorage >& 
             Exception,
             RuntimeException, std::exception )
 {
+    SAL_WARN( "sfx2.doc", "entering " << OSL_THIS_FUNC );
+
     SfxModelGuard aGuard( *this );
 
     Reference< embed::XStorage > xResult;
@@ -3755,11 +3758,13 @@ void SAL_CALL SfxBaseModel::storeToStorage( const Reference< embed::XStorage >& 
         // storing to the own storage
         bSuccess = m_pData->m_pObjectShell->DoSave();
     }
-    else
+    else /* xStorage != m_pData->m_pObjectShell->GetStorage() */
     {
         // TODO/LATER: if the provided storage has some data inside the storing might fail, probably the storage must be truncated
         // TODO/LATER: is it possible to have a template here?
-        m_pData->m_pObjectShell->SetupStorage( xStorage, nVersion, false );
+        try {
+            m_pData->m_pObjectShell->SetupStorage( xStorage, nVersion, false );
+        } catch ( ... ) { }
 
         // BaseURL is part of the ItemSet
         SfxMedium aMedium( xStorage, OUString(), &aSet );
@@ -3781,7 +3786,7 @@ void SAL_CALL SfxBaseModel::storeToStorage( const Reference< embed::XStorage >& 
         nError = nError ? nError : ERRCODE_IO_GENERAL;
         throw task::ErrorCodeIOException(
             "SfxBaseModel::storeToStorage: 0x" + OUString::number(nError, 16),
-            Reference< XInterface >(), nError);
+            Reference< XInterface >(), nError );
     }
 }
 

@@ -446,7 +446,7 @@ void SfxObjectShell::UpdateFromTemplate_Impl(  )
             }
             catch (const Exception& e)
             {
-                SAL_INFO("sfx.doc", "caught exception" << e.Message);
+                SAL_WARN( "sfx.doc", "caught exception: " << e.Message );
             }
 
             // if modify date was read successfully
@@ -653,7 +653,7 @@ bool SfxObjectShell::IsModifyPasswordEntered()
 
 void SfxObjectShell::libreOfficeKitCallback(int /*nType*/, const char* /*pPayload*/) const
 {
-    SAL_INFO("sfx.tiledrendering", "SfxObjectShell::libreOfficeKitCallback interface not overridden for SfxObjectShell subclass typeId: " << typeid(*this).name());
+    SAL_WARN( "sfx.tiledrendering", OSL_THIS_FUNC << "interface not overridden for SfxObjectShell subclass typeId " << typeid(*this).name() );
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

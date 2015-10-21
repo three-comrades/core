@@ -226,12 +226,23 @@ void OStorageHelper::SetCommonStorageEncryptionData(
 
 sal_Int32 OStorageHelper::GetXStorageFormat(
             const uno::Reference< embed::XStorage >& xStorage )
-        throw ( uno::Exception, std::exception )
 {
-    uno::Reference< beans::XPropertySet > xStorProps( xStorage, uno::UNO_QUERY_THROW );
+    SAL_INFO( "comphelper.misc", "entering " << OSL_THIS_FUNC );
+
+    uno::Reference< beans::XPropertySet > xStorProps( xStorage, uno::UNO_QUERY );
+    if ( ! xStorProps.is() )
+    {
+        SAL_WARN( "comphelper.misc", "unable to get properties of storage" );
+        return SOFFICE_FILEFORMAT_CURRENT;
+    }
 
     OUString aMediaType;
     xStorProps->getPropertyValue("MediaType") >>= aMediaType;
+    if ( aMediaType.isEmpty() )
+    {
+        SAL_WARN( "comphelper.misc", "unable to get type of media property" );
+        return SOFFICE_FILEFORMAT_CURRENT;
+    }
 
     sal_Int32 nResult = 0;
 
@@ -274,14 +285,19 @@ sal_Int32 OStorageHelper::GetXStorageFormat(
     }
     else
     {
-        // the mediatype is not known
-        OUString aMsg(OSL_THIS_FUNC);
-        aMsg += ":";
-        aMsg += OUString::number(__LINE__);
-        aMsg += ": unknown media type '";
-        aMsg += aMediaType;
-        aMsg += "'";
-        throw beans::IllegalTypeException(aMsg);
+        // the type of media is not known
+        OUString msg( OSL_THIS_FUNC );
+        msg += ":";
+        msg += OUString::number(__LINE__);
+        //msg += ": unknown media type '";
+        //msg += aMediaType;
+        //msg += "'";
+        OString oMediaType = OUStringToOString( aMediaType, RTL_TEXTENCODING_ASCII_US );
+        SAL_INFO( "comphelper.misc",
+                  msg << ": unknown media type" <<
+                  " \'" << oMediaType.pData->buffer << "\'" );
+        // assume it fits to format which is used now
+        return SOFFICE_FILEFORMAT_CURRENT;
     }
 
     return nResult;
