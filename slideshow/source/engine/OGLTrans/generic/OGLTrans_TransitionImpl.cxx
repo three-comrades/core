@@ -35,6 +35,7 @@
 #include <array>
 #include <utility>
 
+#include <boost/math/special_functions/next.hpp>
 #include <comphelper/random.hxx>
 
 #include "OGLTrans_TransitionImpl.hxx"
@@ -868,7 +869,7 @@ std::shared_ptr<OGLTransitionImpl> makeRochade()
 
 inline double randFromNeg1to1()
 {
-    return comphelper::rng::uniform_real_distribution(-1.0, std::nextafter(1.0, DBL_MAX));
+    return comphelper::rng::uniform_real_distribution(-1.0, boost::math::nextafter(1.0, DBL_MAX));
 }
 
 // TODO(Q3): extract to basegfx
