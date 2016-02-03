@@ -1,0 +1,153 @@
+--- builds/posix/prefix.darwin_powerpc
++++ builds/posix/prefix.darwin_powerpc
+@@ -25,8 +25,8 @@
+ 
+ OS_ServerFiles=inet_server.cpp
+ 
+-PROD_FLAGS=-DNDEBUG -DDARWIN -pipe -p -MMD -fPIC -fno-common -arch ppc -mmacosx-version-min=10.2
+-DEV_FLAGS=-ggdb -DDARWIN -pipe -p -MMD -fPIC -fno-common -Wall -arch ppc -mmacosx-version-min=10.2
++PROD_FLAGS=-DNDEBUG -DDARWIN -pipe -p -MMD -fPIC -fno-common
++DEV_FLAGS=-ggdb -DDARWIN -pipe -p -MMD -fPIC -fno-common -Wall
+ CXXFLAGS:=$(CXXFLAGS) -fvisibility-inlines-hidden -fvisibility=hidden -fno-weak
+ EMBED_UTIL_TARGETS=gstat gds_relay gsec fbguard nbackup fb_lock_print fbsvcmgr fbtracemgr
+ CLIENT_UTIL_TARGETS=gds_relay gstat gsec fbguard fbmgr_bin nbackup fb_lock_print fbsvcmgr fbtracemgr
+--- extern/btyacc/Makefile
++++ extern/btyacc/Makefile
+@@ -17,7 +17,7 @@
+ # No LDFLAGS
+ #LDFLAGS=
+ 
+-LIBS=
++LIBS = -lSystemStubs
+ 
+ # For GNU environment, gmake will set $CC to gcc
+ # Other environments will have different values, maybe no GNU installed!
+--- src/common/classes/semaphore.h
++++ src/common/classes/semaphore.h
+@@ -93,49 +93,7 @@
+ 
+ #else // WINNT
+ 
+-#if defined(DARWIN)
+-
+-// Mach semaphore
+-#define COMMON_CLASSES_SEMAPHORE_MACH
+-#include <dispatch/dispatch.h>
+-
+-namespace Firebird
+-{
+-
+-class MemoryPool;
+-
+-class SignalSafeSemaphore
+-{
+-private:
+-	dispatch_semaphore_t semaphore;
+-
+-	void init();
+-
+-public:
+-	SignalSafeSemaphore() { init(); }
+-	explicit SignalSafeSemaphore(MemoryPool&) { init(); }
+-
+-	~SignalSafeSemaphore();
+-
+-	void enter()
+-	{
+-		dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+-	}
+-
+-	void release(SLONG count = 1)
+-	{
+-		fb_assert(count >= 0);
+-		while (count--)
+-		{
+-			dispatch_semaphore_signal(semaphore);
+-		}
+-	}
+-};
+-
+-} // namespace Firebird
+-
+-
+-#elif defined(HAVE_SEMAPHORE_H)
++#if defined(HAVE_SEMAPHORE_H)
+ 
+ #define COMMON_CLASSES_SEMAPHORE_POSIX_RT
+ #include <semaphore.h>
+@@ -190,8 +148,53 @@
+ 
+ #else // posix OS choice - not found a way to have SignalSafeSemaphore
+ 
++#if defined(DARWIN)
++
++// Mach semaphore
++#define COMMON_CLASSES_SEMAPHORE_MACH
++#include <dispatch/dispatch.h>
++
++namespace Firebird
++{
++
++class MemoryPool;
++
++class SignalSafeSemaphore
++{
++private:
++	dispatch_semaphore_t semaphore;
++
++	void init();
++
++public:
++	SignalSafeSemaphore() { init(); }
++	explicit SignalSafeSemaphore(MemoryPool&) { init(); }
++
++	~SignalSafeSemaphore();
++
++	void enter()
++	{
++		dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
++	}
++
++	void release(SLONG count = 1)
++	{
++		fb_assert(count >= 0);
++		while (count--)
++		{
++			dispatch_semaphore_signal(semaphore);
++		}
++	}
++};
++
++} // namespace Firebird
++
++#else
++
+ #define CLASSES_SEMAPHORE_H_NO_SS_SEM
+ 
++#endif
++
+ #endif // posix OS choice
+ 
+ #ifdef CLASSES_SEMAPHORE_H_HAS_TRYENTER
+--- configure.in
++++ configure.in
+@@ -95,7 +95,7 @@
+     PLATFORM=DARWIN
+     INSTALL_PREFIX=darwin
+     AC_DEFINE(DARWIN, 1, [Define this if OS is DARWIN])
+-	XE_APPEND(-framework CoreFoundation,LIBS)
++	XE_APPEND(-lSystemStubs -framework CoreFoundation,LIBS)
+     EDITLINE_FLG=Y
+     SHRLIB_EXT=dylib
+     ICU_PLATFORM=MacOSX
+--- configure
++++ configure
+@@ -2399,7 +2399,7 @@
+ #define DARWIN 1
+ _ACEOF
+ 
+-	LIBS="$LIBS -framework CoreFoundation"
++	LIBS="$LIBS -lSystemStubs -framework CoreFoundation"
+     EDITLINE_FLG=Y
+     SHRLIB_EXT=dylib
+     ICU_PLATFORM=MacOSX
