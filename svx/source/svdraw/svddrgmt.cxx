@@ -3270,7 +3270,7 @@ void SdrDragCrook::MoveSdrDrag(const Point& rPnt)
             aCenter=aNeuCenter;
             aFact=aNeuFact;
             aRad=Point(nNeuRad,nNeuRad);
-            bResize=aFact!=Fraction(1,1) && aFact.GetDenominator()!=0 && aFact.IsValid();
+            bResize = aFact != Fraction(1,1) && aFact.GetDenominator() != 0 && aFact.IsOkay();
             DragStat().NextMove(aPnt);
             Show();
         }

@@ -33,21 +33,20 @@ class SAL_WARN_UNUSED TOOLS_DLLPUBLIC Fraction
 
     std::unique_ptr<Impl> mpImpl;
 
-    bool            HasOverflowValue();
+    bool            HasOutsideOf32bitValue();
 
 public:
                     Fraction();
                     Fraction( const Fraction & rFrac );
-                    Fraction( long nNum, long nDen=1 );
+                    Fraction( sal_Int32 nNum, sal_Int32 nDen = 1 );
                     Fraction( double dVal );
                     ~Fraction();
 
-    bool            IsValid() const;
+    bool            IsOkay() const;
 
-    long            GetNumerator() const;
-    long            GetDenominator() const;
+    sal_Int64       GetNumerator() const;
+    sal_Int64       GetDenominator() const;
 
-    operator        long() const;
     operator        double() const;
 
     Fraction&       operator=( const Fraction& rfrFrac );
@@ -57,7 +56,7 @@ public:
     Fraction&       operator*=( const Fraction& rfrFrac );
     Fraction&       operator/=( const Fraction& rfrFrac );
 
-    void            ReduceInaccurate( unsigned nSignificantBits );
+    void            ReduceInaccurate( size_t nSignificantBits );
 
     TOOLS_DLLPUBLIC friend Fraction operator+( const Fraction& rVal1, const Fraction& rVal2 );
     TOOLS_DLLPUBLIC friend Fraction operator-( const Fraction& rVal1, const Fraction& rVal2 );

@@ -32,13 +32,27 @@ void MoveXPoly(XPolygon& rPoly, const Size& S)
     rPoly.Move(S.Width(),S.Height());
 }
 
+void ResizePoint(Point& rPnt, const Point& rRef, Fraction xFact, Fraction yFact)
+{
+    if ( !xFact.IsOkay() ) {
+        SAL_WARN( "svx.svdraw", "fraction xFact looks too precise so use 1/1 as “don't scale”" );
+        xFact = Fraction(1,1);
+    }
+    if ( !yFact.IsOkay() ) {
+        SAL_WARN( "svx.svdraw", "fraction yFact looks too precise so use 1/1 as “don't scale”" );
+        yFact = Fraction(1,1);
+    }
+    rPnt.X() = rRef.X() + svx::Round( (rPnt.X() - rRef.X()) * double(xFact) );
+    rPnt.Y() = rRef.Y() + svx::Round( (rPnt.Y() - rRef.Y()) * double(yFact) );
+}
+
 void ResizeRect(Rectangle& rRect, const Point& rRef, const Fraction& rxFact, const Fraction& ryFact)
 {
     Fraction aXFact(rxFact);
     Fraction aYFact(ryFact);
 
-    if (!aXFact.IsValid()) {
-        SAL_WARN( "svx.svdraw", "invalid fraction xFract, using Fraction(1,1)" );
+    if ( !aXFact.IsOkay() ) {
+        SAL_WARN( "svx.svdraw", "fraction xFact looks too precise" );
         aXFact = Fraction(1,1);
         long nWdt = rRect.Right() - rRect.Left();
         if (nWdt == 0) rRect.Right()++;
@@ -46,8 +60,8 @@ void ResizeRect(Rectangle& rRect, const Point& rRef, const Fraction& rxFact, con
     rRect.Left()  = rRef.X() + svx::Round( (rRect.Left()  - rRef.X()) * double(aXFact) );
     rRect.Right() = rRef.X() + svx::Round( (rRect.Right() - rRef.X()) * double(aXFact) );
 
-    if (!aYFact.IsValid()) {
-        SAL_WARN( "svx.svdraw", "invalid fraction yFract, using Fraction(1,1)" );
+    if ( !aYFact.IsOkay() ) {
+        SAL_WARN( "svx.svdraw", "fraction yFact looks too precise" );
         aYFact = Fraction(1,1);
         long nHgt = rRect.Bottom() - rRect.Top();
         if (nHgt == 0) rRect.Bottom()++;

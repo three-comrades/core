@@ -59,6 +59,7 @@ inline void MovePoint(Point& rPnt, const Size& S)        { rPnt.X()+=S.Width(); 
 inline void MovePoly(tools::Polygon& rPoly, const Size& S)      { rPoly.Move(S.Width(),S.Height()); }
 void MoveXPoly(XPolygon& rPoly, const Size& S);
 
+SVX_DLLPUBLIC void ResizePoint(Point& rPnt, const Point& rRef, Fraction xFact, Fraction yFact);
 SVX_DLLPUBLIC void ResizeRect(Rectangle& rRect, const Point& rRef, const Fraction& xFact, const Fraction& yFact);
 inline void ResizePoint(Point& rPnt, const Point& rRef, const Fraction& xFract, const Fraction& yFract);
 void ResizePoly(tools::Polygon& rPoly, const Point& rRef, const Fraction& xFact, const Fraction& yFact);
