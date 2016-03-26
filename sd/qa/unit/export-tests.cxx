@@ -1689,12 +1689,14 @@ void SdExportTest::testExtFileField()
 
     xDocShRef = saveAndReload( xDocShRef, PPTX );
 
-    for(sal_uInt16 i = 0; i <= 3; ++i)
+    for ( sal_uInt16 i = 0; i < 4; ++i )
     {
         uno::Reference< text::XTextField > xField = getTextFieldFromPage(0, 0, i, 0, xDocShRef);
-        CPPUNIT_ASSERT_MESSAGE("Where is the text field?", xField.is() );
+        CPPUNIT_ASSERT_MESSAGE( "Where is the text field?", xField.is() );
 
-        uno::Reference< beans::XPropertySet > xPropSet( xField, uno::UNO_QUERY_THROW );
+        uno::Reference< beans::XPropertySet > xPropSet( xField, uno::UNO_QUERY );
+        CPPUNIT_ASSERT_MESSAGE( "Where is property set?", xPropSet.is() );
+
         sal_Int32 nNumFmt;
         xPropSet->getPropertyValue("FileFormat") >>= nNumFmt;
         switch( i )
