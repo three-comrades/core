@@ -3861,7 +3861,7 @@ void RtfAttributeOutput::FlyFrameGraphic(const SwFlyFrameFormat* pFlyFrameFormat
             pGraphicAry = nullptr;
             break;
 
-        case GfxLinkType::NativeJpg:
+        case GfxLinkType::NativeJpeg:
             pBLIPType = OOO_STRING_SVTOOLS_RTF_JPEGBLIP;
             break;
         case GfxLinkType::NativePng:
