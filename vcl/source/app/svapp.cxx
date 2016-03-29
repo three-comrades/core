@@ -35,6 +35,7 @@
 
 #include <unotools/configmgr.hxx>
 #include <unotools/syslocaleoptions.hxx>
+#include <unotools/bootstrap.hxx>
 
 #include <vcl/dialog.hxx>
 #include <vcl/floatwin.hxx>
@@ -1231,6 +1232,19 @@ OUString Application::GetHWOSConfInfo()
     else
 #endif
         aDetails.append( VclResId(SV_APP_DEFAULT).toString() );
+    aDetails.append( "; " );
+
+    // get information about user's profile
+    OUString sUserPathURL;
+    ::utl::Bootstrap::locateUserData( sUserPathURL );
+    OUString fsUserPath;
+    ::osl::FileBase::getSystemPathFromFileURL( sUserPathURL, fsUserPath );
+    if ( fsUserPath.isEmpty() )
+        fsUserPath = "-";
+
+    aDetails.append( "\n" );
+    aDetails.append( VclResId( SV_APP_USERDATA ).toString() );
+    aDetails.append( fsUserPath );
     aDetails.append( "; " );
 
     return aDetails.makeStringAndClear();
