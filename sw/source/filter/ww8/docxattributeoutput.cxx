@@ -248,6 +248,8 @@ static bool lcl_isOnelinerSdt(const OUString& rName)
 
 void DocxAttributeOutput::StartParagraph( ww8::WW8TableNodeInfo::Pointer_t pTextNodeInfo )
 {
+    SAL_WARN( "sw.ww8", "<StartParagraph>" );
+
     if ( m_nColBreakStatus == COLBRK_POSTPONE )
         m_nColBreakStatus = COLBRK_WRITE;
 
@@ -336,6 +338,8 @@ void DocxAttributeOutput::StartParagraph( ww8::WW8TableNodeInfo::Pointer_t pText
 
     m_bParagraphOpened = true;
     m_bIsFirstParagraph = false;
+
+    SAL_WARN( "sw.ww8", "</StartParagraph>" );
 }
 
 static void lcl_deleteAndResetTheLists( rtl::Reference<sax_fastparser::FastAttributeList>& pSdtPrTokenChildren, rtl::Reference<sax_fastparser::FastAttributeList>& pSdtPrDataBindingAttrs, OUString& rSdtPrAlias)
@@ -350,6 +354,7 @@ static void lcl_deleteAndResetTheLists( rtl::Reference<sax_fastparser::FastAttri
 
 void DocxAttributeOutput::PopulateFrameProperties(const SwFrameFormat* pFrameFormat, const Size& rSize)
 {
+    SAL_WARN( "sw.ww8", "<PopulateFrameProperties>" );
 
     sax_fastparser::FastAttributeList* attrList = FastSerializerHelper::createAttrList();
 
@@ -416,6 +421,8 @@ void DocxAttributeOutput::PopulateFrameProperties(const SwFrameFormat* pFrameFor
 
     sax_fastparser::XFastAttributeListRef xAttrList(attrList);
     m_pSerializer->singleElementNS( XML_w, XML_framePr, xAttrList );
+
+    SAL_WARN( "sw.ww8", "</PopulateFrameProperties>" );
 }
 
 bool DocxAttributeOutput::TextBoxIsFramePr(const SwFrameFormat& rFrameFormat)
@@ -834,6 +841,8 @@ void DocxAttributeOutput::SectionBreaks(const SwNode& rNode)
 
 void DocxAttributeOutput::StartParagraphProperties()
 {
+    SAL_WARN( "sw.ww8", "<StartParagraphProperties>" );
+
     m_pSerializer->mark(Tag_StartParagraphProperties);
 
     m_pSerializer->startElementNS( XML_w, XML_pPr, FSEND );
@@ -846,6 +855,8 @@ void DocxAttributeOutput::StartParagraphProperties()
     }
 
     InitCollectedParagraphProperties();
+
+    SAL_WARN( "sw.ww8", "</StartParagraphProperties>" );
 }
 
 void DocxAttributeOutput::InitCollectedParagraphProperties()
@@ -905,6 +916,8 @@ void DocxAttributeOutput::InitCollectedParagraphProperties()
 
 void DocxAttributeOutput::WriteCollectedParagraphProperties()
 {
+    SAL_INFO( "sw.ww8", "<WriteCollectedParagraphProperties>" );
+
     if ( m_rExport.SdrExporter().getFlyAttrList().is() )
     {
         XFastAttributeListRef xAttrList( m_rExport.SdrExporter().getFlyAttrList().get() );
@@ -928,6 +941,8 @@ void DocxAttributeOutput::WriteCollectedParagraphProperties()
 
         m_pSerializer->singleElementNS( XML_w, XML_shd, xAttrList );
     }
+
+    SAL_INFO( "sw.ww8", "</WriteCollectedParagraphProperties>" );
 }
 
 namespace
@@ -968,6 +983,8 @@ void lcl_writeParagraphMarkerProperties(DocxAttributeOutput& rAttributeOutput, c
 
 void DocxAttributeOutput::EndParagraphProperties(const SfxItemSet& rParagraphMarkerProperties, const SwRedlineData* pRedlineData, const SwRedlineData* pRedlineParagraphMarkerDeleted, const SwRedlineData* pRedlineParagraphMarkerInserted)
 {
+    SAL_WARN( "sw.ww8", "<EndParagraphProperties>" );
+
     // Call the 'Redline' function. This will add redline (change-tracking) information that regards to paragraph properties.
     // This includes changes like 'Bold', 'Underline', 'Strikethrough' etc.
 
@@ -1020,7 +1037,7 @@ void DocxAttributeOutput::EndParagraphProperties(const SfxItemSet& rParagraphMar
         EndRedline( pRedlineParagraphMarkerInserted );
     }
 
-    // mergeTopMarks() after paragraph mark properties child elements.
+    // mergeTopMarks() after paragraph mark properties child elements
     m_pSerializer->mergeTopMarks(Tag_InitCollectedRunProperties);
     m_pSerializer->endElementNS( XML_w, XML_rPr );
 
@@ -1036,10 +1053,10 @@ void DocxAttributeOutput::EndParagraphProperties(const SfxItemSet& rParagraphMar
 
     m_pSerializer->endElementNS( XML_w, XML_pPr );
 
-    // RDF metadata for this text node.
+    // RDF metadata for this text node
     SwTextNode* pTextNode = m_rExport.m_pCurPam->GetNode().GetTextNode();
     std::map<OUString, OUString> aStatements = SwRDFHelper::getTextNodeStatements("urn:bails", *pTextNode);
-    if (!aStatements.empty())
+    if ( !aStatements.empty() )
     {
         m_pSerializer->startElementNS(XML_w, XML_smartTag,
                                       FSNS(XML_w, XML_uri), "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -1054,6 +1071,8 @@ void DocxAttributeOutput::EndParagraphProperties(const SfxItemSet& rParagraphMar
         m_pSerializer->endElementNS(XML_w, XML_smartTagPr);
         m_pSerializer->endElementNS(XML_w, XML_smartTag);
     }
+    else
+        SAL_WARN( "sw.ww8", "RDF metadata is empty" );
 
     if ( m_nColBreakStatus == COLBRK_WRITE )
     {
@@ -1068,6 +1087,8 @@ void DocxAttributeOutput::EndParagraphProperties(const SfxItemSet& rParagraphMar
     // merge the properties _before_ the run (strictly speaking, just
     // after the start of the paragraph)
     m_pSerializer->mergeTopMarks(Tag_StartParagraphProperties, sax_fastparser::MergeMarks::PREPEND);
+
+    SAL_WARN( "sw.ww8", "</EndParagraphProperties>" );
 }
 
 void DocxAttributeOutput::SetStateOfFlyFrame( FlyProcessingState nStateOfFlyFrame )
@@ -1730,6 +1751,8 @@ void DocxAttributeOutput::StartRunProperties()
 
 void DocxAttributeOutput::InitCollectedRunProperties()
 {
+    SAL_INFO( "sw.ww8", "<InitCollectedRunProperties>" );
+
     m_pFontsAttrList = nullptr;
     m_pEastAsianLayoutAttrList = nullptr;
     m_pCharLangAttrList = nullptr;
@@ -1799,6 +1822,8 @@ void DocxAttributeOutput::InitCollectedRunProperties()
         aSeqOrder[i] = aOrder[i];
 
     m_pSerializer->mark(Tag_InitCollectedRunProperties, aSeqOrder);
+
+    SAL_INFO( "sw.ww8", "</InitCollectedRunProperties>" );
 }
 
 namespace
@@ -1966,6 +1991,8 @@ void lclProcessRecursiveGrabBag(sal_Int32 aElementId, const css::uno::Sequence<c
 
 void DocxAttributeOutput::WriteCollectedRunProperties()
 {
+    SAL_INFO( "sw.ww8", "<WriteCollectedRunProperties>" );
+
     // Write all differed properties
     if ( m_pFontsAttrList.is() )
     {
@@ -2010,6 +2037,8 @@ void DocxAttributeOutput::WriteCollectedRunProperties()
         }
         m_aTextEffectsGrabBag.clear();
     }
+
+    SAL_INFO( "sw.ww8", "</WriteCollectedRunProperties>" );
 }
 
 void DocxAttributeOutput::EndRunProperties( const SwRedlineData* pRedlineData )
@@ -2206,7 +2235,6 @@ void DocxAttributeOutput::RawText(const OUString& /*rText*/, rtl_TextEncoding /*
 
 void DocxAttributeOutput::StartRuby( const SwTextNode& rNode, sal_Int32 nPos, const SwFormatRuby& rRuby )
 {
-    OSL_TRACE("TODO DocxAttributeOutput::StartRuby( const SwTextNode& rNode, const SwFormatRuby& rRuby )" );
     EndRun(); // end run before starting ruby to avoid nested runs, and overlap
     assert(!m_closeHyperlinkInThisRun); // check that no hyperlink overlaps ruby
     assert(!m_closeHyperlinkInPreviousRun);
@@ -2270,7 +2298,6 @@ void DocxAttributeOutput::StartRuby( const SwTextNode& rNode, sal_Int32 nPos, co
 
 void DocxAttributeOutput::EndRuby()
 {
-    OSL_TRACE( "TODO DocxAttributeOutput::EndRuby()" );
     EndRun( );
     m_pSerializer->endElementNS( XML_w, XML_rubyBase );
     m_pSerializer->endElementNS( XML_w, XML_ruby );
@@ -2589,9 +2616,11 @@ void DocxAttributeOutput::FormatDrop( const SwTextNode& /*rNode*/, const SwForma
 
 void DocxAttributeOutput::ParagraphStyle( sal_uInt16 nStyle )
 {
+    SAL_WARN( "sw.ww8", "<ParagraphStyle>" );
     OString aStyleId(m_rExport.m_pStyles->GetStyleId(nStyle));
 
     m_pSerializer->singleElementNS( XML_w, XML_pStyle, FSNS( XML_w, XML_val ), aStyleId.getStr(), FSEND );
+    SAL_WARN( "sw.ww8", "</ParagraphStyle>" );
 }
 
 static void impl_borderLine( FSHelperPtr pSerializer, sal_Int32 elementToken, const SvxBorderLine* pBorderLine, sal_uInt16 nDist,

@@ -656,6 +656,7 @@ FlyProcessingState SwWW8AttrIter::OutFlys(sal_Int32 nSwPos)
         }
         ++maFlyIter;
     }
+
     return ( m_rExport.AttrOutput().IsFlyProcessingPostponed() ? FLY_POSTPONED : FLY_PROCESSED ) ;
 }
 
@@ -1406,6 +1407,7 @@ const SwRedlineData* SwWW8AttrIter::GetParagraphLevelRedline( )
             }
         }
     }
+
     return nullptr;
 }
 
@@ -2034,7 +2036,8 @@ void MSWordExportBase::GetSortedBookmarks( const SwTextNode& rNode, sal_Int32 nA
 
 void MSWordExportBase::OutputTextNode( const SwTextNode& rNode )
 {
-    SAL_INFO( "sw.ww8", "<OutWW8_SwTextNode>" );
+    SAL_WARN( "sw.ww8", "<OutputTextNode>" );
+    SAL_WARN( "sw.ww8", "\"" << rNode.GetText() << "\"" );
 
     ww8::WW8TableNodeInfo::Pointer_t pTextNodeInfo( m_pTableInfo->getTableNodeInfo( &rNode ) );
 
@@ -2104,6 +2107,7 @@ void MSWordExportBase::OutputTextNode( const SwTextNode& rNode )
     {
         OUString sBkmkName =  "_toc" + OUString::number( rNode.GetIndex() );
         AppendWordBookmark( sBkmkName );
+        SAL_WARN( "sw.ww8", "appended bookmark" );
     }
 
     const OUString& aStr( rNode.GetText() );
@@ -2115,12 +2119,14 @@ void MSWordExportBase::OutputTextNode( const SwTextNode& rNode )
     OUString aStringForImage("\001");
 
     ww8::WW8TableNodeInfoInner::Pointer_t pTextNodeInfoInner;
-    if ( pTextNodeInfo.get() != nullptr )
+    if ( pTextNodeInfo.get() )
     {
         pTextNodeInfoInner = pTextNodeInfo->getFirstInner();
     }
 
     do {
+        SAL_WARN( "sw.ww8", OUString::number( nAktPos ) << " = nAktPos" );
+
         const SwRedlineData* pRedlineData = aAttrIter.GetRunLevelRedline( nAktPos );
         FlyProcessingState nStateOfFlyFrame = FLY_PROCESSED;
         bool bPostponeWritingText    = false ;
@@ -2436,11 +2442,9 @@ void MSWordExportBase::OutputTextNode( const SwTextNode& rNode )
     if ( m_pParentFrame && IsInTable() )    // Fly-Attrs
         OutputFormat( m_pParentFrame->GetFrameFormat(), false, false, true );
 
-    if ( pTextNodeInfo.get() != nullptr )
+    if ( pTextNodeInfo.get() )
     {
-#ifdef DBG_UTIL
-        SAL_INFO( "sw.ww8", pTextNodeInfo->toString());
-#endif
+        SAL_WARN( "sw.ww8", "TextNodeInfo \"" << pTextNodeInfo->toString() << "\"" );
 
         AttrOutput().TableInfoCell( pTextNodeInfoInner );
         if (pTextNodeInfoInner->isFirstInTable())
@@ -2448,13 +2452,15 @@ void MSWordExportBase::OutputTextNode( const SwTextNode& rNode )
             const SwTable * pTable = pTextNodeInfoInner->getTable();
 
             const SwTableFormat* pTabFormat = pTable->GetFrameFormat();
-            if (pTabFormat != nullptr)
+            if ( pTabFormat )
             {
                 if (pTabFormat->GetBreak().GetBreak() == SVX_BREAK_PAGE_BEFORE)
                     AttrOutput().PageBreakBefore(true);
             }
         }
     }
+    else
+        SAL_WARN( "sw.ww8", "no TextNodeInfo" );
 
     if ( !bFlyInTable )
     {
@@ -2769,9 +2775,9 @@ void MSWordExportBase::OutputTextNode( const SwTextNode& rNode )
             // then properties on character 8 are for the paragraph marker
             if( (endPos) && (startPos == *endPos ) && (*endPos == rNode.GetText().getLength()) )
             {
-                SAL_INFO( "sw.ww8", startPos << "startPos == endPos" << *endPos);
+                SAL_WARN( "sw.ww8", startPos << " startPos == endPos " << *endPos );
                 sal_uInt16 nWhich = pHt->GetAttr().Which();
-                SAL_INFO( "sw.ww8", "nWhich" << nWhich);
+                SAL_WARN( "sw.ww8", "nWhich = " << nWhich );
                 if (nWhich == RES_TXTATR_AUTOFMT || nWhich == RES_TXTATR_CHARFMT)
                     aParagraphMarkerProperties.Put(pHt->GetAttr());
                 if (nWhich != RES_TXTATR_CHARFMT)
@@ -2790,7 +2796,7 @@ void MSWordExportBase::OutputTextNode( const SwTextNode& rNode )
 
     AttrOutput().EndParagraph( pTextNodeInfoInner );
 
-    SAL_INFO( "sw.ww8", "</OutWW8_SwTextNode>" );
+    SAL_INFO( "sw.ww8", "</OutputTextNode>" );
 }
 
 // Tables
@@ -3061,24 +3067,29 @@ void WW8AttributeOutput::Redline( const SwRedlineData* pRedline )
 
 void MSWordExportBase::OutputContentNode( const SwContentNode& rNode )
 {
+    SAL_WARN( "sw.ww8", "<OutputContentNode>" );
     switch ( rNode.GetNodeType() )
     {
         case ND_TEXTNODE:
-        {
-            const SwTextNode& rTextNode = *rNode.GetTextNode();
-            OutputTextNode( rTextNode );
-        }
-        break;
+            SAL_WARN( "sw.ww8", "it's TextNode" );
+            {
+                const SwTextNode* rTextNode = rNode.GetTextNode();
+                OutputTextNode( *rTextNode );
+            }
+            break;
         case ND_GRFNODE:
+            SAL_WARN( "sw.ww8", "it's GrfNode" );
             OutputGrfNode( *rNode.GetGrfNode() );
             break;
         case ND_OLENODE:
+            SAL_WARN( "sw.ww8", "it's OLENode" );
             OutputOLENode( *rNode.GetOLENode() );
             break;
         default:
-            OSL_TRACE("Unhandled node, type == %d", rNode.GetNodeType() );
+            SAL_WARN( "sw.ww8", "unhandled node of type " << OUString::number( rNode.GetNodeType() ) );
             break;
     }
+    SAL_WARN( "sw.ww8", "</OutputContentNode>" );
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

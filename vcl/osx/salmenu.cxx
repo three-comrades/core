@@ -675,7 +675,7 @@ void AquaSalMenu::SetAccelerator( unsigned /*nPos*/, SalMenuItem* pSalMenuItem, 
     sal_uInt16 nModifier;
     sal_Unicode nCommandKey = 0;
 
-    sal_uInt16 nKeyCode=rKeyCode.GetCode();
+    sal_uInt16 nKeyCode = rKeyCode.GetCode();
     if( nKeyCode )
     {
         if ((nKeyCode>=KEY_A) && (nKeyCode<=KEY_Z))           // letter A..Z
@@ -722,7 +722,8 @@ void AquaSalMenu::SetAccelerator( unsigned /*nPos*/, SalMenuItem* pSalMenuItem, 
     else // not even a code ? nonsense -> ignore
         return;
 
-    DBG_ASSERT( nCommandKey, "unmapped accelerator key" );
+    if ( nCommandKey == 0 )
+        SAL_WARN( "vcl.osx" , "unmapped accelerator for key code 0x" << OUString::number(nKeyCode, 16) );
 
     nModifier=rKeyCode.GetModifier();
 
