@@ -158,7 +158,11 @@ void OutputDevice::disposeOnce()
     // we should introduce this assert:
     //    assert( mnRefCnt > 0 );
 
-    dispose();
+    try {
+        dispose();
+    }
+    catch ( ... )
+    {   SAL_WARN( "vcl.gdi", "exception caught while disposing" );   }
 }
 
 void OutputDevice::dispose()
@@ -180,10 +184,9 @@ void OutputDevice::dispose()
     delete mpOutDevData;
     mpOutDevData = nullptr;
 
-    // for some reason, we haven't removed state from the stack properly
     if ( !mpOutDevStateStack->empty() )
     {
-        SAL_WARN( "vcl.gdi", "OutputDevice::~OutputDevice(): OutputDevice::Push() calls != OutputDevice::Pop() calls" );
+        SAL_WARN( "vcl.gdi", "for some reason, output device state stack is not empty" );
         while ( !mpOutDevStateStack->empty() )
         {
             mpOutDevStateStack->pop_back();
