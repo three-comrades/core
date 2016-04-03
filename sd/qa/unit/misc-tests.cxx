@@ -113,11 +113,12 @@ void SdMiscTest::testTdf96206()
     auto pSSVS = sd::slidesorter::SlideSorterViewShell::GetSlideSorter(pViewShell->GetViewShellBase());
     auto& rSSController = pSSVS->GetSlideSorter().GetController();
 
-    const sal_uInt16 nMasterPageCnt1 = xDocSh->GetDoc()->GetMasterSdPageCount(PageKind::PK_STANDARD);
+    const sal_uInt16 nMasterPageCnt1 = xDocSh->GetDoc()->GetMasterSdPageCount( PageKind::Standard );
     CPPUNIT_ASSERT_EQUAL(sal_uInt16(2), nMasterPageCnt1);
+
     rSSController.GetClipboard().DoCopy();
     rSSController.GetClipboard().DoPaste();
-    const sal_uInt16 nMasterPageCnt2 = xDocSh->GetDoc()->GetMasterSdPageCount(PageKind::PK_STANDARD);
+    const sal_uInt16 nMasterPageCnt2 = xDocSh->GetDoc()->GetMasterSdPageCount( PageKind::Standard );
     CPPUNIT_ASSERT_EQUAL(nMasterPageCnt1, nMasterPageCnt2);
 
     xDocSh->DoClose();
@@ -131,7 +132,7 @@ void SdMiscTest::testTdf96708()
     auto& rSSController = pSSVS->GetSlideSorter().GetController();
     auto& rPageSelector = rSSController.GetPageSelector();
 
-    const sal_uInt16 nMasterPageCnt1 = xDocSh->GetDoc()->GetMasterSdPageCount(PageKind::PK_STANDARD);
+    const sal_uInt16 nMasterPageCnt1 = xDocSh->GetDoc()->GetMasterSdPageCount( PageKind::Standard );
     CPPUNIT_ASSERT_EQUAL(sal_uInt16(4), nMasterPageCnt1);
     rPageSelector.SelectAllPages();
     rSSController.GetClipboard().DoCopy();
@@ -141,7 +142,7 @@ void SdMiscTest::testTdf96708()
     Scheduler::ProcessTaskScheduling(true);
 
     rSSController.GetClipboard().DoPaste();
-    const sal_uInt16 nMasterPageCnt2 = xDocSh->GetDoc()->GetMasterSdPageCount(PageKind::PK_STANDARD);
+    const sal_uInt16 nMasterPageCnt2 = xDocSh->GetDoc()->GetMasterSdPageCount( PageKind::Standard );
     CPPUNIT_ASSERT_EQUAL(nMasterPageCnt1, nMasterPageCnt2);
 
     xDocSh->DoClose();

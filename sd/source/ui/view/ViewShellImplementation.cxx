@@ -147,10 +147,10 @@ void ViewShell::Implementation::ProcessModifyPageSlot (
                 rRequest.Ignore ();
                 break;
             }
-            if (ePageKind == PK_HANDOUT)
+            if ( ePageKind == PageKind::Handout )
             {
                 bHandoutMode = true;
-                pHandoutMPage = pDocument->GetMasterSdPage(0, PK_HANDOUT);
+                pHandoutMPage = pDocument->GetMasterSdPage( 0, PageKind::Handout );
             }
         }
         else
@@ -186,11 +186,11 @@ void ViewShell::Implementation::ProcessModifyPageSlot (
                 {
                     pCurrentPage->SetName(aNewName);
 
-                    if (ePageKind == PK_STANDARD)
+                    if ( ePageKind == PageKind::Standard )
                     {
-                        sal_uInt16 nPage = (pCurrentPage->GetPageNum()-1) / 2;
-                        SdPage* pNotesPage = pDocument->GetSdPage(nPage, PK_NOTES);
-                        if (pNotesPage != nullptr)
+                        sal_uInt16 nPage = (pCurrentPage->GetPageNum() - 1) / 2;
+                        SdPage* pNotesPage = pDocument->GetSdPage( nPage, PageKind::Notes );
+                        if ( pNotesPage )
                             pNotesPage->SetName(aNewName);
                     }
                 }
@@ -263,7 +263,7 @@ void ViewShell::Implementation::AssignLayout ( SfxRequest& rRequest, PageKind eP
 
         SetOfByte aVisibleLayers;
 
-        if( pPage->GetPageKind() == PK_HANDOUT )
+        if( pPage->GetPageKind() == PageKind::Handout )
             aVisibleLayers.SetAll();
         else
             aVisibleLayers = pPage->TRG_GetMasterPageVisibleLayers();

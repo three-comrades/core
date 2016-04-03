@@ -326,14 +326,14 @@ bool SlideSorterController::Command (
             if (aSelectedPages.HasMoreElements())
                 pPage = aSelectedPages.GetNextElement()->GetPage();
 
-            if (mrModel.GetEditMode() == EM_PAGE)
+            if ( mrModel.GetEditMode() == EditMode::Page )
             {
-                if (pPage != nullptr)
+                if ( pPage )
                     aPopupId = "pagepane";
                 else
                     aPopupId = "pagepanenosel";
             }
-            else if (pPage != nullptr)
+            else if ( pPage )
                 aPopupId = "pagepanemaster";
             else
                 aPopupId = "pagepanenoselmaster";
@@ -743,7 +743,7 @@ void SlideSorterController::PrepareEditModeChange()
     //  Before we throw away the page descriptors we prepare for selecting
     //  descriptors in the other mode and for restoring the current
     //  selection when switching back to the current mode.
-    if (mrModel.GetEditMode() == EM_PAGE)
+    if ( mrModel.GetEditMode() == EditMode::Page )
     {
         maSelectionBeforeSwitch.clear();
 
@@ -787,7 +787,7 @@ void SlideSorterController::ChangeEditMode (EditMode eEditMode)
 
 void SlideSorterController::FinishEditModeChange()
 {
-    if (mrModel.GetEditMode() == EM_MASTERPAGE)
+    if ( mrModel.GetEditMode() == EditMode::MasterPage )
     {
         mpPageSelector->DeselectAllPages();
 

@@ -491,7 +491,7 @@ void SAL_CALL SlideShow::setPropertyValue( const OUString& aPropertyName, const 
         {
             bIllegalArgument = false;
 
-            SdOptions* pOptions = SD_MOD()->GetSdOptions(DOCUMENT_TYPE_IMPRESS);
+            SdOptions* pOptions = SD_MOD()->GetSdOptions( DocumentType::Impress );
             pOptions->SetDisplay( nDisplay );
 
             FullScreenWorkWindow *pWin = dynamic_cast<FullScreenWorkWindow *>(GetWorkWindow());
@@ -570,7 +570,7 @@ Any SAL_CALL SlideShow::getPropertyValue( const OUString& PropertyName ) throw(U
         return Any( rPresSettings.mbShowPauseLogo );
     case ATTR_PRESENT_DISPLAY:
     {
-        SdOptions* pOptions = SD_MOD()->GetSdOptions(DOCUMENT_TYPE_IMPRESS);
+        SdOptions* pOptions = SD_MOD()->GetSdOptions( DocumentType::Impress );
         return Any(pOptions->GetDisplay());
     }
 
@@ -737,7 +737,7 @@ void SAL_CALL SlideShow::end()
                         if (xDrawView.is())
                             xDrawView->setCurrentPage(
                                 Reference<XDrawPage>(
-                                    mpDoc->GetSdPage(xController->getRestoreSlide(), PK_STANDARD)->getUnoPage(),
+                                    mpDoc->GetSdPage( xController->getRestoreSlide(), PageKind::Standard )->getUnoPage(),
                                     UNO_QUERY));
                     }
                 }
@@ -1063,7 +1063,7 @@ void SlideShow::StartInPlacePresentation()
                 FrameView* pFrameView = pMainViewShell->GetFrameView();
                 pFrameView->SetPresentationViewShellId(SID_VIEWSHELL1);
                 pFrameView->SetPreviousViewShellType (pMainViewShell->GetShellType());
-                pFrameView->SetPageKind (PK_STANDARD);
+                pFrameView->SetPageKind ( PageKind::Standard );
             }
 
             pHelper->RequestView( FrameworkHelper::msImpressViewURL, FrameworkHelper::msCenterPaneURL );
@@ -1156,7 +1156,7 @@ sal_Int32 SlideShow::GetDisplay()
 {
     sal_Int32 nDisplay = 0;
 
-    SdOptions* pOptions = SD_MOD()->GetSdOptions(DOCUMENT_TYPE_IMPRESS);
+    SdOptions* pOptions = SD_MOD()->GetSdOptions( DocumentType::Impress );
     if( pOptions )
         nDisplay = pOptions->GetDisplay();
 

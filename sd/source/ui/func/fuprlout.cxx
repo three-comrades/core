@@ -95,7 +95,7 @@ void FuPresentationLayout::DoExecute( SfxRequest& rReq )
     if (DrawViewShell *pShell = dynamic_cast<DrawViewShell*>(mpViewShell))
     {
         EditMode eEditMode = pShell->GetEditMode();
-        if (eEditMode == EM_MASTERPAGE)
+        if ( eEditMode == EditMode::MasterPage )
             bOnMaster = true;
     }
 
@@ -115,7 +115,7 @@ void FuPresentationLayout::DoExecute( SfxRequest& rReq )
                 for (auto it = xSelection->begin(); it != xSelection->end(); ++it)
                 {
                     SdPage *pPage = *it;
-                    if (pPage->IsSelected() || pPage->GetPageKind() != PK_STANDARD)
+                    if ( pPage->IsSelected() || pPage->GetPageKind() != PageKind::Standard )
                         continue;
                     mpDoc->SetSelected(pPage, true);
                     aUnselect.push_back(pPage);
@@ -125,11 +125,11 @@ void FuPresentationLayout::DoExecute( SfxRequest& rReq )
     }
 
     std::vector<SdPage*> aSelectedPages;
-    std::vector<sal_uInt16> aSelectedPageNums;
+    std::vector<sal_uInt32> aSelectedPageNums;
     // determine the active pages
-    for (sal_uInt16 nPage = 0; nPage < mpDoc->GetSdPageCount(PK_STANDARD); nPage++)
+    for ( sal_uInt32 nPage = 0; nPage < mpDoc->GetSdPageCount( PageKind::Standard ); nPage++ )
     {
-        SdPage* pPage = mpDoc->GetSdPage(nPage, PK_STANDARD);
+        SdPage* pPage = mpDoc->GetSdPage( nPage, PageKind::Standard );
         if (pPage->IsSelected())
         {
             aSelectedPages.push_back(pPage);
@@ -250,7 +250,7 @@ void FuPresentationLayout::DoExecute( SfxRequest& rReq )
                     {
                         sal_uInt16 nPgNum = pSelectedPage->TRG_GetMasterPage().GetPageNum();
 
-                        if (static_cast<DrawViewShell*>(mpViewShell)->GetPageKind() == PK_NOTES)
+                        if ( static_cast< DrawViewShell * >( mpViewShell )->GetPageKind() == PageKind::Notes )
                             nPgNum++;
 
                         pView->HideSdrPage();

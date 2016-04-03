@@ -656,7 +656,7 @@ void SlideTransitionPane::updateControls()
         mpMF_ADVANCE_AUTO_AFTER->SetValue( aEffect.mfTime * 100.0);
     }
 
-    SdOptions* pOptions = SD_MOD()->GetSdOptions(DOCUMENT_TYPE_IMPRESS);
+    SdOptions* pOptions = SD_MOD()->GetSdOptions( DocumentType::Impress );
     mpCB_AUTO_PREVIEW->Check( pOptions->IsPreviewTransitions() );
 
     mbUpdatingControls = false;
@@ -987,18 +987,20 @@ IMPL_LINK_TYPED(SlideTransitionPane,EventMultiplexerListener,
 
 IMPL_LINK_NOARG_TYPED(SlideTransitionPane, ApplyToAllButtonClicked, Button*, void)
 {
-    DBG_ASSERT( mpDrawDoc, "Invalid Draw Document!" );
     if( !mpDrawDoc )
+    {
+        SAL_WARN( "sd.ui", "mpDrawDoc is nil" );
         return;
+    }
 
     ::sd::slidesorter::SharedPageSelection pPages (
         new ::sd::slidesorter::SlideSorterViewShell::PageSelection());
 
-    sal_uInt16 nPageCount = mpDrawDoc->GetSdPageCount( PK_STANDARD );
+    sal_uInt32 nPageCount = mpDrawDoc->GetSdPageCount( PageKind::Standard );
     pPages->reserve( nPageCount );
-    for( sal_uInt16 i=0; i<nPageCount; ++i )
+    for( sal_uInt32 i = 0; i < nPageCount; ++i )
     {
-        SdPage * pPage = mpDrawDoc->GetSdPage( i, PK_STANDARD );
+        SdPage * pPage = mpDrawDoc->GetSdPage( i, PageKind::Standard );
         if( pPage )
             pPages->push_back( pPage );
     }
@@ -1117,7 +1119,7 @@ IMPL_LINK_NOARG_TYPED(SlideTransitionPane, LoopSoundBoxChecked, Button*, void)
 
 IMPL_LINK_NOARG_TYPED(SlideTransitionPane, AutoPreviewClicked, Button*, void)
 {
-    SdOptions* pOptions = SD_MOD()->GetSdOptions(DOCUMENT_TYPE_IMPRESS);
+    SdOptions* pOptions = SD_MOD()->GetSdOptions( DocumentType::Impress );
     pOptions->SetPreviewTransitions( mpCB_AUTO_PREVIEW->IsChecked() );
 }
 

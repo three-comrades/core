@@ -104,7 +104,7 @@ static SdPage* GetCurrentPage( sd::ViewShell* pViewSh, EditFieldInfo* pInfo, boo
                 nPgNum++;
         }
 
-        pPage = pViewSh->GetDoc()->GetSdPage( (sal_uInt16)nPgNum, PK_STANDARD );
+        pPage = pViewSh->GetDoc()->GetSdPage( nPgNum, PageKind::Standard );
     }
     else
     {
@@ -232,7 +232,7 @@ IMPL_LINK_TYPED(SdModule, CalcFieldValueHdl, EditFieldInfo*, pInfo, void)
         {
             int nPgNum;
 
-            if( (pPage->GetPageKind() == PK_HANDOUT) && pViewSh )
+            if( ( pPage->GetPageKind() == PageKind::Handout ) && pViewSh )
             {
                 nPgNum = pViewSh->GetPrintedHandoutPageNum();
             }
@@ -271,8 +271,8 @@ IMPL_LINK_TYPED(SdModule, CalcFieldValueHdl, EditFieldInfo*, pInfo, void)
         }
         else
         {
-            DocumentType eDocType = pDoc ? pDoc->GetDocumentType() : DOCUMENT_TYPE_IMPRESS;
-            aRepresentation = ( ( eDocType == DOCUMENT_TYPE_IMPRESS )
+            DocumentType eDocType = pDoc ? pDoc->GetDocumentType() : DocumentType::Impress;
+            aRepresentation = ( ( eDocType == DocumentType::Impress )
                                 ? SdResId(STR_FIELD_PLACEHOLDER_SLIDENAME).toString()
                                 : SdResId(STR_FIELD_PLACEHOLDER_PAGENAME).toString() );
         }
@@ -300,7 +300,7 @@ IMPL_LINK_TYPED(SdModule, CalcFieldValueHdl, EditFieldInfo*, pInfo, void)
 
         if( !bMasterView )
         {
-            if( pPage && (pPage->GetPageKind() == PK_HANDOUT) && pViewSh )
+            if( pPage && ( pPage->GetPageKind() == PageKind::Handout ) && pViewSh )
             {
                 nPageCount = pViewSh->GetPrintedHandoutPageCount();
             }
@@ -414,9 +414,9 @@ SfxItemSet*  SdModule::CreateItemSet( sal_uInt16 nSlot )
     SdDrawDocument* pDoc = nullptr;
 
     // Here we set the DocType of the option dialog (not document!)
-    DocumentType eDocType = DOCUMENT_TYPE_IMPRESS;
+    DocumentType eDocType = DocumentType::Impress;
     if( nSlot == SID_SD_GRAPHIC_OPTIONS )
-        eDocType = DOCUMENT_TYPE_DRAW;
+        eDocType = DocumentType::Draw;
 
     if (pDocSh)
     {
@@ -499,7 +499,7 @@ SfxItemSet*  SdModule::CreateItemSet( sal_uInt16 nSlot )
     sal_Int32  nY;
     if( pDocSh )
     {
-        SdrPage* pPage = static_cast<SdrPage*>(pDoc->GetSdPage(0, PK_STANDARD));
+        SdrPage* pPage = static_cast< SdrPage* >( pDoc->GetSdPage( 0, PageKind::Standard ) );
         Size aSize(pPage->GetSize());
         nW = aSize.Width();
         nH = aSize.Height();
@@ -540,9 +540,9 @@ void SdModule::ApplyItemSet( sal_uInt16 nSlot, const SfxItemSet& rSet )
     ::sd::DrawDocShell* pDocSh = dynamic_cast< ::sd::DrawDocShell *>( SfxObjectShell::Current() );
     SdDrawDocument* pDoc = nullptr;
     // Here we set the DocType of the option dialog (not document!)
-    DocumentType eDocType = DOCUMENT_TYPE_IMPRESS;
+    DocumentType eDocType = DocumentType::Impress;
     if( nSlot == SID_SD_GRAPHIC_OPTIONS )
-        eDocType = DOCUMENT_TYPE_DRAW;
+        eDocType = DocumentType::Draw;
 
     ::sd::ViewShell* pViewShell = nullptr;
 

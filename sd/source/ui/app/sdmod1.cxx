@@ -406,7 +406,7 @@ void SdModule::GetState(SfxItemSet& rItemSet)
         {
             ::sd::ViewShell* pViewShell = pDocShell->GetViewShell();
 
-            if( pViewShell && (pDocShell->GetDocumentType() == DOCUMENT_TYPE_IMPRESS) )
+            if( pViewShell && ( pDocShell->GetDocumentType() == DocumentType::Impress ) )
             {
                 // add our event listener as soon as possible
                 Application::AddEventListener( LINK( this, SdModule, EventListenerHdl ) );
@@ -436,7 +436,7 @@ IMPL_STATIC_LINK_TYPED( SdModule, EventListenerHdl, VclSimpleEvent&, rSimpleEven
                         ::sd::ViewShell* pViewShell = pDocShell->GetViewShell();
 
                         // #i97925# start the presentation if and only if an Impress document is focused
-                        if( pViewShell && (pDocShell->GetDocumentType() == DOCUMENT_TYPE_IMPRESS) )
+                        if( pViewShell && ( pDocShell->GetDocumentType() == DocumentType::Impress ) )
                             pViewShell->GetViewFrame()->GetDispatcher()->Execute( SID_PRESENTATION );
                     }
                     break;
@@ -457,21 +457,18 @@ void SdModule::AddSummaryPage (SfxViewFrame* pViewFrame, SdDrawDocument* pDocume
     pViewFrame->GetDispatcher()->Execute(SID_SUMMARY_PAGE,
         SfxCallMode::SYNCHRON | SfxCallMode::RECORD);
 
-    OSL_ASSERT (pDocument!=nullptr);
-
-    sal_Int32 nPageCount = pDocument->GetSdPageCount (PK_STANDARD);
+    sal_Int32 nPageCount = pDocument->GetSdPageCount( PageKind::Standard );
 
     // We need at least two pages: the summary page and one to use as
     // template to take the transition parameters from.
     if (nPageCount >= 2)
     {
         // Get a page from which to retrieve the transition parameters.
-        SdPage* pTemplatePage = pDocument->GetSdPage (0, PK_STANDARD);
+        SdPage* pTemplatePage = pDocument->GetSdPage( 0, PageKind::Standard );
         OSL_ASSERT (pTemplatePage!=nullptr);
 
         // The summary page, if it exists, is the last page.
-        SdPage* pSummaryPage = pDocument->GetSdPage (
-            (sal_uInt16)nPageCount-1, PK_STANDARD);
+        SdPage* pSummaryPage = pDocument->GetSdPage ( nPageCount - 1, PageKind::Standard );
         OSL_ASSERT (pSummaryPage!=nullptr);
 
         // Take the change mode of the template page as indication of the
@@ -527,7 +524,7 @@ SfxFrame* SdModule::ExecuteNewDocument( SfxRequest& rReq )
         if ( pFrmItem )
             xTargetFrame = pFrmItem->GetFrame();
 
-        SdOptions* pOpt = GetSdOptions(DOCUMENT_TYPE_IMPRESS);
+        SdOptions* pOpt = GetSdOptions( DocumentType::Impress );
         bool bStartWithTemplate = pOpt->IsStartWithTemplate();
 
         bool bNewDocDirect = rReq.GetSlot() == SID_NEWSD;
@@ -577,7 +574,7 @@ SfxFrame* SdModule::CreateEmptyDocument( const Reference< XFrame >& i_rFrame )
 
     SfxObjectShellLock xDocShell;
     ::sd::DrawDocShell* pNewDocSh;
-    xDocShell = pNewDocSh = new ::sd::DrawDocShell(SfxObjectCreateMode::STANDARD,false,DOCUMENT_TYPE_IMPRESS);
+    xDocShell = pNewDocSh = new ::sd::DrawDocShell( SfxObjectCreateMode::STANDARD, false, DocumentType::Impress );
     pNewDocSh->DoInitNew();
     SdDrawDocument* pDoc = pNewDocSh->GetDoc();
     if (pDoc)
@@ -693,14 +690,14 @@ void SdModule::ChangeMedium( ::sd::DrawDocShell* pDocShell, SfxViewFrame* pViewF
     }
 
     bool bScaleAll = true;
-    sal_uInt16 nPageCnt = pDoc->GetMasterSdPageCount(PK_STANDARD);
+    sal_uInt16 nPageCnt = pDoc->GetMasterSdPageCount( PageKind::Standard );
     sal_uInt16 i;
     SdPage* pPage;
 
     // master pages first
     for (i = 0; i < nPageCnt; i++)
     {
-        pPage = pDoc->GetMasterSdPage(i, PK_STANDARD);
+        pPage = pDoc->GetMasterSdPage( i, PageKind::Standard );
 
         if (pPage)
         {
@@ -711,19 +708,21 @@ void SdModule::ChangeMedium( ::sd::DrawDocShell* pDocShell, SfxViewFrame* pViewF
                 pPage->SetSize(aNewSize);
                 pPage->SetBorder(nLeft, nUpper, nRight, nLower);
             }
-            SdPage* pNotesPage = pDoc->GetMasterSdPage(i, PK_NOTES);
-            DBG_ASSERT( pNotesPage, "Wrong page ordering!" );
-            if( pNotesPage ) pNotesPage->CreateTitleAndLayout();
+            SdPage* pNotesPage = pDoc->GetMasterSdPage( i, PageKind::Notes );
+            if( pNotesPage )
+                pNotesPage->CreateTitleAndLayout();
+            else
+                SAL_WARN( "sd.ui", "unexpected page ordering" );
             pPage->CreateTitleAndLayout();
         }
     }
 
-    nPageCnt = pDoc->GetSdPageCount(PK_STANDARD);
+    nPageCnt = pDoc->GetSdPageCount( PageKind::Standard );
 
     // then slides
     for (i = 0; i < nPageCnt; i++)
     {
-        pPage = pDoc->GetSdPage(i, PK_STANDARD);
+        pPage = pDoc->GetSdPage( i, PageKind::Standard );
 
         if (pPage)
         {
@@ -734,14 +733,16 @@ void SdModule::ChangeMedium( ::sd::DrawDocShell* pDocShell, SfxViewFrame* pViewF
                 pPage->SetSize(aNewSize);
                 pPage->SetBorder(nLeft, nUpper, nRight, nLower);
             }
-            SdPage* pNotesPage = pDoc->GetSdPage(i, PK_NOTES);
-            DBG_ASSERT( pNotesPage, "Wrong page ordering!" );
-            if( pNotesPage ) pNotesPage->SetAutoLayout( pNotesPage->GetAutoLayout() );
+            SdPage* pNotesPage = pDoc->GetSdPage( i, PageKind::Notes );
+            if( pNotesPage )
+                pNotesPage->SetAutoLayout( pNotesPage->GetAutoLayout() );
+            else
+                SAL_WARN( "sd.ui", "unexpected page ordering" );
             pPage->SetAutoLayout( pPage->GetAutoLayout() );
         }
     }
 
-    SdPage* pHandoutPage = pDoc->GetSdPage(0, PK_HANDOUT);
+    SdPage* pHandoutPage = pDoc->GetSdPage( 0, PageKind::Handout );
     pHandoutPage->CreateTitleAndLayout(true);
 
     if( (eMedium != OUTPUT_ORIGINAL) && pViewFrame && pViewFrame->GetDispatcher())
@@ -750,7 +751,7 @@ void SdModule::ChangeMedium( ::sd::DrawDocShell* pDocShell, SfxViewFrame* pViewF
     }
 }
 
-//===== OutlineToImpressFinalize ==============================================
+//===== OutlineToImpressFinalizer ==============================================
 
 namespace {
 
@@ -835,10 +836,10 @@ void OutlineToImpressFinalizer::operator() (bool)
 
         // Call UpdatePreview once for every slide to resync the
         // document with the outliner of the OutlineViewShell.
-        sal_uInt16 nPageCount (mrDocument.GetSdPageCount(PK_STANDARD));
-        for (sal_uInt16 nIndex=0; nIndex<nPageCount; nIndex++)
+        sal_uInt32 nPageCount = mrDocument.GetSdPageCount( PageKind::Standard );
+        for ( sal_uInt32 nIndex = 0; nIndex < nPageCount; nIndex++ )
         {
-            SdPage* pPage = mrDocument.GetSdPage(nIndex, PK_STANDARD);
+            SdPage* pPage = mrDocument.GetSdPage( nIndex, PageKind::Standard );
             // Make the page the actual page so that the
             // following UpdatePreview() call accesses the
             // correct paragraphs.
@@ -846,7 +847,7 @@ void OutlineToImpressFinalizer::operator() (bool)
             pOutlineShell->UpdatePreview(pPage, true);
         }
         // Select the first slide.
-        SdPage* pPage = mrDocument.GetSdPage(0, PK_STANDARD);
+        SdPage* pPage = mrDocument.GetSdPage( 0, PageKind::Standard );
         pView->SetActualPage(pPage);
         pOutlineShell->UpdatePreview(pPage, true);
     }

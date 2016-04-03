@@ -73,7 +73,7 @@ SdNavigatorWin::SdNavigatorWin(
     , maLbDocs ( VclPtr<ListBox>::Create( this, SdResId( LB_DOCS ) ) )
     , mbDocImported ( false )
       // On changes of the DragType: adjust SelectionMode of TLB!
-    , meDragType ( NAVIGATOR_DRAGTYPE_EMBEDDED )
+    , meDragType ( NavigatorDragType::Embedded )
     , mpBindings ( pInBindings )
     , mpNavigatorCtrlItem( nullptr )
     , mpPageNameCtrlItem( nullptr )
@@ -248,8 +248,8 @@ NavigatorDragType SdNavigatorWin::GetNavigatorDragType()
     NavigatorDragType   eDT = meDragType;
     NavDocInfo*         pInfo = GetDocInfo();
 
-    if( ( eDT == NAVIGATOR_DRAGTYPE_LINK ) && ( ( pInfo && !pInfo->HasName() ) || !maTlbObjects->IsLinkableSelected() ) )
-        eDT = NAVIGATOR_DRAGTYPE_NONE;
+    if( ( eDT == NavigatorDragType::Link ) && ( ( pInfo && !pInfo->HasName() ) || !maTlbObjects->IsLinkableSelected() ) )
+        eDT = NavigatorDragType::None;
 
     return eDT;
 }
@@ -258,7 +258,7 @@ NavigatorDragType SdNavigatorWin::GetNavigatorDragType()
 sd::DrawDocShell* SdNavigatorWin::GetDrawDocShell( const SdDrawDocument* pDoc )
 {
     if( !pDoc )
-        return nullptr; // const as const can...
+        return nullptr;
     sd::DrawDocShell* pDocShell = pDoc->GetDocSh();
     return pDocShell;
 }
@@ -279,7 +279,7 @@ IMPL_LINK_NOARG_TYPED(SdNavigatorWin, SelectToolboxHdl, ToolBox *, void)
 
     if( ePage != PAGE_NONE )
     {
-        SfxUInt16Item aItem( SID_NAVIGATOR_PAGE, (sal_uInt16)ePage );
+        SfxUInt16Item aItem( SID_NAVIGATOR_PAGE, static_cast< sal_uInt16 >( ePage ) );
         mpBindings->GetDispatcher()->ExecuteList(SID_NAVIGATOR_PAGE,
                 SfxCallMode::SLOT | SfxCallMode::RECORD, { &aItem });
     }
@@ -304,16 +304,14 @@ IMPL_LINK_TYPED( SdNavigatorWin, DropdownClickToolBoxHdl, ToolBox*, pBox, void )
                  nullptr
             };
 
-            for( sal_uInt16 nID = NAVIGATOR_DRAGTYPE_URL;
-                 nID < NAVIGATOR_DRAGTYPE_COUNT;
-                 nID++ )
+            sal_uInt16 nURLid = static_cast< sal_uInt16 >( NavigatorDragType::URL );
+            for( sal_uInt16 nID = nURLid; nID < NavigatorDragType_Count; nID++ )
             {
-                sal_uInt16 nRId = GetDragTypeSdResId( (NavigatorDragType)nID );
+                sal_uInt16 nRId = GetDragTypeSdResId( static_cast< NavigatorDragType >( nID ) );
                 if( nRId > 0 )
                 {
-                    DBG_ASSERT(aHIDs[nID-NAVIGATOR_DRAGTYPE_URL],"HelpId not added!");
                     pMenu->InsertItem( nID, SD_RESSTR( nRId ) );
-                    pMenu->SetHelpId( nID, aHIDs[nID - NAVIGATOR_DRAGTYPE_URL] );
+                    pMenu->SetHelpId( nID, aHIDs[ nID - nURLid ] );
                 }
 
             }
@@ -321,12 +319,12 @@ IMPL_LINK_TYPED( SdNavigatorWin, DropdownClickToolBoxHdl, ToolBox*, pBox, void )
 
             if( ( pInfo && !pInfo->HasName() ) || !maTlbObjects->IsLinkableSelected() )
             {
-                pMenu->EnableItem( NAVIGATOR_DRAGTYPE_LINK, false );
-                pMenu->EnableItem( NAVIGATOR_DRAGTYPE_URL, false );
-                meDragType = NAVIGATOR_DRAGTYPE_EMBEDDED;
+                pMenu->EnableItem( static_cast< sal_uInt16 >( NavigatorDragType::Link ), false );
+                pMenu->EnableItem( static_cast< sal_uInt16 >( NavigatorDragType::URL ), false );
+                meDragType = NavigatorDragType::Embedded;
             }
 
-            pMenu->CheckItem( (sal_uInt16)meDragType );
+            pMenu->CheckItem( static_cast< sal_uInt16 >( meDragType ) );
             pMenu->SetSelectHdl( LINK( this, SdNavigatorWin, MenuSelectHdl ) );
 
             pMenu->Execute( this, maToolbox->GetItemRect( nId ), PopupMenuFlags::ExecuteDown );
@@ -432,9 +430,9 @@ IMPL_LINK_NOARG_TYPED(SdNavigatorWin, SelectDocumentHdl, ListBox&, void)
     }
 
     // check if link or url is possible
-    if( ( pInfo && !pInfo->HasName() ) || !maTlbObjects->IsLinkableSelected() || ( meDragType != NAVIGATOR_DRAGTYPE_EMBEDDED ) )
+    if( ( pInfo && !pInfo->HasName() ) || !maTlbObjects->IsLinkableSelected() || ( meDragType != NavigatorDragType::Embedded ) )
     {
-        meDragType = NAVIGATOR_DRAGTYPE_EMBEDDED;
+        meDragType = NavigatorDragType::Embedded;
         SetDragImage();
     }
 }
@@ -449,17 +447,17 @@ IMPL_LINK_TYPED( SdNavigatorWin, MenuSelectHdl, Menu *, pMenu, bool )
     if( pMenu )
         nMenuId = pMenu->GetCurItemId();
     else
-        nMenuId = NAVIGATOR_DRAGTYPE_URL;
+        nMenuId = static_cast< sal_uInt16 >( NavigatorDragType::URL );
 
     if( nMenuId != USHRT_MAX ) // Necessary ?
     {
-        NavigatorDragType eDT = (NavigatorDragType) nMenuId;
+        NavigatorDragType eDT = static_cast< NavigatorDragType >( nMenuId );
         if( meDragType != eDT )
         {
             meDragType = eDT;
             SetDragImage();
 
-            if( meDragType == NAVIGATOR_DRAGTYPE_URL )
+            if( meDragType == NavigatorDragType::URL )
             {
                 // patch, prevents endless loop
                 if( maTlbObjects->GetSelectionCount() > 1 )
@@ -476,7 +474,7 @@ IMPL_LINK_TYPED( SdNavigatorWin, MenuSelectHdl, Menu *, pMenu, bool )
 
 IMPL_LINK_TYPED( SdNavigatorWin, ShapeFilterCallback, Menu *, pMenu, bool )
 {
-    if (pMenu != nullptr)
+    if ( pMenu )
     {
         bool bShowAllShapes (maTlbObjects->GetShowAllShapes());
         sal_uInt16 nMenuId (pMenu->GetCurItemId());
@@ -491,25 +489,24 @@ IMPL_LINK_TYPED( SdNavigatorWin, ShapeFilterCallback, Menu *, pMenu, bool )
                 break;
 
             default:
-                OSL_FAIL(
-                    "SdNavigatorWin::ShapeFilterCallback called for unknown menu entry");
+                SAL_WARN( "sd", "SdNavigatorWin::ShapeFilterCallback met unknown menu entry" );
                 break;
         }
 
         maTlbObjects->SetShowAllShapes(bShowAllShapes, true);
 
-        // Remember the selection in the FrameView.
+        // remember the selection in the FrameView
         NavDocInfo* pInfo = GetDocInfo();
-        if (pInfo != nullptr)
+        if ( pInfo )
         {
             ::sd::DrawDocShell* pDocShell = pInfo->mpDocShell;
-            if (pDocShell != nullptr)
+            if ( pDocShell )
             {
                 ::sd::ViewShell* pViewShell = pDocShell->GetViewShell();
-                if (pViewShell != nullptr)
+                if ( pViewShell )
                 {
                     ::sd::FrameView* pFrameView = pViewShell->GetFrameView();
-                    if (pFrameView != nullptr)
+                    if ( pFrameView )
                     {
                         pFrameView->SetIsNavigatorShowingAllShapes(bShowAllShapes);
                     }
@@ -703,15 +700,15 @@ sal_uInt16 SdNavigatorWin::GetDragTypeSdResId( NavigatorDragType eDT, bool bImag
 {
     switch( eDT )
     {
-        case NAVIGATOR_DRAGTYPE_NONE:
+        case NavigatorDragType::None:
                 return( bImage ? 0 : STR_NONE );
-        case NAVIGATOR_DRAGTYPE_URL:
+        case NavigatorDragType::URL:
                 return( bImage ? TBI_HYPERLINK : STR_DRAGTYPE_URL );
-        case NAVIGATOR_DRAGTYPE_EMBEDDED:
+        case NavigatorDragType::Embedded:
                 return( bImage ? TBI_EMBEDDED : STR_DRAGTYPE_EMBEDDED );
-        case NAVIGATOR_DRAGTYPE_LINK:
+        case NavigatorDragType::Link:
                 return( bImage ? TBI_LINK : STR_DRAGTYPE_LINK );
-        default: OSL_FAIL( "No resource for DragType available!" );
+        default: SAL_WARN( "sd", "unexpected NavigatorDragType" ); break;
     }
     return 0;
 }

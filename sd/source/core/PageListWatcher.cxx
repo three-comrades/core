@@ -33,26 +33,26 @@ void ImpPageListWatcher::ImpRecreateSortedPageListOnDemand()
     // build up vectors again
     const sal_uInt32 nPageCount(ImpGetPageCount());
 
-    for(sal_uInt32 a(0L); a < nPageCount; a++)
+    for( sal_uInt32 a = 0; a < nPageCount; a++ )
     {
         SdPage* pCandidate = ImpGetPage(a);
-        DBG_ASSERT(pCandidate, "ImpPageListWatcher::ImpRecreateSortedPageListOnDemand: Invalid PageList in Model (!)");
+        DBG_ASSERT( pCandidate, "ImpRecreateSortedPageListOnDemand: something strange with PageList in Model" );
 
-        switch(pCandidate->GetPageKind())
+        switch( pCandidate->GetPageKind() )
         {
-            case PK_STANDARD:
+            case PageKind::Standard:
             {
                 maPageVectorStandard.push_back(pCandidate);
                 break;
             }
-            case PK_NOTES:
+            case PageKind::Notes:
             {
                 maPageVectorNotes.push_back(pCandidate);
                 break;
             }
-            case PK_HANDOUT:
+            case PageKind::Handout:
             {
-                DBG_ASSERT(!mpHandoutPage, "ImpPageListWatcher::ImpRecreateSortedPageListOnDemand: Two Handout pages in PageList of Model (!)");
+                DBG_ASSERT( !mpHandoutPage, "ImpRecreateSortedPageListOnDemand: two Handout pages in PageList of Model" );
                 mpHandoutPage = pCandidate;
                 break;
             }
@@ -85,39 +85,53 @@ SdPage* ImpPageListWatcher::GetSdPage(PageKind ePgKind, sal_uInt32 nPgNum)
 
     switch(ePgKind)
     {
-        case PK_STANDARD:
+        case PageKind::Standard:
         {
-            if( nPgNum < (sal_uInt32)maPageVectorStandard.size() )
-                pRetval = maPageVectorStandard[nPgNum];
-            else
+            sal_uInt32 vectorSize = static_cast< sal_uInt32 >( maPageVectorStandard.size() );
+            if ( vectorSize > 0 )
             {
-                SAL_WARN( "sd.core",
-                          "ImpPageListWatcher::GetSdPage(PK_STANDARD): page number " << nPgNum << " >= " << maPageVectorStandard.size() );
+                if( nPgNum < vectorSize )
+                {
+                    pRetval = maPageVectorStandard[nPgNum];
+                }
+                else
+                {
+                    SAL_WARN( "sd.core",
+                        "GetSdPage( PageKind::Standard, /* page number */ " << nPgNum << " ): page number is out of maPageVectorStandard.size()" );
+                }
             }
+            else
+                SAL_WARN( "sd.core", "GetSdPage( PageKind::Standard, /* page number */ " << nPgNum << " ): maPageVectorStandard is empty" );
+
             break;
         }
-        case PK_NOTES:
+        case PageKind::Notes:
         {
-            if( nPgNum < (sal_uInt32)maPageVectorNotes.size() )
-                pRetval = maPageVectorNotes[nPgNum];
-            else
+            sal_uInt32 vectorSize = static_cast< sal_uInt32 >( maPageVectorNotes.size() );
+            if ( vectorSize > 0 )
             {
-                SAL_WARN( "sd.core",
-                          "ImpPageListWatcher::GetSdPage(PK_NOTES): page number " << nPgNum << " >= " << maPageVectorNotes.size() );
+                if( nPgNum < vectorSize )
+                {
+                    pRetval = maPageVectorNotes[nPgNum];
+                }
+                else
+                {
+                    SAL_WARN( "sd.core",
+                        "GetSdPage( PageKind::Notes, /* page number */ " << nPgNum << " ): page number is out of maPageVectorNotes.size()" );
+                }
             }
+            else
+                SAL_WARN( "sd.core", "GetSdPage( PageKind::Notes, /* page number */ " << nPgNum << " ): maPageVectorNotes is empty" );
+
             break;
         }
-        case PK_HANDOUT:
+        case PageKind::Handout:
         {
 //          #11420# for models used to transfer drawing shapes via clipboard its ok to not have a handout page
-            DBG_ASSERT(nPgNum == 0L, "ImpPageListWatcher::GetSdPage: access to non existing handout page (!)");
-            if (nPgNum == 0)
+            if ( nPgNum == 0 )
                 pRetval = mpHandoutPage;
             else
-            {
-                DBG_ASSERT(nPgNum == 0L,
-                    "ImpPageListWatcher::GetSdPage: access to non existing handout page (!)");
-            }
+                SAL_WARN( "sd.core", "GetSdPage( PageKind::Handout, /* page number */ " << nPgNum << " ): there's no such handout page" );
             break;
         }
     }
@@ -127,7 +141,7 @@ SdPage* ImpPageListWatcher::GetSdPage(PageKind ePgKind, sal_uInt32 nPgNum)
 
 sal_uInt32 ImpPageListWatcher::GetSdPageCount(PageKind ePgKind)
 {
-    sal_uInt32 nRetval(0L);
+    sal_uInt32 nRetval = 0;
 
     if(!mbPageListValid)
     {
@@ -136,21 +150,21 @@ sal_uInt32 ImpPageListWatcher::GetSdPageCount(PageKind ePgKind)
 
     switch(ePgKind)
     {
-        case PK_STANDARD:
+        case PageKind::Standard:
         {
             nRetval = maPageVectorStandard.size();
             break;
         }
-        case PK_NOTES:
+        case PageKind::Notes:
         {
             nRetval = maPageVectorNotes.size();
             break;
         }
-        case PK_HANDOUT:
+        case PageKind::Handout:
         {
             if(mpHandoutPage)
             {
-                nRetval = 1L;
+                nRetval = 1;
             }
 
             break;
@@ -167,10 +181,11 @@ sal_uInt32 ImpPageListWatcher::GetVisibleSdPageCount()
     // build up vectors again
     const sal_uInt32 nPageCount(ImpGetPageCount());
 
-    for(sal_uInt32 a(0L); a < nPageCount; a++)
+    for( sal_uInt32 a = 0; a < nPageCount; a++ )
     {
         SdPage* pCandidate = ImpGetPage(a);
-        if ((pCandidate->GetPageKind() == PK_STANDARD)&&(!pCandidate->IsExcluded())) nVisiblePageCount++;
+        if(( pCandidate->GetPageKind() == PageKind::Standard ) && ( !pCandidate->IsExcluded() ))
+            nVisiblePageCount++;
     }
     return nVisiblePageCount;
 }

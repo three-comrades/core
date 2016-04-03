@@ -161,8 +161,8 @@ Outliner::Outliner( SdDrawDocument* pDoc, OutlinerMode nMode )
       mpTextObj(nullptr),
       mnText(0),
       mpParaObj(nullptr),
-      meStartViewMode(PK_STANDARD),
-      meStartEditMode(EM_PAGE),
+      meStartViewMode( PageKind::Standard ),
+      meStartEditMode( EditMode::Page ),
       mnStartPageIndex((sal_uInt16)-1),
       mpStartEditedObject(nullptr),
       maStartSelection(),
@@ -874,14 +874,14 @@ void Outliner::DetectChange()
 
     // Detect change of page count.  Restart search at first/last page in
     // that case.
-    else if (aPosition.meEditMode == EM_PAGE
+    else if (aPosition.meEditMode == EditMode::Page
         && mpDrawDocument->GetSdPageCount(aPosition.mePageKind) != mnPageCount)
     {
         // The number of pages has changed.
         mnPageCount = mpDrawDocument->GetSdPageCount(aPosition.mePageKind);
         maObjectIterator = ::sd::outliner::OutlinerContainer(this).current();
     }
-    else if (aPosition.meEditMode == EM_MASTERPAGE
+    else if (aPosition.meEditMode == EditMode::MasterPage
         && mpDrawDocument->GetSdPageCount(aPosition.mePageKind) != mnPageCount)
     {
         // The number of master pages has changed.
@@ -1209,7 +1209,7 @@ bool Outliner::ShowWrapArroundDialog()
         return false;
 
     // The question text depends on the search direction.
-    bool bImpress = mpDrawDocument && mpDrawDocument->GetDocumentType() == DOCUMENT_TYPE_IMPRESS;
+    bool bImpress = mpDrawDocument && mpDrawDocument->GetDocumentType() == DocumentType::Impress;
 
     sal_uInt16 nStringId;
     if (mbDirectionIsForward)
@@ -1321,14 +1321,14 @@ void Outliner::SetViewMode (PageKind ePageKind)
         OUString sViewURL;
         switch (ePageKind)
         {
-            case PK_STANDARD:
+            case PageKind::Standard:
             default:
                 sViewURL = framework::FrameworkHelper::msImpressViewURL;
                 break;
-            case PK_NOTES:
+            case PageKind::Notes:
                 sViewURL = framework::FrameworkHelper::msNotesViewURL;
                 break;
-            case PK_HANDOUT:
+            case PageKind::Handout:
                 sViewURL = framework::FrameworkHelper::msHandoutViewURL;
                 break;
         }
@@ -1711,7 +1711,7 @@ sal_uInt16 Outliner::ShowModalMessageBox (Dialog& rMessageBox)
 //===== Outliner::Implementation ==============================================
 
 Outliner::Implementation::Implementation()
-    : meOriginalEditMode(EM_PAGE),
+    : meOriginalEditMode(EditMode::Page),
       mbOwnOutlineView(false),
       mpOutlineView(nullptr)
 {

@@ -352,7 +352,7 @@ void DrawViewShell::FuTemporary(SfxRequest& rReq)
 
                     // Create shapes for the default layout.
                     SdPage* pMasterPage = GetDoc()->GetMasterSdPage(
-                        nIndex, PK_STANDARD);
+                        nIndex, PageKind::Standard);
                     pMasterPage->CreateTitleAndLayout (true,true);
                 }
             }
@@ -367,8 +367,8 @@ void DrawViewShell::FuTemporary(SfxRequest& rReq)
 
         case SID_MODIFYPAGE:
         {
-            if (mePageKind==PK_STANDARD || mePageKind==PK_NOTES ||
-                (mePageKind==PK_HANDOUT && meEditMode==EM_MASTERPAGE) )
+            if ( mePageKind == PageKind::Standard || mePageKind == PageKind::Notes ||
+                ( mePageKind == PageKind::Handout && meEditMode == EditMode::MasterPage ) )
             {
                 if ( mpDrawView->IsTextEdit() )
                 {
@@ -389,7 +389,8 @@ void DrawViewShell::FuTemporary(SfxRequest& rReq)
 
         case SID_ASSIGN_LAYOUT:
         {
-            if (mePageKind==PK_STANDARD || mePageKind==PK_NOTES || (mePageKind==PK_HANDOUT && meEditMode==EM_MASTERPAGE))
+            if ( mePageKind == PageKind::Standard || mePageKind == PageKind::Notes ||
+                ( mePageKind == PageKind::Handout && meEditMode == EditMode::MasterPage ) )
             {
                 if ( mpDrawView->IsTextEdit() )
                     mpDrawView->SdrEndTextEdit();
@@ -404,7 +405,7 @@ void DrawViewShell::FuTemporary(SfxRequest& rReq)
         case SID_RENAMEPAGE:
         case SID_RENAME_MASTER_PAGE:
         {
-            if (mePageKind==PK_STANDARD || mePageKind==PK_NOTES )
+            if ( mePageKind == PageKind::Standard || mePageKind == PageKind::Notes )
             {
                 if ( mpDrawView->IsTextEdit() )
                 {
@@ -412,7 +413,7 @@ void DrawViewShell::FuTemporary(SfxRequest& rReq)
                 }
 
                 sal_uInt16 nPageId = maTabControl->GetCurPageId();
-                SdPage* pCurrentPage = ( GetEditMode() == EM_PAGE )
+                SdPage* pCurrentPage = ( GetEditMode() == EditMode::Page )
                     ? GetDoc()->GetSdPage( nPageId - 1, GetPageKind() )
                     : GetDoc()->GetMasterSdPage( nPageId - 1, GetPageKind() );
 
@@ -447,7 +448,7 @@ void DrawViewShell::FuTemporary(SfxRequest& rReq)
 
         case SID_RENAMEPAGE_QUICK:
         {
-            if (mePageKind==PK_STANDARD || mePageKind==PK_NOTES )
+            if ( mePageKind == PageKind::Standard || mePageKind == PageKind::Notes )
             {
                 if ( mpDrawView->IsTextEdit() )
                 {
@@ -3081,7 +3082,7 @@ SdPage* DrawViewShell::CreateOrDuplicatePage (
     const sal_Int32 nInsertPosition)
 {
     SdPage* pNewPage = nullptr;
-    if (ePageKind == PK_STANDARD && meEditMode != EM_MASTERPAGE)
+    if ( ePageKind == PageKind::Standard && meEditMode != EditMode::MasterPage )
     {
         if ( mpDrawView->IsTextEdit() )
         {

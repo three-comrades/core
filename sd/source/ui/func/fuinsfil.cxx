@@ -146,7 +146,7 @@ void FuInsertFile::DoExecute( SfxRequest& rReq )
 
         aFileDialog.SetTitle( SD_RESSTR(STR_DLG_INSERT_PAGES_FROM_FILE) );
 
-        if( mpDoc->GetDocumentType() == DOCUMENT_TYPE_IMPRESS )
+        if( mpDoc->GetDocumentType() == DocumentType::Impress )
         {
             aOwnCont = "simpress";
             aOtherCont = "sdraw";
@@ -169,7 +169,7 @@ void FuInsertFile::DoExecute( SfxRequest& rReq )
                 lcl_AddFilter( aFilterVector, pFilter );
 
                 // get template filter
-                if( mpDoc->GetDocumentType() == DOCUMENT_TYPE_IMPRESS )
+                if( mpDoc->GetDocumentType() == DocumentType::Impress )
                     pFilter = DrawDocShell::Factory().GetTemplateFilter();
                 else
                     pFilter = GraphicDocShell::Factory().GetTemplateFilter();
@@ -360,13 +360,13 @@ bool FuInsertFile::InsSDDinDrMode(SfxMedium* pMedium)
 
         sal_uInt16 nPos = 0xFFFF;
 
-        if (pPage && !pPage->IsMasterPage())
+        if ( pPage && !pPage->IsMasterPage() )
         {
-            if (pPage->GetPageKind() == PK_STANDARD)
+            if ( pPage->GetPageKind() == PageKind::Standard )
             {
                 nPos = pPage->GetPageNum() + 2;
             }
-            else if (pPage->GetPageKind() == PK_NOTES)
+            else if ( pPage->GetPageKind() == PageKind::Notes )
             {
                 nPos = pPage->GetPageNum() + 1;
             }
@@ -465,7 +465,7 @@ void FuInsertFile::InsTextOrRTFinDrMode(SfxMedium* pMedium)
         else
         {
             // is it a master page?
-            if (static_cast<DrawViewShell*>(mpViewShell)->GetEditMode() == EM_MASTERPAGE &&
+            if (static_cast<DrawViewShell*>(mpViewShell)->GetEditMode() == EditMode::MasterPage &&
                 !pPage->IsMasterPage())
             {
                 pPage = static_cast<SdPage*>(&(pPage->TRG_GetMasterPage()));
@@ -576,7 +576,7 @@ void FuInsertFile::InsTextOrRTFinOlMode(SfxMedium* pMedium)
             nPage++;
         pPara = rDocliner.GetParagraph( nPos - 1 );
     }
-    SdPage* pPage = mpDoc->GetSdPage(nPage, PK_STANDARD);
+    SdPage* pPage = mpDoc->GetSdPage( nPage, PageKind::Standard );
     aLayoutName = pPage->GetLayoutName();
     sal_Int32 nIndex = aLayoutName.indexOf(SD_LT_SEPARATOR);
     if( nIndex != -1 )

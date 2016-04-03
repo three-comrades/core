@@ -406,7 +406,7 @@ HtmlExport::~HtmlExport()
 // get common export parameters from item set
 void HtmlExport::InitExportParameters( const Sequence< PropertyValue >& rParams )
 {
-    mbImpress = mpDoc->GetDocumentType() == DOCUMENT_TYPE_IMPRESS;
+    mbImpress = mpDoc->GetDocumentType() == DocumentType::Impress;
 
     sal_Int32 nArgs = rParams.getLength();
     const PropertyValue* pParams = rParams.getConstArray();
@@ -437,7 +437,7 @@ void HtmlExport::InitExportParameters( const Sequence< PropertyValue >& rParams 
             if(!aTmp.isEmpty())
             {
                 aTmp = aTmp.replaceFirst("%", "");
-                mnCompression = (sal_Int16)aTmp.toInt32();
+                mnCompression = static_cast< sal_Int16 >( aTmp.toInt32() );
             }
         }
         else if ( pParams->Name == "Width" )
@@ -450,7 +450,7 @@ void HtmlExport::InitExportParameters( const Sequence< PropertyValue >& rParams 
         {
             sal_Int32 temp = 0;
             pParams->Value >>= temp;
-            mnButtonThema = (sal_Int16)temp;
+            mnButtonThema = static_cast< sal_Int16 >( temp );
         }
         else if ( pParams->Name == "IsExportNotes" )
         {
@@ -583,7 +583,7 @@ void HtmlExport::InitExportParameters( const Sequence< PropertyValue >& rParams 
         }
         else
         {
-            OSL_FAIL("Unknown property for html export detected!");
+            SAL_WARN( "sd.filter", "unknown property \"" << pParams->Name << "\" for html export" );
         }
 
         pParams++;
@@ -597,7 +597,7 @@ void HtmlExport::InitExportParameters( const Sequence< PropertyValue >& rParams 
     }
 
     // calculate image sizes
-    SdPage* pPage = mpDoc->GetSdPage(0, PK_STANDARD);
+    SdPage* pPage = mpDoc->GetSdPage( 0, PageKind::Standard );
     Size aTmpSize( pPage->GetSize() );
     double dRatio=((double)aTmpSize.Width())/aTmpSize.Height();
 
@@ -611,15 +611,15 @@ void HtmlExport::InitExportParameters( const Sequence< PropertyValue >& rParams 
     maExportPath = aINetURLObj.GetPartBeforeLastName(); // with trailing '/'
     maIndex = aINetURLObj.GetLastName();
 
-    mnSdPageCount = mpDoc->GetSdPageCount( PK_STANDARD );
+    mnSdPageCount = mpDoc->GetSdPageCount( PageKind::Standard );
     for( sal_uInt16 nPage = 0; nPage < mnSdPageCount; nPage++ )
     {
-        pPage = mpDoc->GetSdPage( nPage, PK_STANDARD );
+        pPage = mpDoc->GetSdPage( nPage, PageKind::Standard );
 
         if( mbHiddenSlides || !pPage->IsExcluded() )
         {
             maPages.push_back( pPage );
-            maNotesPages.push_back( mpDoc->GetSdPage( nPage, PK_NOTES ) );
+            maNotesPages.push_back( mpDoc->GetSdPage( nPage, PageKind::Notes ) );
         }
     }
     mnSdPageCount = maPages.size();
@@ -803,8 +803,8 @@ void HtmlExport::ExportHtml()
 
 void HtmlExport::SetDocColors( SdPage* pPage )
 {
-    if( pPage == nullptr )
-        pPage = mpDoc->GetSdPage(0, PK_STANDARD);
+    if( ! pPage )
+        pPage = mpDoc->GetSdPage( 0, PageKind::Standard );
 
     svtools::ColorConfig aConfig;
     maVLinkColor = Color(aConfig.GetColorValue(svtools::LINKSVISITED).nColor);
@@ -814,7 +814,7 @@ void HtmlExport::SetDocColors( SdPage* pPage )
 
     SfxStyleSheet* pSheet = nullptr;
 
-    if( mpDoc->GetDocumentType() == DOCUMENT_TYPE_IMPRESS )
+    if( mpDoc->GetDocumentType() == DocumentType::Impress )
     {
         // default text color from the outline template of the first page
         pSheet = pPage->GetStyleSheetForPresObj(PRESOBJ_OUTLINE);
@@ -2209,7 +2209,7 @@ OUString HtmlExport::getDocumentTitle()
         {
             // if there is a non-empty title object, use their first passage
             // as page title
-            SdPage* pSdPage = mpDoc->GetSdPage(0, PK_STANDARD);
+            SdPage* pSdPage = mpDoc->GetSdPage( 0, PageKind::Standard );
             SdrObject* pTitleObj = pSdPage->GetPresObj(PRESOBJ_TITLE);
             if (pTitleObj && !pTitleObj->IsEmptyPresObj())
             {

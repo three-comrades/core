@@ -541,7 +541,7 @@ void SlotManager::GetMenuState (SfxItemSet& rSet)
     if (SfxItemState::DEFAULT == rSet.GetItemState(SID_EXPAND_PAGE))
     {
         bool bDisable = true;
-        if (eEditMode == EM_PAGE)
+        if ( eEditMode == EditMode::Page )
         {
             // At least one of the selected pages has to contain an outline
             // presentation objects in order to enable the expand page menu
@@ -584,7 +584,7 @@ void SlotManager::GetMenuState (SfxItemSet& rSet)
     if (SfxItemState::DEFAULT == rSet.GetItemState(SID_SUMMARY_PAGE))
     {
         bool bDisable = true;
-        if (eEditMode == EM_PAGE)
+        if ( eEditMode == EditMode::Page )
         {
             // At least one of the selected pages has to contain a title
             // presentation objects in order to enable the summary page menu
@@ -675,18 +675,18 @@ void SlotManager::GetMenuState (SfxItemSet& rSet)
     }
 
     PageKind ePageKind = mrSlideSorter.GetModel().GetPageType();
-    if ((eEditMode == EM_MASTERPAGE) && (ePageKind != PK_HANDOUT))
+    if ( ( eEditMode == EditMode::MasterPage ) && ( ePageKind != PageKind::Handout ) )
     {
         rSet.DisableItem(SID_ASSIGN_LAYOUT);
     }
 
-    if ((eEditMode == EM_MASTERPAGE) || (ePageKind==PK_NOTES))
+    if ( ( eEditMode == EditMode::MasterPage ) || ( ePageKind == PageKind::Notes ) )
     {
         rSet.DisableItem(SID_INSERTPAGE);
     }
 
-    // Disable some slots when in master page mode.
-    if (eEditMode == EM_MASTERPAGE)
+    // disable some slots when editing master page
+    if ( eEditMode == EditMode::MasterPage )
     {
         if (rSet.GetItemState(SID_INSERTPAGE) == SfxItemState::DEFAULT)
             rSet.DisableItem(SID_INSERTPAGE);
@@ -748,7 +748,7 @@ void SlotManager::GetClipboardState ( SfxItemSet& rSet)
         || rSet.GetItemState(SID_PASTE_SPECIAL)  == SfxItemState::DEFAULT
         || rSet.GetItemState(SID_CUT)  == SfxItemState::DEFAULT)
     {
-        if (mrSlideSorter.GetModel().GetEditMode() == EM_MASTERPAGE)
+        if ( mrSlideSorter.GetModel().GetEditMode() == EditMode::MasterPage )
         {
             if (rSet.GetItemState(SID_CUT) == SfxItemState::DEFAULT)
                 rSet.DisableItem(SID_CUT);
@@ -871,7 +871,7 @@ void SlotManager::RenameSlide()
     PageKind ePageKind = mrSlideSorter.GetModel().GetPageType();
     View* pDrView = &mrSlideSorter.GetView();
 
-    if (ePageKind==PK_STANDARD || ePageKind==PK_NOTES)
+    if ( ePageKind == PageKind::Standard || ePageKind == PageKind::Notes )
     {
         if ( pDrView->IsTextEdit() )
         {
@@ -950,7 +950,7 @@ bool SlotManager::RenameSlideFromDrawViewShell( sal_uInt16 nPageId, const OUStri
 
     ::svl::IUndoManager* pManager = pDocument->GetDocSh()->GetUndoManager();
 
-    if( mrSlideSorter.GetModel().GetEditMode() == EM_PAGE )
+    if( mrSlideSorter.GetModel().GetEditMode() == EditMode::Page )
     {
         model::SharedPageDescriptor pDescriptor (
             mrSlideSorter.GetController().GetCurrentSlideManager()->GetCurrentSlide());
@@ -976,10 +976,10 @@ bool SlotManager::RenameSlideFromDrawViewShell( sal_uInt16 nPageId, const OUStri
             // rename
             pPageToRename->SetName( rName );
 
-            if( ePageKind == PK_STANDARD )
+            if( ePageKind == PageKind::Standard )
             {
                 // also rename notes-page
-                SdPage* pNotesPage = pDocument->GetSdPage( nPageId, PK_NOTES );
+                SdPage* pNotesPage = pDocument->GetSdPage( nPageId, PageKind::Notes );
                 if (pNotesPage != nullptr)
                     pNotesPage->SetName (rName);
             }
@@ -1040,11 +1040,11 @@ void SlotManager::InsertSlide (SfxRequest& rRequest)
     PageSelector::BroadcastLock aBroadcastLock (mrSlideSorter);
 
     SdPage* pNewPage = nullptr;
-    if (mrSlideSorter.GetModel().GetEditMode() == EM_PAGE)
+    if ( mrSlideSorter.GetModel().GetEditMode() == EditMode::Page )
     {
         SlideSorterViewShell* pShell = dynamic_cast<SlideSorterViewShell*>(
             mrSlideSorter.GetViewShell());
-        if (pShell != nullptr)
+        if ( pShell )
         {
             pNewPage = pShell->CreateOrDuplicatePage (
                 rRequest,
@@ -1070,7 +1070,7 @@ void SlotManager::InsertSlide (SfxRequest& rRequest)
 
                 // Create shapes for the default layout.
                 pNewPage = pDocument->GetMasterSdPage(
-                    (sal_uInt16)(nInsertionIndex+1), PK_STANDARD);
+                    (sal_uInt16)(nInsertionIndex+1), PageKind::Standard);
                 pNewPage->CreateTitleAndLayout (true,true);
             }
         }
@@ -1119,7 +1119,7 @@ void SlotManager::DuplicateSelectedSlides (SfxRequest& rRequest)
     {
         aPagesToSelect.push_back(
             mrSlideSorter.GetViewShell()->CreateOrDuplicatePage(
-                rRequest, PK_STANDARD, *iPage, nInsertPosition));
+                rRequest, PageKind::Standard, *iPage, nInsertPosition));
     }
     aPagesToDuplicate.clear();
 

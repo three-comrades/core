@@ -100,7 +100,7 @@ public:
 };
 
 SdHtmlOptionsDialog::SdHtmlOptionsDialog() :
-    meDocType   ( DOCUMENT_TYPE_DRAW )
+    meDocType   ( DocumentType::Draw )
 {
 }
 
@@ -217,18 +217,17 @@ sal_Int16 SdHtmlOptionsDialog::execute()
 void SdHtmlOptionsDialog::setSourceDocument( const Reference< XComponent >& xDoc )
         throw ( IllegalArgumentException, RuntimeException, std::exception )
 {
-    // try to set the corresponding metric unit
-    Reference< XServiceInfo > xServiceInfo(xDoc, UNO_QUERY);
+    Reference< XServiceInfo > xServiceInfo( xDoc, UNO_QUERY );
     if ( xServiceInfo.is() )
     {
         if ( xServiceInfo->supportsService( "com.sun.star.presentation.PresentationDocument" ) )
         {
-            meDocType = DOCUMENT_TYPE_IMPRESS;
+            meDocType = DocumentType::Impress;
             return;
         }
         else if ( xServiceInfo->supportsService( "com.sun.star.drawing.DrawingDocument" ) )
         {
-            meDocType = DOCUMENT_TYPE_DRAW;
+            meDocType = DocumentType::Draw;
             return;
         }
     }

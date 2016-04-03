@@ -133,7 +133,7 @@ bool DrawView::SetAttributes(const SfxItemSet& rSet,
     bool bOk = false;
 
     // is there a masterpage edit?
-    if ( mpDrawViewShell && mpDrawViewShell->GetEditMode() == EM_MASTERPAGE )
+    if ( mpDrawViewShell && mpDrawViewShell->GetEditMode() == EditMode::MasterPage )
     {
         SfxStyleSheetBasePool* pStShPool = mrDoc.GetStyleSheetPool();
         SdPage& rPage = *mpDrawViewShell->getCurrentPage();
@@ -429,7 +429,7 @@ bool DrawView::SetStyleSheet(SfxStyleSheet* pStyleSheet, bool bDontRemoveHardAtt
     bool bResult = true;
 
     // is there a masterpage edit?
-    if (mpDrawViewShell && mpDrawViewShell->GetEditMode() == EM_MASTERPAGE)
+    if ( mpDrawViewShell && mpDrawViewShell->GetEditMode() == EditMode::MasterPage )
     {
         if (IsPresObjSelected(false))
         {
@@ -463,7 +463,7 @@ void DrawView::CompleteRedraw(OutputDevice* pOutDev, const vcl::Region& rReg, sd
     bool bStandardPaint = true;
 
     SdDrawDocument* pDoc = mpDocShell->GetDoc();
-    if( pDoc && pDoc->GetDocumentType() == DOCUMENT_TYPE_IMPRESS)
+    if( pDoc && pDoc->GetDocumentType() == DocumentType::Impress )
     {
         rtl::Reference< sd::SlideShow > xSlideshow( SlideShow::GetSlideShow( pDoc ) );
         if(xSlideshow.is() && xSlideshow->isRunning())

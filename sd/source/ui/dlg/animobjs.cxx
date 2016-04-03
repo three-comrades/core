@@ -164,7 +164,7 @@ AnimationWindow::AnimationWindow(SfxBindings* pInBindings, SfxChildWindow *pCW, 
     m_pCtlDisplay->Show();
 
     // create new document with page
-    pMyDoc = new SdDrawDocument(DOCUMENT_TYPE_IMPRESS, nullptr);
+    pMyDoc = new SdDrawDocument( DocumentType::Impress, nullptr );
     SdPage* pPage = pMyDoc->AllocSdPage(false);
     pMyDoc->InsertPage(pPage);
 
@@ -414,7 +414,7 @@ IMPL_LINK_TYPED( AnimationWindow, ClickGetObjectHdl, Button*, pBtn, void )
 
 IMPL_LINK_TYPED( AnimationWindow, ClickRemoveBitmapHdl, Button*, pBtn, void )
 {
-    SdPage*     pPage = pMyDoc->GetSdPage(0, PK_STANDARD);
+    SdPage*     pPage = pMyDoc->GetSdPage( 0, PageKind::Standard );
     SdrObject*  pObject;
 
     // tdf#95298 check m_nCurrentFrame for EMPTY_FRAMELIST to avoid out-of-bound array access
@@ -525,7 +525,7 @@ void AnimationWindow::UpdateControl(bool const bDisableCtrls)
     {
         BitmapEx aBmp(*m_FrameList[m_nCurrentFrame].first);
 
-        SdPage* pPage = pMyDoc->GetSdPage(0, PK_STANDARD);
+        SdPage* pPage = pMyDoc->GetSdPage( 0, PageKind::Standard );
         SdrObject *const pObject =
             static_cast<SdrObject*>(pPage->GetObj(m_nCurrentFrame));
         if( pObject )
@@ -714,7 +714,7 @@ void AnimationWindow::AddObj (::sd::View& rView )
     // clone object(s) and insert the clone(s) into the list
     const SdrMarkList& rMarkList   = rView.GetMarkedObjectList();
     const size_t nMarkCount = rMarkList.GetMarkCount();
-    SdPage*            pPage       = pMyDoc->GetSdPage(0, PK_STANDARD);
+    SdPage* pPage = pMyDoc->GetSdPage( 0, PageKind::Standard );
     const size_t nCloneCount = pPage->GetObjCount();
 
     if (nMarkCount > 0)
@@ -1019,7 +1019,7 @@ void AnimationWindow::CreateAnimObj (::sd::View& rView )
         // calculate offset for the specified direction
         Size aOffset;
         SdrObject * pClone = nullptr;
-        SdPage* pPage = pMyDoc->GetSdPage(0, PK_STANDARD);
+        SdPage* pPage = pMyDoc->GetSdPage( 0, PageKind::Standard );
 
         for (size_t i = 0; i < nCount; ++i)
         {

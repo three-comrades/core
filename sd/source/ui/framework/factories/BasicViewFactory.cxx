@@ -339,7 +339,7 @@ std::shared_ptr<ViewShell> BasicViewFactory::CreateViewShell (
                 &rFrame,
                 *mpBase,
                 &rWindow,
-                PK_STANDARD,
+                PageKind::Standard,
                 pFrameView));
     }
     else if (rsViewURL.equals(FrameworkHelper::msDrawViewURL))
@@ -367,7 +367,7 @@ std::shared_ptr<ViewShell> BasicViewFactory::CreateViewShell (
                 &rFrame,
                 *mpBase,
                 &rWindow,
-                PK_NOTES,
+                PageKind::Notes,
                 pFrameView));
     }
     else if (rsViewURL.equals(FrameworkHelper::msHandoutViewURL))
@@ -377,7 +377,7 @@ std::shared_ptr<ViewShell> BasicViewFactory::CreateViewShell (
                 &rFrame,
                 *mpBase,
                 &rWindow,
-                PK_HANDOUT,
+                PageKind::Handout,
                 pFrameView));
     }
     else if (rsViewURL.equals(FrameworkHelper::msPresentationViewURL))

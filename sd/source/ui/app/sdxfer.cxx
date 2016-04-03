@@ -261,7 +261,7 @@ void SdTransferable::CreateData()
     {
         mbOwnView = true;
 
-        SdPage* pPage = mpSdDrawDocument->GetSdPage(0, PK_STANDARD);
+        SdPage* pPage = mpSdDrawDocument->GetSdPage( 0, PageKind::Standard );
 
         if( 1 == pPage->GetObjCount() )
             CreateObjectReplacement( pPage->GetObj( 0 ) );
@@ -302,7 +302,7 @@ void SdTransferable::CreateData()
         SdrModel*           pOldModel = mpSdView->GetModel();
         SdStyleSheetPool*   pOldStylePool = static_cast<SdStyleSheetPool*>( pOldModel->GetStyleSheetPool() );
         SdStyleSheetPool*   pNewStylePool = static_cast<SdStyleSheetPool*>( mpSdDrawDocumentIntern->GetStyleSheetPool() );
-        SdPage*             pPage = mpSdDrawDocumentIntern->GetSdPage( 0, PK_STANDARD );
+        SdPage*             pPage = mpSdDrawDocumentIntern->GetSdPage( 0, PageKind::Standard );
         OUString            aOldLayoutName( pOldPage->GetLayoutName() );
 
         pPage->SetSize( pOldPage->GetSize() );
@@ -322,7 +322,7 @@ void SdTransferable::CreateData()
         mpSdDrawDocumentIntern && mpSdViewIntern &&
         mpSdDrawDocumentIntern->GetPageCount() )
     {
-        SdPage* pPage = mpSdDrawDocumentIntern->GetSdPage( 0, PK_STANDARD );
+        SdPage* pPage = mpSdDrawDocumentIntern->GetSdPage( 0, PageKind::Standard );
 
         if( 1 == mpSdDrawDocumentIntern->GetPageCount() )
         {
@@ -610,16 +610,19 @@ bool SdTransferable::WriteObject( tools::SvRef<SotStorageStream>& rxOStm, void* 
 
                 {
                     css::uno::Reference<css::io::XOutputStream> xDocOut( new utl::OOutputStreamWrapper( *rxOStm ) );
-                    if( SvxDrawingLayerExport( pDoc, xDocOut, xComponent, (pDoc->GetDocumentType() == DOCUMENT_TYPE_IMPRESS) ? "com.sun.star.comp.Impress.XMLClipboardExporter" : "com.sun.star.comp.DrawingLayer.XMLExporter" ) )
+                    if( SvxDrawingLayerExport( pDoc, xDocOut, xComponent,
+                            ( pDoc->GetDocumentType() == DocumentType::Impress )
+                                ? "com.sun.star.comp.Impress.XMLClipboardExporter"
+                                : "com.sun.star.comp.DrawingLayer.XMLExporter" ) )
                         rxOStm->Commit();
                 }
 
                 xComponent->dispose();
                 bRet = ( rxOStm->GetError() == ERRCODE_NONE );
             }
-            catch( Exception& )
+            catch( ... )
             {
-                OSL_FAIL( "sd::SdTransferable::WriteObject(), exception catched!" );
+                SAL_WARN( "sd", "caught exception in SdTransferable::WriteObject()" );
                 bRet = false;
             }
         }
@@ -658,8 +661,7 @@ bool SdTransferable::WriteObject( tools::SvRef<SotStorageStream>& rxOStm, void* 
                 bRet = true;
                 rxOStm->Commit();
             }
-            catch ( Exception& )
-            {}
+            catch ( ... ) { }
         }
 
         break;
@@ -723,7 +725,7 @@ void SdTransferable::SetPageBookmarks( const std::vector<OUString> &rPageBookmar
 
         if( mpSdViewIntern )
         {
-            SdPage* pPage = mpSdDrawDocument->GetSdPage( 0, PK_STANDARD );
+            SdPage* pPage = mpSdDrawDocument->GetSdPage( 0, PageKind::Standard );
 
             if( pPage )
             {

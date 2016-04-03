@@ -1055,9 +1055,9 @@ void ToolBarRules::MainViewShellChanged (const ViewShell& rMainViewShell)
         {
             const DrawViewShell* pDrawViewShell
                 = dynamic_cast<const DrawViewShell*>(&rMainViewShell);
-            if (pDrawViewShell != nullptr)
+            if ( pDrawViewShell )
             {
-                if (pDrawViewShell->GetEditMode() == EM_MASTERPAGE)
+                if ( pDrawViewShell->GetEditMode() == EditMode::MasterPage )
                     mpToolBarManager->AddToolBar(
                         ToolBarManager::TBG_MASTER_MODE,
                         ToolBarManager::msMasterViewToolBar);

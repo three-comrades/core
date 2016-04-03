@@ -103,8 +103,8 @@ SlideSorterModel::SlideSorterModel (SlideSorter& rSlideSorter)
     : maMutex(),
       mrSlideSorter(rSlideSorter),
       mxSlides(),
-      mePageKind(PK_STANDARD),
-      meEditMode(EM_PAGE),
+      mePageKind( PageKind::Standard ),
+      meEditMode( EditMode::Page ),
       maPageDescriptors(0)
 {
 }
@@ -440,7 +440,7 @@ void SlideSorterModel::UpdatePageList()
     {
         switch (meEditMode)
         {
-            case EM_MASTERPAGE:
+            case EditMode::MasterPage:
             {
                 Reference<drawing::XMasterPagesSupplier> xSupplier (
                     xController->getModel(), UNO_QUERY);
@@ -451,7 +451,7 @@ void SlideSorterModel::UpdatePageList()
             }
             break;
 
-            case EM_PAGE:
+            case EditMode::Page:
             {
                 Reference<drawing::XDrawPagesSupplier> xSupplier (
                     xController->getModel(), UNO_QUERY);
@@ -528,9 +528,9 @@ bool SlideSorterModel::NotifyPageEvent (const SdrPage* pSdrPage)
 
     // We are only interested in pages that are currently served by this
     // model.
-    if (pPage->GetPageKind() != mePageKind)
+    if ( pPage->GetPageKind() != mePageKind )
         return false;
-    if (pPage->IsMasterPage() != (meEditMode==EM_MASTERPAGE))
+    if ( pPage->IsMasterPage() != ( meEditMode == EditMode::MasterPage ) )
         return false;
 
     //NotifyPageEvent is called for add, remove, *and* change position so for
@@ -634,9 +634,9 @@ void SlideSorterModel::UpdateIndices (const sal_Int32 nFirstIndex)
 SdPage* SlideSorterModel::GetPage (const sal_Int32 nSdIndex) const
 {
     SdDrawDocument* pModel = const_cast<SlideSorterModel*>(this)->GetDocument();
-    if (pModel != nullptr)
+    if ( pModel )
     {
-        if (meEditMode == EM_PAGE)
+        if ( meEditMode == EditMode::Page )
             return pModel->GetSdPage ((sal_uInt16)nSdIndex, mePageKind);
         else
             return pModel->GetMasterSdPage ((sal_uInt16)nSdIndex, mePageKind);

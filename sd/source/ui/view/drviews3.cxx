@@ -149,9 +149,11 @@ void  DrawViewShell::ExecCtrl(SfxRequest& rReq)
                     const SfxUInt32Item* pWhatPage = rReq.GetArg<SfxUInt32Item>(ID_VAL_WHATPAGE);
                     const SfxUInt32Item* pWhatKind = rReq.GetArg<SfxUInt32Item>(ID_VAL_WHATKIND);
 
-                    sal_Int32 nWhatPage = (sal_Int32)pWhatPage->GetValue ();
-                    sal_Int32 nWhatKind = (sal_Int32)pWhatKind->GetValue ();
-                    if (! CHECK_RANGE (PK_STANDARD, nWhatKind, PK_HANDOUT))
+                    sal_Int32 nWhatPage = static_cast< sal_Int32 >( pWhatPage->GetValue () );
+                    sal_Int32 nWhatKind = static_cast< sal_Int32 >( pWhatKind->GetValue () );
+                    if (! CHECK_RANGE ( static_cast< sal_Int32 >( PageKind::Standard )
+                                      , nWhatKind
+                                      , static_cast< sal_Int32 >( PageKind::Handout ) ))
                     {
 #if HAVE_FEATURE_SCRIPTING
                         StarBASIC::FatalError (ERRCODE_BASIC_BAD_PROP_VALUE);
@@ -159,9 +161,9 @@ void  DrawViewShell::ExecCtrl(SfxRequest& rReq)
                         rReq.Ignore ();
                         break;
                     }
-                    else if (meEditMode != EM_MASTERPAGE)
+                    else if ( meEditMode != EditMode::MasterPage )
                     {
-                        if (! CHECK_RANGE (0, nWhatPage, GetDoc()->GetSdPageCount((PageKind)nWhatKind)))
+                        if (! CHECK_RANGE ( 0, nWhatPage, GetDoc()->GetSdPageCount( static_cast< PageKind >( nWhatKind ) ) ))
                         {
 #if HAVE_FEATURE_SCRIPTING
                             StarBASIC::FatalError (ERRCODE_BASIC_BAD_PROP_VALUE);
@@ -171,7 +173,7 @@ void  DrawViewShell::ExecCtrl(SfxRequest& rReq)
                         }
 
                         nSelectedPage = (short) nWhatPage;
-                        mePageKind    = (PageKind) nWhatKind;
+                        mePageKind    = static_cast< PageKind >( nWhatKind );
                     }
                 }
                 else
@@ -244,18 +246,18 @@ void  DrawViewShell::ExecCtrl(SfxRequest& rReq)
                 const SfxBoolItem* pIsActive = rReq.GetArg<SfxBoolItem>(ID_VAL_ISACTIVE);
                 const SfxUInt32Item* pWhatKind = rReq.GetArg<SfxUInt32Item>(ID_VAL_WHATKIND);
 
-                sal_Int32 nWhatKind = (sal_Int32)pWhatKind->GetValue ();
-                if (CHECK_RANGE (PK_STANDARD, nWhatKind, PK_HANDOUT))
+                sal_Int32 nWhatKind = pWhatKind->GetValue ();
+                if (CHECK_RANGE ( static_cast< sal_Int32 >( PageKind::Standard ), nWhatKind, static_cast< sal_Int32 >( PageKind::Handout ) ))
                 {
                     mbIsLayerModeActive = pIsActive->GetValue ();
-                    mePageKind = (PageKind) nWhatKind;
+                    mePageKind = static_cast< PageKind >( nWhatKind );
                 }
             }
 
             // turn on default layer of page
             mpDrawView->SetActiveLayer(SD_RESSTR(STR_LAYER_LAYOUT));
 
-            ChangeEditMode(EM_PAGE, mbIsLayerModeActive);
+            ChangeEditMode( EditMode::Page, mbIsLayerModeActive );
 
             Invalidate();
             rReq.Done ();
@@ -272,11 +274,13 @@ void  DrawViewShell::ExecCtrl(SfxRequest& rReq)
                 const SfxBoolItem* pWhatLayerMode = rReq.GetArg<SfxBoolItem>(ID_VAL_ISACTIVE);
                 const SfxUInt32Item* pWhatLayer = rReq.GetArg<SfxUInt32Item>(ID_VAL_WHATLAYER);
 
-                sal_Int32 nWhatLayer = (sal_Int32)pWhatLayer->GetValue ();
-                if (CHECK_RANGE (EM_PAGE, nWhatLayer, EM_MASTERPAGE))
+                sal_Int32 nWhatLayer = static_cast< sal_Int32 >( pWhatLayer->GetValue () );
+                if (CHECK_RANGE ( static_cast< sal_Int32 >( EditMode::Page )
+                                , nWhatLayer
+                                , static_cast< sal_Int32 >( EditMode::MasterPage ) ))
                 {
                     mbIsLayerModeActive = pWhatLayerMode->GetValue ();
-                    meEditMode = (EditMode) nWhatLayer;
+                    meEditMode = static_cast< EditMode >( nWhatLayer );
                 }
             }
 
@@ -312,7 +316,7 @@ void  DrawViewShell::ExecCtrl(SfxRequest& rReq)
         case SID_MASTER_LAYOUTS:
         {
             SdPage* pPage = GetActualPage();
-            if (meEditMode == EM_MASTERPAGE)
+            if ( meEditMode == EditMode::MasterPage )
                 // Use the master page of the current page.
                 pPage = static_cast<SdPage*>(&pPage->TRG_GetMasterPage());
 

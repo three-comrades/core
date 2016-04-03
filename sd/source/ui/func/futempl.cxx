@@ -241,7 +241,7 @@ void FuTemplate::DoExecute( SfxRequest& rReq )
                     (pStyleSheet->GetFamily() == SD_STYLE_FAMILY_GRAPHICS && pOldStyleSheet->GetHelpId( aStr ) == HID_PSEUDOSHEET_BACKGROUNDOBJECTS) ||
 
                     // allow if old was presentation and we are a drawing document
-                    (pOldStyleSheet->GetFamily() == SD_STYLE_FAMILY_MASTERPAGE && mpDoc->GetDocumentType() == DOCUMENT_TYPE_DRAW) )
+                    (pOldStyleSheet->GetFamily() == SD_STYLE_FAMILY_MASTERPAGE && mpDoc->GetDocumentType() == DocumentType::Draw ) )
                 {
                     mpView->SetStyleSheet( static_cast<SfxStyleSheet*>(pStyleSheet));
                     mpDoc->SetChanged();
@@ -513,11 +513,11 @@ void FuTemplate::DoExecute( SfxRequest& rReq )
                         if( pDrawViewShell )
                         {
                             PageKind ePageKind = pDrawViewShell->GetPageKind();
-                            if( ePageKind == PK_NOTES || ePageKind == PK_HANDOUT )
+                            if( ePageKind == PageKind::Notes || ePageKind == PageKind::Handout )
                             {
                                 SdPage* pPage = mpViewShell->GetActualPage();
 
-                                if(pDrawViewShell->GetEditMode() == EM_MASTERPAGE)
+                                if( pDrawViewShell->GetEditMode() == EditMode::MasterPage )
                                 {
                                     pPage = static_cast<SdPage*>((&(pPage->TRG_GetMasterPage())));
                                 }

@@ -474,7 +474,7 @@ bool FuText::MouseMove(const MouseEvent& rMEvt)
 
 void FuText::ImpSetAttributesForNewTextObject(SdrTextObj* pTxtObj)
 {
-    if(mpDoc->GetDocumentType() == DOCUMENT_TYPE_IMPRESS)
+    if( mpDoc->GetDocumentType() == DocumentType::Impress )
     {
         if( nSlotId == SID_ATTR_CHAR )
         {
@@ -554,7 +554,7 @@ void FuText::ImpSetAttributesFitToSizeVertical(SdrTextObj* pTxtObj)
 void FuText::ImpSetAttributesFitCommon(SdrTextObj* pTxtObj)
 {
     // Normal Textobject
-    if (mpDoc->GetDocumentType() == DOCUMENT_TYPE_IMPRESS)
+    if ( mpDoc->GetDocumentType() == DocumentType::Impress )
     {
         if( nSlotId == SID_ATTR_CHAR )
         {

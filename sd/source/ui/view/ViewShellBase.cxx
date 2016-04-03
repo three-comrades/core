@@ -550,7 +550,7 @@ sal_uInt16 ViewShellBase::SetPrinter (
         if (pDrawViewShell)
         {
             SdPage* pPage = GetDocument()->GetSdPage(
-                0, PK_STANDARD );
+                0, PageKind::Standard );
             pDrawViewShell->SetPageSizeAndBorder (
                 pDrawViewShell->GetPageKind(),
                 aNewSize,
@@ -708,13 +708,13 @@ void ViewShellBase::ReadUserDataSequence (
                 switch (dynamic_cast<DrawViewShell&>(*pShell).GetPageKind())
                 {
                     default:
-                    case PK_STANDARD:
+                    case PageKind::Standard:
                         sViewURL = framework::FrameworkHelper::msImpressViewURL;
                         break;
-                    case PK_NOTES:
+                    case PageKind::Notes:
                         sViewURL = framework::FrameworkHelper::msNotesViewURL;
                         break;
-                    case PK_HANDOUT:
+                    case PageKind::Handout:
                         sViewURL = framework::FrameworkHelper::msHandoutViewURL;
                         break;
                 }
@@ -891,15 +891,15 @@ OUString ViewShellBase::GetInitialViewShellType()
                 rProperty.Value >>= nPageKind;
                 switch ((PageKind)nPageKind)
                 {
-                    case PK_STANDARD:
+                    case PageKind::Standard:
                         sRequestedView = FrameworkHelper::msImpressViewURL;
                         break;
 
-                    case PK_HANDOUT:
+                    case PageKind::Handout:
                         sRequestedView = FrameworkHelper::msHandoutViewURL;
                         break;
 
-                    case PK_NOTES:
+                    case PageKind::Notes:
                         sRequestedView = FrameworkHelper::msNotesViewURL;
                         break;
 
@@ -1246,8 +1246,8 @@ void ViewShellBase::Implementation::GetSlotState (SfxItemSet& rSet)
                         if (ViewShell* pViewShell = mrBase.GetMainViewShell().get())
                         {
                             pFrameView = pViewShell->GetFrameView();
-                            bState = pFrameView->GetViewShEditMode() == EM_PAGE
-                                && pFrameView->GetPageKind() == PK_STANDARD;
+                            bState = pFrameView->GetViewShEditMode() == EditMode::Page
+                                && pFrameView->GetPageKind() == PageKind::Standard;
                         }
                         break;
 
@@ -1255,8 +1255,8 @@ void ViewShellBase::Implementation::GetSlotState (SfxItemSet& rSet)
                         if (ViewShell* pViewShell = mrBase.GetMainViewShell().get())
                         {
                             pFrameView = pViewShell->GetFrameView();
-                            bState = pFrameView->GetViewShEditMode() == EM_MASTERPAGE
-                                && pFrameView->GetPageKind() == PK_STANDARD;
+                            bState = pFrameView->GetViewShEditMode() == EditMode::MasterPage
+                                && pFrameView->GetPageKind() == PageKind::Standard;
                         }
                         break;
 
@@ -1281,8 +1281,8 @@ void ViewShellBase::Implementation::GetSlotState (SfxItemSet& rSet)
                         if (ViewShell* pViewShell = mrBase.GetMainViewShell().get())
                         {
                             pFrameView = pViewShell->GetFrameView();
-                            bState = pFrameView->GetViewShEditMode() == EM_MASTERPAGE
-                                && pFrameView->GetPageKind() == PK_HANDOUT;
+                            bState = pFrameView->GetViewShEditMode() == EditMode::MasterPage
+                                && pFrameView->GetPageKind() == PageKind::Handout;
                         }
                         break;
 
@@ -1290,8 +1290,8 @@ void ViewShellBase::Implementation::GetSlotState (SfxItemSet& rSet)
                         if (ViewShell* pViewShell = mrBase.GetMainViewShell().get())
                         {
                             pFrameView = pViewShell->GetFrameView();
-                            bState = pFrameView->GetViewShEditMode() == EM_PAGE
-                                && pFrameView->GetPageKind() == PK_NOTES;
+                            bState = pFrameView->GetViewShEditMode() == EditMode::Page
+                                && pFrameView->GetPageKind() == PageKind::Notes;
                         }
                         break;
 
@@ -1299,8 +1299,8 @@ void ViewShellBase::Implementation::GetSlotState (SfxItemSet& rSet)
                         if (ViewShell* pViewShell = mrBase.GetMainViewShell().get())
                         {
                             pFrameView = pViewShell->GetFrameView();
-                            bState = pFrameView->GetViewShEditMode() == EM_MASTERPAGE
-                                && pFrameView->GetPageKind() == PK_NOTES;
+                            bState = pFrameView->GetViewShEditMode() == EditMode::MasterPage
+                                && pFrameView->GetPageKind() == PageKind::Notes;
                         }
                         break;
 
@@ -1330,7 +1330,7 @@ void ViewShellBase::Implementation::GetSlotState (SfxItemSet& rSet)
                     bool bMasterPageMode (false);
                     if (DrawViewShell* pShell = dynamic_cast<DrawViewShell*>(pCenterViewShell))
                     {
-                        if (pShell->GetEditMode() == EM_MASTERPAGE)
+                        if ( pShell->GetEditMode() == EditMode::MasterPage )
                         {
                             bMasterPageMode = true;
                         }
@@ -1379,14 +1379,14 @@ void CurrentPageSetter::operator() (bool)
         pFrameView = mrBase.GetMainViewShell()->GetFrameView();
     }
 
-    if (pFrameView!=nullptr)
+    if ( pFrameView )
     {
         try
         {
             // Get the current page either from the DrawPagesSupplier or the
             // MasterPagesSupplier.
             Any aPage;
-            if (pFrameView->GetViewShEditModeOnLoad() == EM_PAGE)
+            if ( pFrameView->GetViewShEditModeOnLoad() == EditMode::Page )
             {
                 Reference<drawing::XDrawPagesSupplier> xPagesSupplier (
                     mrBase.GetController()->getModel(), UNO_QUERY_THROW);

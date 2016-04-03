@@ -101,33 +101,33 @@ enum AutoLayout
     AUTOLAYOUT_END
 };
 
-enum PageKind
+enum class PageKind
 {
-    PK_STANDARD,
-    PK_NOTES,
-    PK_HANDOUT
+    Standard,
+    Notes,
+    Handout
 };
 
-enum EditMode
+enum class EditMode
 {
-    EM_PAGE,
-    EM_MASTERPAGE
+    Page,
+    MasterPage
 };
 
-enum DocumentType
+enum class DocumentType
 {
-    DOCUMENT_TYPE_IMPRESS,
-    DOCUMENT_TYPE_DRAW
+    Impress,
+    Draw
 };
 
-enum NavigatorDragType
+enum class NavigatorDragType
 {
-    NAVIGATOR_DRAGTYPE_NONE,
-    NAVIGATOR_DRAGTYPE_URL,
-    NAVIGATOR_DRAGTYPE_LINK,
-    NAVIGATOR_DRAGTYPE_EMBEDDED
+    None,
+    URL,
+    Link,
+    Embedded
 };
-#define NAVIGATOR_DRAGTYPE_COUNT 4
+#define NavigatorDragType_Count  4
 
 #endif // INCLUDED_SD_INC_PRES_HXX
 

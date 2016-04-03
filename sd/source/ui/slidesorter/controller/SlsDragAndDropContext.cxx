@@ -43,8 +43,8 @@ DragAndDropContext::DragAndDropContext (SlideSorter& rSlideSorter)
     : mpTargetSlideSorter(&rSlideSorter),
       mnInsertionIndex(-1)
 {
-    // No Drag-and-Drop for master pages.
-    if (rSlideSorter.GetModel().GetEditMode() != EM_PAGE)
+    // no drag&drop for master pages
+    if ( rSlideSorter.GetModel().GetEditMode() != EditMode::Page )
         return;
 
     // For properly handling transferables created by the navigator we

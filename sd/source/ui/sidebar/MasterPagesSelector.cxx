@@ -354,7 +354,7 @@ void MasterPagesSelector::AssignMasterPageToAllSlides (SdPage* pMasterPage)
     if (pMasterPage == nullptr)
         return;
 
-    sal_uInt16 nPageCount = mrDocument.GetSdPageCount(PK_STANDARD);
+    sal_uInt16 nPageCount = mrDocument.GetSdPageCount( PageKind::Standard );
     if (nPageCount == 0)
         return;
 
@@ -366,7 +366,7 @@ void MasterPagesSelector::AssignMasterPageToAllSlides (SdPage* pMasterPage)
         new ::sd::slidesorter::SlideSorterViewShell::PageSelection());
     for (sal_uInt16 nPageIndex=0; nPageIndex<nPageCount; nPageIndex++)
     {
-        SdPage* pPage = mrDocument.GetSdPage (nPageIndex, PK_STANDARD);
+        SdPage* pPage = mrDocument.GetSdPage ( nPageIndex, PageKind::Standard );
         if (pPage != nullptr && pPage->GetLayoutName() != sFullLayoutName)
         {
             pPageList->push_back (pPage);

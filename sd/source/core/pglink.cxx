@@ -58,7 +58,7 @@ SdPageLink::~SdPageLink()
     const OUString&, const css::uno::Any& )
 {
     SdDrawDocument* pDoc = static_cast<SdDrawDocument*>( pPage->GetModel() );
-    sfx2::LinkManager* pLinkManager = pDoc!=nullptr ? pDoc->GetLinkManager() : nullptr;
+    sfx2::LinkManager* pLinkManager = pDoc ? pDoc->GetLinkManager() : nullptr;
 
     if (pLinkManager)
     {
@@ -84,7 +84,7 @@ SdPageLink::~SdPageLink()
             if (aBookmarkName.isEmpty())
             {
                 // no page name specified: we assume it is the first page
-                aBookmarkName = pBookmarkDoc->GetSdPage(0, PK_STANDARD)->GetName();
+                aBookmarkName = pBookmarkDoc->GetSdPage( 0, PageKind::Standard )->GetName();
                 pPage->SetBookmarkName(aBookmarkName);
             }
 

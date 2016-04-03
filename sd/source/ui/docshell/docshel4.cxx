@@ -302,7 +302,7 @@ bool DrawDocShell::Load( SfxMedium& rMedium )
         //TODO/LATER: looks a little bit strange!
         if( ( GetCreateMode() == SfxObjectCreateMode::EMBEDDED ) && SfxObjectShell::GetVisArea( ASPECT_CONTENT ).IsEmpty() )
         {
-            SdPage* pPage = mpDoc->GetSdPage( 0, PK_STANDARD );
+            SdPage* pPage = mpDoc->GetSdPage( 0, PageKind::Standard );
 
             if( pPage )
                 SetVisArea( Rectangle( pPage->GetAllObjBoundRect() ) );
@@ -757,7 +757,7 @@ bool DrawDocShell::GotoBookmark(const OUString& rBookmark)
             // or the handout view.
             PageKind eNewPageKind = pPage->GetPageKind();
 
-            if( (eNewPageKind != PK_STANDARD) && (mpDoc->GetDocumentType() == DOCUMENT_TYPE_DRAW) )
+            if( ( eNewPageKind != PageKind::Standard ) && ( mpDoc->GetDocumentType() == DocumentType::Draw ) )
                 return false;
 
             if (eNewPageKind != pDrawViewShell->GetPageKind())
@@ -767,13 +767,13 @@ bool DrawDocShell::GotoBookmark(const OUString& rBookmark)
                 OUString sViewURL;
                 switch (eNewPageKind)
                 {
-                    case PK_STANDARD:
+                    case PageKind::Standard:
                         sViewURL = FrameworkHelper::msImpressViewURL;
                         break;
-                    case PK_NOTES:
+                    case PageKind::Notes:
                         sViewURL = FrameworkHelper::msNotesViewURL;
                         break;
-                    case PK_HANDOUT:
+                    case PageKind::Handout:
                         sViewURL = FrameworkHelper::msHandoutViewURL;
                         break;
                     default:
@@ -985,10 +985,10 @@ bool DrawDocShell::SaveAsOwnFormat( SfxMedium& rMedium )
 
         if (!aLayoutName.isEmpty())
         {
-            sal_uInt32 nCount = mpDoc->GetMasterSdPageCount(PK_STANDARD);
+            sal_uInt32 nCount = mpDoc->GetMasterSdPageCount( PageKind::Standard );
             for (sal_uInt32 i = 0; i < nCount; ++i)
             {
-                OUString aOldPageLayoutName = mpDoc->GetMasterSdPage(i, PK_STANDARD)->GetLayoutName();
+                OUString aOldPageLayoutName = mpDoc->GetMasterSdPage( i, PageKind::Standard )->GetLayoutName();
                 OUString aNewLayoutName = aLayoutName;
                 // Don't add suffix for the first master page
                 if( i > 0 )
@@ -1012,7 +1012,7 @@ void DrawDocShell::FillClass(SvGlobalName* pClassName,
 {
     if (nFileFormat == SOFFICE_FILEFORMAT_60)
     {
-        if ( meDocType == DOCUMENT_TYPE_DRAW )
+        if ( meDocType == DocumentType::Draw )
         {
             *pClassName = SvGlobalName(SO3_SDRAW_CLASSID_60);
             *pFormat = SotClipboardFormatId::STARDRAW_60;
@@ -1027,7 +1027,7 @@ void DrawDocShell::FillClass(SvGlobalName* pClassName,
     }
     else if (nFileFormat == SOFFICE_FILEFORMAT_8)
     {
-        if ( meDocType == DOCUMENT_TYPE_DRAW )
+        if ( meDocType == DocumentType::Draw )
         {
             *pClassName = SvGlobalName(SO3_SDRAW_CLASSID_60);
             *pFormat = bTemplate ? SotClipboardFormatId::STARDRAW_8_TEMPLATE : SotClipboardFormatId::STARDRAW_8;
@@ -1041,7 +1041,7 @@ void DrawDocShell::FillClass(SvGlobalName* pClassName,
         }
     }
 
-    *pShortTypeName = OUString(SdResId( (meDocType == DOCUMENT_TYPE_DRAW) ?
+    *pShortTypeName = OUString(SdResId( ( meDocType == DocumentType::Draw ) ?
                                       STR_GRAPHIC_DOCUMENT : STR_IMPRESS_DOCUMENT ));
 }
 
@@ -1050,7 +1050,7 @@ OutputDevice* DrawDocShell::GetDocumentRefDev()
     OutputDevice* pReferenceDevice = SfxObjectShell::GetDocumentRefDev ();
     // Only when our parent does not have a reference device then we return
     // our own.
-    if (pReferenceDevice == nullptr && mpDoc != nullptr)
+    if ( !pReferenceDevice && mpDoc )
         pReferenceDevice = mpDoc->GetRefDevice ();
     return pReferenceDevice;
 }
@@ -1081,10 +1081,10 @@ void DrawDocShell::setEditMode(DrawViewShell* pDrawViewShell, bool isMasterPage)
 {
     // Set the edit mode to either the normal edit mode or the
     // master page mode.
-    EditMode eNewEditMode = EM_PAGE;
+    EditMode eNewEditMode = EditMode::Page;
     if (isMasterPage)
     {
-        eNewEditMode = EM_MASTERPAGE;
+        eNewEditMode = EditMode::MasterPage;
     }
 
     if (eNewEditMode != pDrawViewShell->GetEditMode())
