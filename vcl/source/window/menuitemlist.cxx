@@ -50,7 +50,7 @@ MenuItemList::~MenuItemList()
         delete i;
 }
 
-MenuItemData* MenuItemList::Insert(
+MenuItemData* MenuItemList::InsertMenuItem(
     sal_uInt16 nId,
     MenuItemType eType,
     MenuItemBits nBits,
@@ -61,6 +61,9 @@ MenuItemData* MenuItemList::Insert(
     const OString &rIdent
 )
 {
+    if ( eType == MenuItemType::SEPARATOR )
+        return InsertSeparator( rIdent, nPos );
+
     MenuItemData* pData     = new MenuItemData( rStr, rImage );
     pData->nId              = nId;
     pData->sIdent           = rIdent;
@@ -92,10 +95,11 @@ MenuItemData* MenuItemList::Insert(
     } else {
         maItemList.push_back( pData );
     }
+
     return pData;
 }
 
-void MenuItemList::InsertSeparator(const OString &rIdent, size_t nPos)
+MenuItemData* MenuItemList::InsertSeparator( const OString &rIdent, size_t nPos )
 {
     MenuItemData* pData     = new MenuItemData;
     pData->nId              = 0;
@@ -124,19 +128,88 @@ void MenuItemList::InsertSeparator(const OString &rIdent, size_t nPos)
     pData->pSalMenuItem = ImplGetSVData()->mpDefInst->CreateMenuItem( &aSalMIData );
 
     if( nPos < maItemList.size() ) {
-        maItemList.insert( maItemList.begin() + nPos, pData );
+        if ( maItemList[ nPos ]->eType != MenuItemType::SEPARATOR )
+        {
+            if ( nPos > 0 && maItemList[ nPos - 1 ]->eType != MenuItemType::SEPARATOR )
+            {
+                maItemList.insert( maItemList.begin() + nPos, pData );
+            }
+            else {  SAL_WARN( "vcl.window", "separator is just above" );  }
+        }
+        else {  SAL_WARN( "vcl.window", "separator is already here" );  }
     } else {
-        maItemList.push_back( pData );
+        if ( maItemList.back()->eType != MenuItemType::SEPARATOR )
+        {
+            maItemList.push_back( pData );
+        }
     }
+
+    return pData;
 }
 
-void MenuItemList::Remove( size_t nPos )
+void MenuItemList::RemoveMenuItem( size_t nPos )
 {
     if( nPos < maItemList.size() )
     {
         delete maItemList[ nPos ];
         maItemList.erase( maItemList.begin() + nPos );
     }
+
+    PeelSeparators();
+}
+
+// bin double separators and boundary ones
+bool MenuItemList::PeelSeparators( bool bLastOneToo )
+{
+    bool bRet = false;
+
+    for ( size_t i = 1; i < maItemList.size(); ++i )
+    {
+        if ( ( maItemList[ i ]->eType == MenuItemType::SEPARATOR )
+                && ( maItemList[ i - 1 ]->eType == MenuItemType::SEPARATOR ) ) {
+            SAL_WARN( "vcl.window", "double separators @" << OUString::number( i ) << " & @" << OUString::number( i - 1 ) );
+            delete maItemList[ i ];
+            maItemList.erase( maItemList.begin() + i );
+            i--;
+            bRet = true;
+        }
+    }
+
+    while ( maItemList.size() > 0 )
+    {
+        if ( maItemList[ 0 ]->eType == MenuItemType::SEPARATOR )
+        {
+            SAL_WARN( "vcl.window", "first item @" << OUString::number( 0 )
+                                        << " \"" << maItemList[ 0 ]->aText
+                                          << "\" id " << OUString::number( maItemList[ 0 ]->nId )
+                                            << " is separator" );
+            delete maItemList[ 0 ];
+            maItemList.erase( maItemList.begin() );
+            bRet = true;
+        }
+        else {  break;  }
+    }
+
+    if ( bLastOneToo )
+    {
+        while ( maItemList.size() > 0 )
+        {
+            if ( maItemList[ maItemList.size() - 1 ]->eType == MenuItemType::SEPARATOR )
+            {
+                size_t n = maItemList.size() - 1;
+                SAL_WARN( "vcl.window", "last item @" << OUString::number( n )
+                                            << " \"" << maItemList[ n ]->aText
+                                              << "\" id " << OUString::number( maItemList[ n ]->nId )
+                                                << " is separator" );
+                delete maItemList[ n ];
+                maItemList.erase( maItemList.end() );
+                bRet = true;
+            }
+            else {  break;  }
+        }
+    }
+
+    return bRet;
 }
 
 MenuItemData* MenuItemList::GetData( sal_uInt16 nSVId, size_t& rPos ) const

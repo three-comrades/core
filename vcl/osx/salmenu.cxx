@@ -513,9 +513,26 @@ void AquaSalMenu::SetFrame( const SalFrame *pFrame )
     mpFrame = static_cast<const AquaSalFrame*>(pFrame);
 }
 
+bool AquaSalMenu::IsItemSeparator( AquaSalMenuItem * pAquaSalMenuItem )
+{
+    if ( ! pAquaSalMenuItem )
+        return false;
+
+    return ( [ pAquaSalMenuItem->mpMenuItem isSeparatorItem ] ? true : false );
+}
+
+bool AquaSalMenu::IsSeparatorAt( unsigned nPos )
+{
+    if( nPos < maItems.size() )
+        return IsItemSeparator( maItems[ nPos ] );
+
+    return false;
+}
+
 void AquaSalMenu::InsertItem( SalMenuItem* pSalMenuItem, unsigned nPos )
 {
     AquaSalMenuItem *pAquaSalMenuItem = static_cast<AquaSalMenuItem*>(pSalMenuItem);
+    NSMenuItem* nsMenuItem = pAquaSalMenuItem->mpMenuItem;
 
     pAquaSalMenuItem->mpParentMenu = this;
     DBG_ASSERT( pAquaSalMenuItem->mpVCLMenu == nullptr        ||
@@ -525,24 +542,37 @@ void AquaSalMenu::InsertItem( SalMenuItem* pSalMenuItem, unsigned nPos )
     if( pAquaSalMenuItem->mpVCLMenu )
         mpVCLMenu = pAquaSalMenuItem->mpVCLMenu;
 
-    if( nPos == MENU_APPEND || nPos == maItems.size() )
-        maItems.push_back( pAquaSalMenuItem );
-    else if( nPos < maItems.size() )
-        maItems.insert( maItems.begin() + nPos, pAquaSalMenuItem );
-    else
+    bool bInsert = true;
+    if ( IsItemSeparator( pAquaSalMenuItem ) )
     {
-        OSL_FAIL( "invalid item index in insert" );
-        return;
+        bInsert = ( !IsSeparatorAt( nPos ) && ( nPos > 0 ) && !IsSeparatorAt( nPos - 1 ) ) ;
+        if ( !bInsert )
+        {
+            SAL_WARN( "vcl.osx", "another separator here is redundant" );
+        }
     }
 
-    if( ! mbMenuBar || pCurrentMenuBar == this )
-        [mpMenu insertItem: pAquaSalMenuItem->mpMenuItem atIndex: getItemIndexByPos(nPos)];
+    if ( bInsert )
+    {
+        if( nPos == MENU_APPEND || nPos == maItems.size() )
+            maItems.push_back( pAquaSalMenuItem );
+        else if( nPos < maItems.size() )
+            maItems.insert( maItems.begin() + nPos, pAquaSalMenuItem );
+        else
+        {
+            SAL_WARN( "vcl.osx", "InsertItem: position of item is somewhere out of items" );
+            return;
+        }
+
+        if( ! mbMenuBar || pCurrentMenuBar == this )
+            [ mpMenu insertItem: nsMenuItem atIndex: getItemIndexByPos( nPos ) ];
+    }
 }
 
 void AquaSalMenu::RemoveItem( unsigned nPos )
 {
     AquaSalMenuItem* pRemoveItem = nullptr;
-    if( nPos == MENU_APPEND || nPos == (maItems.size()-1) )
+    if( nPos == MENU_APPEND || nPos == ( maItems.size() - 1 ) )
     {
         pRemoveItem = maItems.back();
         maItems.pop_back();
@@ -550,18 +580,18 @@ void AquaSalMenu::RemoveItem( unsigned nPos )
     else if( nPos < maItems.size() )
     {
         pRemoveItem = maItems[ nPos ];
-        maItems.erase( maItems.begin()+nPos );
+        maItems.erase( maItems.begin() + nPos );
     }
     else
     {
-        OSL_FAIL( "invalid item index in remove" );
+        SAL_WARN( "vcl.osx", "RemoveItem: item is somewhere out" );
         return;
     }
 
     pRemoveItem->mpParentMenu = nullptr;
 
     if( ! mbMenuBar || pCurrentMenuBar == this )
-        [mpMenu removeItemAtIndex: getItemIndexByPos(nPos)];
+        [ mpMenu removeItemAtIndex: getItemIndexByPos( nPos ) ];
 }
 
 void AquaSalMenu::SetSubMenu( SalMenuItem* pSalMenuItem, SalMenu* pSubMenu, unsigned /*nPos*/ )
@@ -776,7 +806,7 @@ void AquaSalMenu::statusLayout()
         if( [pNSView isMemberOfClass: [OOStatusItemView class]] ) // well of course it is
             [(OOStatusItemView*)pNSView layout];
         else
-            OSL_FAIL( "someone stole our status view" );
+            SAL_WARN( "vcl.osx", "¿where is my status view?" );
     }
 }
 
@@ -900,6 +930,8 @@ AquaSalMenuItem::AquaSalMenuItem( const SalItemParams* pItemData ) :
         // anything but a separator should set a menu to dispatch to
         DBG_ASSERT( mpVCLMenu, "no menu" );
     }
+
+    SAL_WARN( "vcl.osx", "created AquaSalMenuItem \"" << aText << "\" of menu \"" << mpVCLMenu->GetText() << "\"" );
 }
 
 AquaSalMenuItem::~AquaSalMenuItem()

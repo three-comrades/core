@@ -230,7 +230,7 @@ void Menu::Deactivate()
     {
         MenuItemData* pData = pItemList->GetDataFromPos( --n );
         if ( pData->bIsTemporary )
-            pItemList->Remove( n );
+            pItemList->RemoveMenuItem( n );
     }
 
     bInCallback = true;
@@ -370,8 +370,8 @@ MenuItemData* Menu::NbcInsertItem(sal_uInt16 nId, MenuItemBits nBits,
                                   size_t nPos, const OString &rIdent)
 {
     // put Item in MenuItemList
-    MenuItemData* pData = pItemList->Insert(nId, MenuItemType::STRING,
-                             nBits, rStr, Image(), pMenu, nPos, rIdent);
+    MenuItemData* pData = pItemList->InsertMenuItem( nId, MenuItemType::STRING,
+                             nBits, rStr, Image(), pMenu, nPos, rIdent );
 
     // update native menu
     if (ImplGetSalMenu() && pData->pSalMenuItem)
@@ -541,11 +541,9 @@ void Menu::InsertSeparator(const OString &rIdent, sal_uInt16 nPos)
         nPos = MENU_APPEND;
 
     // put separator in item list
-    pItemList->InsertSeparator(rIdent, nPos);
+    MenuItemData *pData = pItemList->InsertSeparator( rIdent, nPos );
 
     // update native menu
-    size_t itemPos = ( nPos != MENU_APPEND ) ? nPos : pItemList->size() - 1;
-    MenuItemData *pData = pItemList->GetDataFromPos( itemPos );
     if( ImplGetSalMenu() && pData && pData->pSalMenuItem )
         ImplGetSalMenu()->InsertItem( pData->pSalMenuItem, nPos );
 
@@ -565,7 +563,7 @@ void Menu::RemoveItem( sal_uInt16 nPos )
         if( ImplGetSalMenu() )
             ImplGetSalMenu()->RemoveItem( nPos );
 
-        pItemList->Remove( nPos );
+        pItemList->RemoveMenuItem( nPos );
         bRemove = true;
     }
 
