@@ -1589,7 +1589,7 @@ static void ImplHandlePaint( vcl::Window* pWindow, const Rectangle& rBoundRect, 
     }
 }
 
-static void KillOwnPopups( vcl::Window* pWindow )
+static void CloseOwnPopups( vcl::Window* pWindow )
 {
     ImplSVData* pSVData = ImplGetSVData();
     vcl::Window *pParent = pWindow->ImplGetWindowImpl()->mpFrameWindow;
@@ -1605,7 +1605,7 @@ void ImplHandleResize( vcl::Window* pWindow, long nNewWidth, long nNewHeight )
 {
     if( pWindow->GetStyle() & (WB_MOVEABLE|WB_SIZEABLE) )
     {
-        KillOwnPopups( pWindow );
+        CloseOwnPopups( pWindow );
         if( pWindow->ImplGetWindow() != ImplGetSVData()->maHelpData.mpHelpWin )
             ImplDestroyHelpWindow( true );
     }
@@ -1684,7 +1684,7 @@ static void ImplHandleMove( vcl::Window* pWindow )
 
     if( pWindow->GetStyle() & (WB_MOVEABLE|WB_SIZEABLE) )
     {
-        KillOwnPopups( pWindow );
+        CloseOwnPopups( pWindow );
         if( pWindow->ImplGetWindow() != ImplGetSVData()->maHelpData.mpHelpWin )
             ImplDestroyHelpWindow( true );
     }
@@ -2480,7 +2480,7 @@ bool ImplWindowFrameProc( vcl::Window* _pWindow, SalEvent nEvent, const void* pE
 
         case SalEvent::ClosePopups:
             {
-            KillOwnPopups( pWindow );
+            CloseOwnPopups( pWindow );
             }
             break;
 
