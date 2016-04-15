@@ -55,7 +55,7 @@
 using namespace ::com::sun::star;
 
 // Property names of a menu/menu item ItemDescriptor
-static const char ITEM_DESCRIPTOR_COMMANDURL[]  = "CommandURL";
+static const char ITEM_DESCRIPTOR_ACTIONURL[]   = "ActionURL";
 static const char ITEM_DESCRIPTOR_HELPURL[]     = "HelpURL";
 static const char ITEM_DESCRIPTOR_OFFSET[]      = "Offset";
 static const char ITEM_DESCRIPTOR_STYLE[]       = "Style";
@@ -308,19 +308,19 @@ void StatusBarManager::CreateControllers()
         if ( nId == 0 )
             continue;
 
-        OUString aCommandURL( m_pStatusBar->GetItemCommand( nId ));
+        OUString aActionURL( m_pStatusBar->GetItemCommand( nId ));
         bool bInit( true );
         uno::Reference< frame::XStatusbarController > xController;
         AddonStatusbarItemData *pItemData = static_cast< AddonStatusbarItemData *>( m_pStatusBar->GetItemData( nId ) );
         uno::Reference< ui::XStatusbarItem > xStatusbarItem(
-            static_cast< cppu::OWeakObject *>( new StatusbarItem( m_pStatusBar, pItemData, nId, aCommandURL ) ),
+            static_cast< cppu::OWeakObject *>( new StatusbarItem( m_pStatusBar, pItemData, nId, aActionURL ) ),
             uno::UNO_QUERY );
 
         beans::PropertyValue aPropValue;
         std::vector< uno::Any > aPropVector;
 
-        aPropValue.Name     = "CommandURL";
-        aPropValue.Value    <<= aCommandURL;
+        aPropValue.Name     = "ActionURL";
+        aPropValue.Value    <<= aActionURL;
         aPropVector.push_back( uno::makeAny( aPropValue ) );
 
         aPropValue.Name     = "ModuleIdentifier";
@@ -353,10 +353,10 @@ void StatusBarManager::CreateControllers()
 
         // 1) UNO Statusbar controllers, registered in Controllers.xcu
         if ( m_xStatusbarControllerFactory.is() &&
-             m_xStatusbarControllerFactory->hasController( aCommandURL, m_aModuleIdentifier ))
+             m_xStatusbarControllerFactory->hasController( aActionURL, m_aModuleIdentifier ))
         {
             xController.set(m_xStatusbarControllerFactory->createInstanceWithArgumentsAndContext(
-                                aCommandURL, aArgs, m_xContext ),
+                                aActionURL, aArgs, m_xContext ),
                             uno::UNO_QUERY );
             bInit = false; // Initialization is done through the factory service
         }
@@ -366,7 +366,7 @@ void StatusBarManager::CreateControllers()
             svt::StatusbarController* pController( nullptr );
 
             // 2) Old SFX2 Statusbar controllers
-            pController = CreateStatusBarController( m_xFrame, m_pStatusBar, nId, aCommandURL );
+            pController = CreateStatusBarController( m_xFrame, m_pStatusBar, nId, aActionURL );
             if ( !pController )
             {
                 // 3) Is Add-on? Generic statusbar controller
@@ -380,7 +380,7 @@ void StatusBarManager::CreateControllers()
                 else
                 {
                     // 4) Default Statusbar controller
-                    pController = new svt::StatusbarController( m_xContext, m_xFrame, aCommandURL, nId );
+                    pController = new svt::StatusbarController( m_xContext, m_xFrame, aActionURL, nId );
                 }
             }
 
@@ -427,7 +427,7 @@ void StatusBarManager::FillStatusBar( const uno::Reference< container::XIndexAcc
     for ( sal_Int32 n = 0; n < rItemContainer->getCount(); n++ )
     {
         uno::Sequence< beans::PropertyValue >   aProp;
-        OUString                                aCommandURL;
+        OUString                                aActionURL;
         OUString                                aHelpURL;
         sal_Int16                               nOffset( 0 );
         sal_Int16                               nStyle( 0 );
@@ -440,9 +440,15 @@ void StatusBarManager::FillStatusBar( const uno::Reference< container::XIndexAcc
             {
                 for ( int i = 0; i < aProp.getLength(); i++ )
                 {
-                    if ( aProp[i].Name == ITEM_DESCRIPTOR_COMMANDURL )
+                    if ( aProp[i].Name == ITEM_DESCRIPTOR_ACTIONURL )
                     {
-                        aProp[i].Value >>= aCommandURL;
+                        aProp[i].Value >>= aActionURL;
+                    }
+                    else if ( aProp[i].Name == "CommandURL" )
+                    {
+                        SAL_WARN( "framework", "\"CommandURL\" to \"ActionURL\" in FillStatusBar" );
+                        aProp[i].Value >>= aActionURL;
+                        aProp[i].Name == ITEM_DESCRIPTOR_ACTIONURL;
                     }
                     else if ( aProp[i].Name == ITEM_DESCRIPTOR_HELPURL )
                     {
@@ -466,13 +472,13 @@ void StatusBarManager::FillStatusBar( const uno::Reference< container::XIndexAcc
                     }
                 }
 
-                if (( nType == css::ui::ItemType::DEFAULT ) && !aCommandURL.isEmpty() )
+                if (( nType == css::ui::ItemType::DEFAULT ) && !aActionURL.isEmpty() )
                 {
-                    OUString aString( vcl::CommandInfoProvider::Instance().GetLabelForCommand(aCommandURL, m_xFrame));
+                    OUString aString( vcl::CommandInfoProvider::Instance().GetLabelForCommand( aActionURL, m_xFrame ));
                     StatusBarItemBits nItemBits( impl_convertItemStyleToItemBits( nStyle ));
 
                     m_pStatusBar->InsertItem( nId, nWidth, nItemBits, nOffset );
-                    m_pStatusBar->SetItemCommand( nId, aCommandURL );
+                    m_pStatusBar->SetItemCommand( nId, aActionURL );
                     m_pStatusBar->SetAccessibleName( nId, aString );
                     ++nId;
                 }

@@ -396,8 +396,14 @@ void MenuBarMerger::GetMenuEntry(
             rAddonMenuEntry[i].Value >>= rAddonMenuItem.aURL;
         else if ( aMenuEntryPropName == ADDONSMENUITEM_STRING_TITLE )
             rAddonMenuEntry[i].Value >>= rAddonMenuItem.aTitle;
-        else if ( aMenuEntryPropName == ADDONSMENUITEM_STRING_TARGET )
-            rAddonMenuEntry[i].Value >>= rAddonMenuItem.aTarget;
+        else if ( aMenuEntryPropName == ADDONSMENUITEM_STRING_RECIPIENT )
+            rAddonMenuEntry[i].Value >>= rAddonMenuItem.aRecipient;
+        else if ( aMenuEntryPropName == "Target" )
+        {
+            SAL_WARN( "framework", "\"Target\" into \"Recipient\" in MenuBarMerger" );
+            rAddonMenuEntry[i].Value >>= rAddonMenuItem.aRecipient;
+            rAddonMenuEntry[i].Name = ADDONSMENUITEM_STRING_RECIPIENT;
+        }
         else if ( aMenuEntryPropName == ADDONSMENUITEM_STRING_SUBMENU )
         {
             uno::Sequence< uno::Sequence< beans::PropertyValue > > aSubMenu;

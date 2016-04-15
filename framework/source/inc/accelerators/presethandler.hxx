@@ -39,7 +39,7 @@ namespace framework
         <layer>/global/<resourcetype>/<preset>.xml
         <layer>/modules/<moduleid>/<resourcetype>/<preset>.xml
 
-        RESOURCETYPE        PRESET        TARGET
+        RESOURCETYPE        PRESET        RECIPIENT
                             (share)       (user)
         "accelerator"       "default"     "current"
                             "word"
@@ -128,9 +128,9 @@ class PresetHandler
                     working storage of the share layer. */
         std::vector<OUString> m_lPresets;
 
-        /** @short  knows the names of all targets inside the current
+        /** @short  knows the names of all recipients inside the current
                     working storage of the user layer. */
-        std::vector<OUString> m_lTargets;
+        std::vector<OUString> m_lRecipients;
 
         /** @short  its the current office locale and will be used
                     to handle localized presets.
@@ -168,7 +168,7 @@ class PresetHandler
         /** @short  return access to the internally used and cached root storage.
 
             @descr  These root storages are the base of all further opened
-                    presets and targets. They are provided here only, to support
+                    presets and recipients. They are provided here only, to support
                     older implementations, which base on them ...
 
                     getOrCreate...() - What does it mean?
@@ -185,7 +185,7 @@ class PresetHandler
         /** @short  provides access to the current working storages.
 
             @descr  Working storages are the "lowest" storages, where the
-                    preset and target files exists.
+                    preset and recipient files exists.
 
             @return css::embed::XStorage
                     which the current working storage.
@@ -247,17 +247,17 @@ class PresetHandler
 
         /** @short  try to copy the specified preset from the share
                     layer to the user layer and establish it as the
-                    specified target.
+                    specified recipient.
 
-            @descr  Means: copy share/.../<preset>.xml user/.../<target>.xml
-                    Note: The target will be overwritten completely or
-                    created as new by this operation!
+            @descr  Means: copy share/.../<preset>.xml user/.../<recipient>.xml
+                    Note: The recipient will be overwritten completely or
+                    created as new by this operation
 
             @param  sPreset
                     the ALIAS name of an existing preset.
 
-            @param  sTarget
-                    the ALIAS name of the target.
+            @param  sRecipient
+                    the ALIAS name of the recipient.
 
             @throw  css::container::NoSuchElementException
                     if the specified preset does not exists.
@@ -265,8 +265,8 @@ class PresetHandler
             @throw  css::io::IOException
                     if copying failed.
          */
-        void copyPresetToTarget(const OUString& sPreset,
-                                const OUString& sTarget);
+        void copyPresetToRecipient( const OUString& sPreset,
+                                    const OUString& sRecipient );
 
         /** @short  open the specified preset as stream object
                     and return it.
@@ -283,21 +283,20 @@ class PresetHandler
          */
         css::uno::Reference< css::io::XStream > openPreset(const OUString& sPreset);
 
-        /** @short  open the specified target as stream object
+        /** @short  open the specified recipient as stream object
                     and return it.
 
-            @descr  Note: Targets resist inside the user
-                    layer. Normally they are opened in read/write mode.
-                   But it will be opened readonly automatically if that isn't possible
-                    (may be the file is write protected on the system ...).
+            @descr  Note: recipients resist inside the user
+                    layer. Normally they open in read/write mode.
+                   But it will be open readonly automatically if write isn't possible
 
-            @param  sTarget
-                    the ALIAS name of the target.
+            @param  sRecipient
+                    the ALIAS name of the recipient.
 
-            @return The opened target stream ... or NULL if the target does not exists
-                    or couldnt be created as new one.
+            @return The opened stream ... or nil if the recipient does not exists
+                    or couldnt be created.
          */
-        css::uno::Reference< css::io::XStream > openTarget(const OUString& sTarget);
+        css::uno::Reference< css::io::XStream > openRecipient( const OUString& sRecipient );
 
         /** @short  do anything which is necessary to flush all changes
                     back to disk.

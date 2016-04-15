@@ -35,9 +35,9 @@
 
 namespace framework{
 
-/*-************************************************************************************************************
+/*
     @short          listen for modify events on model and tag frame container window so it can react accordingly
-    @descr          Used e.g. by our MAC port where such state is shown separately on some controls of the
+    @descr          Used e.g. by our mac os x port where such state is shown separately on some controls of the
                     title bar.
 
     @base           OWeakObject
@@ -45,7 +45,7 @@ namespace framework{
 
     @devstatus      draft
     @threadsafe     yes
-*//*-*************************************************************************************************************/
+*/
 class TagWindowAsModified :   public  ::cppu::WeakImplHelper<
                                           css::lang::XInitialization,
                                           css::frame::XFrameActionListener, // => XEventListener
@@ -69,9 +69,8 @@ class TagWindowAsModified :   public  ::cppu::WeakImplHelper<
 
     public:
 
-        // ctor/dtor
                  TagWindowAsModified();
-        virtual ~TagWindowAsModified(                                                                   );
+        virtual ~TagWindowAsModified();
 
         // XInterface, XTypeProvider
 

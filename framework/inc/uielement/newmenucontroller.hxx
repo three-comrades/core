@@ -48,7 +48,7 @@ namespace framework
 {
     struct NewDocument
     {
-        css::util::URL                                    aTargetURL;
+        css::util::URL                                    aRecipientURL;
         css::uno::Sequence< css::beans::PropertyValue >   aArgSeq;
         css::uno::Reference< css::frame::XDispatch >      xDispatch;
     };
@@ -97,7 +97,7 @@ namespace framework
                                                                       m_bModuleIdentified : 1,
                                                                       m_bAcceleratorCfg : 1;
             OUString                                                  m_aIconTheme;
-            OUString                                                  m_aTargetFrame;
+            OUString                                                  m_aFrame;
             OUString                                                  m_aModuleIdentifier;
             OUString                                                  m_aEmptyDocURL;
             css::uno::Reference< css::uno::XComponentContext >        m_xContext;

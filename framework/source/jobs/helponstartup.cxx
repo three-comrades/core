@@ -19,7 +19,7 @@
 
 // include own header
 #include <jobs/helponstartup.hxx>
-#include <loadenv/targethelper.hxx>
+#include <loadenv/deliveryhelper.hxx>
 #include <services.h>
 
 // include others
@@ -223,8 +223,8 @@ OUString HelpOnStartup::its_getCurrentHelpURL()
     if (!xDesktop.is())
         return OUString();
 
-    css::uno::Reference< css::frame::XFrame > xHelp = xDesktop->findFrame(SPECIALTARGET_HELPTASK, css::frame::FrameSearchFlag::CHILDREN);
-    if (!xHelp.is())
+    css::uno::Reference< css::frame::XFrame > xHelp = xDesktop->findFrame( SPECIAL_HELPTASK, css::frame::FrameSearchOption::Children );
+    if ( !xHelp.is() )
         return OUString();
 
     OUString sCurrentHelpURL;

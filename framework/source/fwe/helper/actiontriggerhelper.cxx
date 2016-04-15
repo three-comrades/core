@@ -61,7 +61,7 @@ bool IsSeparator( const Reference< XPropertySet >& xPropertySet )
 
 void GetMenuItemAttributes( const Reference< XPropertySet >& xActionTriggerPropertySet,
                             OUString& aMenuLabel,
-                            OUString& aCommandURL,
+                            OUString& aActionURL,
                             OUString& aHelpURL,
                             Reference< XBitmap >& xBitmap,
                             Reference< XIndexContainer >& xSubContainer )
@@ -70,29 +70,36 @@ void GetMenuItemAttributes( const Reference< XPropertySet >& xActionTriggerPrope
 
     try
     {
-        // mandatory properties
-        a = xActionTriggerPropertySet->getPropertyValue("Text");
+        a = xActionTriggerPropertySet->getPropertyValue( "Text" );
         a >>= aMenuLabel;
-        a = xActionTriggerPropertySet->getPropertyValue("CommandURL");
-        a >>= aCommandURL;
-        a = xActionTriggerPropertySet->getPropertyValue("Image");
+
+        a = xActionTriggerPropertySet->getPropertyValue( "CommandURL" );
+        if ( a.hasValue() )
+        {
+            SAL_WARN( "framework.fwe", "\"CommandURL\" to \"ActionURL\" in GetMenuItemAttributes" );
+            a >>= aActionURL;
+            ///xActionTriggerPropertySet->setPropertyValue( "CommandURL", Any() );
+            //xActionTriggerPropertySet->setPropertyValue( "ActionURL", aActionURL );
+        }
+
+        a = xActionTriggerPropertySet->getPropertyValue( "ActionURL" );
+        a >>= aActionURL;
+
+        a = xActionTriggerPropertySet->getPropertyValue( "Image");
         a >>= xBitmap;
-        a = xActionTriggerPropertySet->getPropertyValue("SubContainer");
+
+        a = xActionTriggerPropertySet->getPropertyValue( "SubContainer" );
         a >>= xSubContainer;
     }
-    catch (const Exception&)
-    {
-    }
+    catch ( const Exception& ) { }
 
     // optional properties
     try
     {
-        a = xActionTriggerPropertySet->getPropertyValue("HelpURL");
+        a = xActionTriggerPropertySet->getPropertyValue( "HelpURL" );
         a >>= aHelpURL;
     }
-    catch (const Exception&)
-    {
-    }
+    catch ( const Exception& ) { }
 }
 
 void InsertSubMenuItems( Menu* pSubMenu, sal_uInt16& nItemId, const Reference< XIndexContainer >& xActionTriggerContainer )
@@ -119,31 +126,31 @@ void InsertSubMenuItems( Menu* pSubMenu, sal_uInt16& nItemId, const Reference< X
                     {
                         // Menu item
                         OUString aLabel;
-                        OUString aCommandURL;
+                        OUString aActionURL;
                         OUString aHelpURL;
                         Reference< XBitmap > xBitmap;
                         Reference< XIndexContainer > xSubContainer;
 
                         sal_uInt16 nNewItemId = nItemId++;
-                        GetMenuItemAttributes( xPropSet, aLabel, aCommandURL, aHelpURL, xBitmap, xSubContainer );
+                        GetMenuItemAttributes( xPropSet, aLabel, aActionURL, aHelpURL, xBitmap, xSubContainer );
 
                         SolarMutexGuard aGuard;
                         {
                             // insert new menu item
-                            sal_Int32 nIndex = aCommandURL.indexOf( aSlotURL );
+                            sal_Int32 nIndex = aActionURL.indexOf( aSlotURL );
                             if ( nIndex >= 0 )
                             {
                                 // Special code for our menu implementation: some menu items don't have a
                                 // command url but uses the item id as a unqiue identifier. These entries
                                 // got a special url during conversion from menu=>actiontriggercontainer.
                                 // Now we have to extract this special url and set the correct item id!!!
-                                nNewItemId = (sal_uInt16)aCommandURL.copy( nIndex+aSlotURL.getLength() ).toInt32();
+                                nNewItemId = (sal_uInt16)aActionURL.copy( nIndex+aSlotURL.getLength() ).toInt32();
                                 pSubMenu->InsertItem( nNewItemId, aLabel );
                             }
                             else
                             {
                                 pSubMenu->InsertItem( nNewItemId, aLabel );
-                                pSubMenu->SetItemCommand( nNewItemId, aCommandURL );
+                                pSubMenu->SetItemCommand( nNewItemId, aActionURL );
                             }
 
                             // handle bitmap
@@ -201,7 +208,7 @@ void InsertSubMenuItems( Menu* pSubMenu, sal_uInt16& nItemId, const Reference< X
                             else
                             {
                                 // Support add-on images for context menu interceptors
-                                Image aImage = aAddonOptions.GetImageFromURL( aCommandURL, false, true );
+                                Image aImage = aAddonOptions.GetImageFromURL( aActionURL, false, true );
                                 if ( !!aImage )
                                     pSubMenu->SetItemImage( nNewItemId, aImage );
                             }
@@ -255,15 +262,15 @@ Reference< XPropertySet > CreateActionTrigger( sal_uInt16 nItemId, const Menu* p
             a <<= aLabel;
             xPropSet->setPropertyValue("Text", a );
 
-            OUString aCommandURL = pMenu->GetItemCommand( nItemId );
+            OUString aActionURL = pMenu->GetItemCommand( nItemId );
 
-            if ( aCommandURL.isEmpty() )
+            if ( aActionURL.isEmpty() )
             {
-                aCommandURL = "slot:" + OUString::number( nItemId );
+                aActionURL = "slot:" + OUString::number( nItemId );
             }
 
-            a <<= aCommandURL;
-            xPropSet->setPropertyValue("CommandURL", a );
+            a <<= aActionURL;
+            xPropSet->setPropertyValue( "ActionURL", a );
 
             Image aImage = pMenu->GetItemImage( nItemId );
             if ( !!aImage )

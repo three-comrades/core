@@ -69,35 +69,35 @@ public:
         E_NO_FEATURE = 0,
         /// enable using of UI elements during loading (means progress, interaction handler etcpp.)
         E_WORK_WITH_UI = 1,
-        /// enable loading of resources, which are not related to a target frame! (see concept of ContentHandler)
+        /// enable loading of resources, which are not related to a frame (see concept of ContentHandler)
         E_ALLOW_CONTENTHANDLER = 2
     };
 
     /** @short  classify a content.
 
-        @descr  The load environment must know, if a content
-                is related to a target frame or not. Only "visible"
+        @descr  The load environment needs to know if a content
+                is related to a recipient frame or not. Only "visible"
                 components, which fulfill the requirements of the
                 model-controller-view paradigm can be loaded into a frame.
                 Such contents are classified as E_CAN_BE_LOADED.
 
                 But e.g. for the dispatch framework exists special ContentHandler
-                objects, which can load a content in "non visible" mode ...
-                and do not need a target frame for its operation. Such
-                ContentHandler e.g. plays sounds.
+                objects, which can load a content in "non visible" mode
+                and do not need a recipient frame for it.
+                Such ContentHandler e.g. plays sounds.
                 Such contents are classified as E_CAN_BE_HANDLED.
 
-                And last but not least a content can be "not valid" in general.
+                And last but not least a content can be not supported.
      */
     enum EContentType
     {
-        /// identifies a content, which seems to be invalid in general
+        /// identifies a content, which seems to be unsupported
         E_UNSUPPORTED_CONTENT,
-        /// identifies a content, which can be used with a ContentHandler and is not related to a target frame
+        /// identifies a content, which can be used with a ContentHandler and is not related to a recipient frame
         E_CAN_BE_HANDLED,
-        /// identifies a content, which can be loaded into a target frame
+        /// identifies a content, which can be loaded into a recipient frame
         E_CAN_BE_LOADED,
-        /// special mode for non real loading, In such case the model is given directly!
+        /// special mode for non real loading, in such case the model is given directly
         E_CAN_BE_SET
     };
 
@@ -110,34 +110,34 @@ private:
     css::uno::Reference< css::uno::XComponentContext > m_xContext;
 
     /** @short  points to the frame, which uses this LoadEnv object
-                and must be used to start target search there.
+                and is used to start recipient search there.
      */
-    css::uno::Reference< css::frame::XFrame > m_xBaseFrame;
+    css::uno::Reference< css::frame::XFrame > m_xOriginFrame;
 
-    /** @short  points to the frame, into which the new component was loaded.
+    /** @short  points to the frame, into which the new component is loaded.
 
         @descr  Note: This reference will be empty if loading failed
-                or a non visible content was loaded!
-                It can be the same frame as m_xBaseFrame it describe, in case
-                the target "_self", "" or the search flag "SELF" was used.
+                or a non visible content is loaded.
+                It can be the same frame as m_xOriginFrame it describe, in case
+                the recipient "_self", "" or the search flag "SELF" was used.
                 Otherwise its the new created or recycled frame, which was
                 used for loading and contains further the new component.
 
-                Please use method getTarget() or getTargetComponent()
+                Please use method getRecipient() or getReceivingComponent()
                 to return the frame/controller or model to any interested
                 user of the results of this load request.
      */
-    css::uno::Reference< css::frame::XFrame > m_xTargetFrame;
+    css::uno::Reference< css::frame::XFrame > m_xRecipientFrame;
 
-    /** @short  contains the name of the target, in which the specified resource
-                of this instance must be loaded.
+    /** @short  contains the name of the recipient, in which the specified resource
+                of this instance is loaded.
      */
-    OUString m_sTarget;
+    OUString m_sRecipient;
 
-    /** @short  if m_sTarget is not a special one, this flags regulate searching
+    /** @short  if m_sRecipient is not a special one, this flags regulate searching
                 of a suitable one.
      */
-    sal_Int32 m_nSearchFlags;
+    sal_Int32 m_nSearchOptions;
 
     /** @short  contains all needed information about the resource,
                 which should be loaded.
@@ -158,38 +158,38 @@ private:
     /** @short  classify the content, which should be loaded by this instance. */
     EContentType m_eContentType;
 
-    /** @short  it indicates, that the member m_xTargetFrame was new created for this
-                load request and must be closed in case loading (not handling!)
-                operation failed. The default value is sal_False!
+    /** @short  it indicates that the member m_xRecipientFrame is created for this
+                load and will be closed in case loading (not handling) failed.
+                The default value is sal_False
      */
     bool m_bCloseFrameOnError;
 
-    /** @short  it indicates, that the old document (which was located inside m_xBaseFrame
-                in combination with the m_sTarget value "_self") was suspended.
+    /** @short  it indicates that the old document (which was located inside m_xOriginFrame
+                in combination with the m_sRecipient value "_self") was suspended.
                 Normally it will be replaced by the new loaded document. But in case
-                loading (not handling!) failed, it must be reactivated.
-                The default value is sal_False!
+                loading (not handling) failed, it must be reactivated.
+                The default value is sal_False
      */
     bool m_bReactivateControllerOnError;
 
-    /** @short  it holds one (!) asynchronous used contenthandler or frameloader
+    /** @short  it holds single asynchronous used content-handler or frame-loader
                 alive, till the asynchronous operation will be finished.
      */
     css::uno::Reference< css::uno::XInterface > m_xAsynchronousJob;
 
     /** @short  holds the information about the finished load process.
 
-        @descr  The content of m_xTargetFrame can't be used as valid indicator,
+        @descr  The content of m_xRecipientFrame can't be used as valid indicator,
                 (in case the existing old document was reactivated)
-                we must hold the result of the load process explicitly.
+                thus hold the result of the load explicitly.
      */
     bool m_bLoaded;
 
     /** @short      holds an XActionLock on the internal used task member.
 
-        @seealso    m_xTargetFrame
+        @seealso    m_xRecipientFrame
      */
-    ActionLockGuard m_aTargetLock;
+    ActionLockGuard m_aRecipientLock;
 
     rtl::Reference<QuietInteraction> m_pQuietInteraction;
 
@@ -201,7 +201,7 @@ public:
                 reference to an uno service manager, which can be used internally
                 to create on needed services on demand.
 
-        @throw  Currently there is no reason to throw such exception!
+        @throw  Currently there is no reason to throw such exception
 
         @throw  A RuntimeException in case any internal process indicates, that
                 the whole runtime can't be used any longer.
@@ -215,57 +215,57 @@ public:
 
     static css::uno::Reference< css::lang::XComponent > loadComponentFromURL(const css::uno::Reference< css::frame::XComponentLoader >&    xLoader,
                                                                              const css::uno::Reference< css::uno::XComponentContext >&     xContext,
-                                                                             const OUString&                                        sURL   ,
-                                                                             const OUString&                                        sTarget,
-                                                                                   sal_Int32                                               nFlags ,
+                                                                             const OUString&                                    sURL   ,
+                                                                             const OUString&                                    sRecipient ,
+                                                                                   sal_Int32                                               nOptions ,
                                                                              const css::uno::Sequence< css::beans::PropertyValue >&        lArgs  )
-        throw(css::lang::IllegalArgumentException,
-              css::io::IOException               ,
-              css::uno::RuntimeException         );
+        throw( css::lang::IllegalArgumentException,
+               css::io::IOException,
+               css::uno::RuntimeException );
 
     /** @short  set some changeable parameters for a new load request.
 
-        @descr  The parameter for targeting, the content description, and
+        @descr  The parameter for getting the description of content and
                 some environment specifier (UI, dispatch functionality)
-                can be set here ... BEFORE the real load process is started
+                can be set here ... BEFORE the real loading is started
                 by calling startLoading(). Of course a still running load request
-                will be detected here and a suitable exception will be thrown.
-                Such constellation can be detected outside by using provided
+                is handled here by throwing a suitable exception.
+                Such constellation can be seen outside by using provided
                 synchronisation methods or callbacks.
 
         @param  sURL
-                points to the resource, which should be loaded.
+                points to the resource, which will be loaded.
 
         @param  lMediaDescriptor
                 contains additional information for the following load request.
 
-        @param  xBaseFrame
-                points to the frame which must be used as start point for target search.
+        @param  xOriginFrame
+                points to the frame which must be used as origin for search.
 
-        @param  sTarget
+        @param  sRecipient
                 regulate searching/creating of frames, which should contain the
                 new loaded component afterwards.
 
-        @param  nSearchFlags
-                regulate searching of targets, if sTarget is not a special one.
+        @param  nSearchOptions
+                regulate searching of frames, if sRecipient is not a special one.
 
         @param  eFeature
                 flag field, which enable/disable special features of this
-                new instance for following load call.
+                new instance for following load.
 
         @throw  A LoadEnvException e.g. if another load operation is till in progress
                 or initialization of a new one fail by other reasons.
                 The real reason, a suitable message and ID will be given here immidiatly.
 
-        @throw  A RuntimeException in case any internal process indicates, that
+        @throw  A RuntimeException in case some internal process shows that
                 the whole runtime can't be used any longer.
      */
-    void initializeLoading(const OUString&                                           sURL            ,
-                           const css::uno::Sequence< css::beans::PropertyValue >&    lMediaDescriptor,
-                           const css::uno::Reference< css::frame::XFrame >&          xBaseFrame      ,
-                           const OUString&                                           sTarget         ,
-                                 sal_Int32                                           nSearchFlags    ,
-                                 EFeature                                            eFeature        = E_NO_FEATURE);
+    void initializeLoading( const OUString& sURL,
+                            const css::uno::Sequence< css::beans::PropertyValue >& lMediaDescriptor,
+                            const css::uno::Reference< css::frame::XFrame >& xOriginFrame,
+                            const OUString& sRecipient,
+                                  sal_Int32 nSearchOptions,
+                                  EFeature eFeature = E_NO_FEATURE );
 
     /** @short  start loading of the resource represented by this loadenv instance.
 
@@ -312,13 +312,13 @@ public:
     bool waitWhileLoading(sal_uInt32 nTimeout = 0);
 
     /** TODO document me ... */
-    css::uno::Reference< css::lang::XComponent > getTargetComponent() const;
+    css::uno::Reference< css::lang::XComponent > getReceivingComponent() const;
 
 public:
 
     /** @short      checks if the specified content can be handled by a
-                    ContentHandler only and is not related to a target frame,
-                    or if it can be loaded by a FrameLoader into a target frame
+                    ContentHandler only and is not related to a recipient frame,
+                    or if it can be loaded by a FrameLoader into a recipient frame
                     as "visible" component.
 
         @descr      using:
@@ -329,7 +329,7 @@ public:
                                 break;
 
                             case E_CAN_BE_LOADED :
-                                xFrame = locateTargetFrame();
+                                xFrame = locateRecipientFrame();
                                 loadIt(xFrame);
                                 break;
 
@@ -405,7 +405,7 @@ private:
         @descr  It searches for a suitable content handler object, registered
                 for the detected content type (must be done before by calling
                 impl_detectTypeAndFilter()). Because such handler does not depend
-                from a real target frame, location of such frame will be
+                from a real recipient frame, location of such frame will be
                 suppressed here.
                 In case handle failed all new created resources will be
                 removed before a suitable exception is thrown.
@@ -423,12 +423,12 @@ private:
 
     /** @short  tries to use FrameLoader objects for loading.
 
-        @descr  First the target frame will be located. If it could be found
+        @descr  First the recipient frame will be located. If it could be found
                 or new created a filter/frame loader will be instantiated and
                 used to load the content into this frame.
                 In case loading failed all new created resources will be
                 removed before a suitable exception is thrown.
-                (Excepting a RuntimeException occurrence!)
+                (excepting a RuntimeException occurrence)
 
         @return TODO
 
@@ -442,10 +442,10 @@ private:
 
     /** @short  checks if the specified content is already loaded.
 
-        @descr  It depends from the set target information, if such
+        @descr  It depends on the set of information from recipient, if such
                 search is allowed or not! So this method checks first,
-                if the target is the special one "_default".
-                If not it returns with an empty result immidatly!
+                if the recipient is the special one "_default".
+                If not it returns with an empty result immidatly.
                 In case search is allowed, an existing document with the
                 same URL is searched. If it could be found, the corresponding
                 view will get the focus and this method return the corresponding frame.
@@ -453,7 +453,7 @@ private:
                 view of the document will be updated to show the position
                 inside the document, which is related to the jumpmark.
 
-        @return A valid reference to the target frame, which contains the already loaded content
+        @return A valid reference to the recipient frame, which contains the already loaded content
                 and could be activated successfully. An empty reference oterwhise.
 
         @throw  A LoadEnvException only in cases, where an internal error indicates,
@@ -466,10 +466,10 @@ private:
     css::uno::Reference< css::frame::XFrame > impl_searchAlreadyLoaded()
         throw(LoadEnvException, css::uno::RuntimeException);
 
-    /** @short  search for any target frame, which seems to be useable
+    /** @short  search for any recipient frame, which seems to be useable
                 for this load request.
 
-        @descr  Because this special feature is bound to the target specifier "_default"
+        @descr  Because this special feature is bound to the recipient specifier "_default"
                 its checked inside first. If its not set => this method return an empty
                 reference. Otherwise any currently existing frame will be analyzed, if
                 it can be used here. The following rules exists:
@@ -479,11 +479,11 @@ private:
                     <li>or contains an empty document of the same application module
                         which the new document will have (Note: the filter of the new content
                         must be well known here!)</li>
-                    <li>and(!) this target must not be already used by any other load request.</li>
+                    <li>and this recipient is not expected to be already used by any other load.</li>
                 </ul>
 
-                If a suitable target is located it will be locked. Thats why the last rule
-                exists! If this method returns a valid frame reference, it was locked to be useable
+                If a suitable recipient is located it will be locked. Thats why the last rule
+                is here. If this method returns a valid frame reference, it was locked to be useable
                 for this load request only. (Don't forget to reset this state later!)
                 Concurrent LoadEnv instances can synchronize her work be using such locks :-) HOPEFULLY
 
@@ -494,7 +494,7 @@ private:
         @throw  A RuntimeException in case any internal process indicates, that
                 the whole runtime can't be used any longer.
      */
-    css::uno::Reference< css::frame::XFrame > impl_searchRecycleTarget()
+    css::uno::Reference< css::frame::XFrame > impl_searchRecycleRecipient()
         throw(LoadEnvException, css::uno::RuntimeException, std::exception);
 
     /** @short  because showing of a frame is needed more than once...

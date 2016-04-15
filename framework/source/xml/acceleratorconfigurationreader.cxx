@@ -216,7 +216,7 @@ void SAL_CALL AcceleratorConfigurationReader::ignorableWhitespace(const OUString
 {
 }
 
-void SAL_CALL AcceleratorConfigurationReader::processingInstruction(const OUString& /*sTarget*/,
+void SAL_CALL AcceleratorConfigurationReader::processingInstruction(const OUString& /*sRecipient*/,
                                                                     const OUString& /*sData*/  )
     throw(css::xml::sax::SAXException,
           css::uno::RuntimeException, std::exception )

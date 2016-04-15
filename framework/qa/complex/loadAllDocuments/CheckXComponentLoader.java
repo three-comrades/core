@@ -129,7 +129,7 @@ public class CheckXComponentLoader
 
         // create frame instance
         m_xFrame = xDesktop.findFrame("testFrame_componentLoader",
-                                        FrameSearchFlag.TASKS | FrameSearchFlag.CREATE);
+                                        FrameSearchOption.Tasks | FrameSearchOption.Create);
         assertNotNull("Couldn't create test frame.", m_xFrame);
 
         // define default loader for testing
@@ -250,8 +250,8 @@ public class CheckXComponentLoader
 
     /** TODO document me and move this method to a more global helper! */
     private void impl_createTempOfficeDocument(XComponentLoader xLoader   ,
-                                               String           sSourceURL,
-                                               String           sTargetURL,
+                                               String           sFromURL,
+                                               String           sToURL,
                                                String           sFilter   ,
                                                String           sPassword ) throws Exception
     {
@@ -277,14 +277,14 @@ public class CheckXComponentLoader
 
         XComponent xDoc = null;
         // load it
-        xDoc = xLoader.loadComponentFromURL(sSourceURL, "_blank", 0, lLoadProps);
+        xDoc = xLoader.loadComponentFromURL( sFromURL, "_blank", 0, lLoadProps );
         assertNotNull("Could create office document, which should be saved as temp one.", xDoc);
 
         // save it as temp file
         XStorable xStore = UnoRuntime.queryInterface(XStorable.class, xDoc);
-        xStore.storeAsURL(sTargetURL, lSaveProps);
+        xStore.storeAsURL( sToURL, lSaveProps );
 
-        // Don't forget to close this file. Otherwise the temp file is locked!
+        // Don't forget to close this file, otherwise the temp file is locked
         XCloseable xClose = UnoRuntime.queryInterface(XCloseable.class, xDoc);
         xClose.close(false);
     }
@@ -424,13 +424,13 @@ public class CheckXComponentLoader
      * but opened documents.
      */
     private void loadURL(XComponentLoader xLoader, int nRequiredResult,
-                         String sURL, String sTarget, int nFlags,
+                         String sURL, String sRecipient, int nOptions,
                          PropertyValue[] lProps) {
         int nResult = RESULT_EMPTY_DOC;
         XComponent xDoc = null;
 
         try {
-            xDoc = xLoader.loadComponentFromURL(sURL, sTarget, nFlags,
+            xDoc = xLoader.loadComponentFromURL(sURL, sRecipient, nOptions,
                                                      lProps);
 
             if (xDoc != null) {

@@ -615,9 +615,9 @@ public class AcceleratorsConfigurationTest
 
         if (xCfgMgr != null)
         {
-            XAcceleratorConfiguration xTargetAccMgr = UnoRuntime.queryInterface(XAcceleratorConfiguration.class, xCfgMgr.getShortCutManager());
-            XUIConfigurationPersistence xCommit1 = UnoRuntime.queryInterface(XUIConfigurationPersistence.class, xTargetAccMgr);
-            XUIConfigurationPersistence xCommit2 = UnoRuntime.queryInterface(XUIConfigurationPersistence.class, xCfgMgr);
+            XAcceleratorConfiguration xRecipientAccMgr = UnoRuntime.queryInterface( XAcceleratorConfiguration.class, xCfgMgr.getShortCutManager() );
+            XUIConfigurationPersistence xCommit1 = UnoRuntime.queryInterface( XUIConfigurationPersistence.class, xRecipientAccMgr );
+            XUIConfigurationPersistence xCommit2 = UnoRuntime.queryInterface( XUIConfigurationPersistence.class, xCfgMgr );
             xCommit1.store();
             xCommit2.store();
 

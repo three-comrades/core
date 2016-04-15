@@ -73,8 +73,8 @@ class SystemExec :     public  ::cppu::WeakImplHelper<
 
         // XDispatchProvider
         virtual css::uno::Reference< css::frame::XDispatch > SAL_CALL                       queryDispatch  ( const css::util::URL&                                       aURL        ,
-                                                                                                             const OUString&                                      sTarget     ,
-                                                                                                                   sal_Int32                                             nFlags      ) throw( css::uno::RuntimeException, std::exception ) override;
+                                                                                                             const OUString&                                      sRecipient     ,
+                                                                                                                   sal_Int32                                             nOptions      ) throw( css::uno::RuntimeException, std::exception ) override;
         virtual css::uno::Sequence< css::uno::Reference< css::frame::XDispatch > > SAL_CALL queryDispatches( const css::uno::Sequence< css::frame::DispatchDescriptor >& lDescriptor ) throw( css::uno::RuntimeException, std::exception ) override;
 
         // XNotifyingDispatch

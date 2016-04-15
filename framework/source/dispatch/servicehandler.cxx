@@ -77,8 +77,8 @@ ServiceHandler::~ServiceHandler()
                 at the same implementation.
 */
 css::uno::Reference< css::frame::XDispatch > SAL_CALL ServiceHandler::queryDispatch( const css::util::URL&  aURL    ,
-                                                                                     const OUString& /*sTarget*/ ,
-                                                                                           sal_Int32        /*nFlags*/  ) throw( css::uno::RuntimeException, std::exception )
+                                                                                     const OUString& /*sRecipient*/ ,
+                                                                                           sal_Int32        /*nOptions*/  ) throw( css::uno::RuntimeException, std::exception )
 {
     css::uno::Reference< css::frame::XDispatch > xDispatcher;
     if (aURL.Complete.startsWith(PROTOCOL_VALUE))
@@ -98,7 +98,7 @@ css::uno::Sequence< css::uno::Reference< css::frame::XDispatch > > SAL_CALL Serv
         lDispatcher[i] = this->queryDispatch(
                             lDescriptor[i].FeatureURL,
                             lDescriptor[i].FrameName,
-                            lDescriptor[i].SearchFlags);
+                            lDescriptor[i].SearchOptions);
     }
     return lDispatcher;
 }

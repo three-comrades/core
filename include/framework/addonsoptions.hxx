@@ -34,7 +34,7 @@
 *//*-*************************************************************************************************************/
 #define ADDONSMENUITEM_STRING_URL                       "URL"
 #define ADDONSMENUITEM_STRING_TITLE                     "Title"
-#define ADDONSMENUITEM_STRING_TARGET                    "Target"
+#define ADDONSMENUITEM_STRING_RECIPIENT                 "Recipient"
 #define ADDONSMENUITEM_STRING_IMAGEIDENTIFIER           "ImageIdentifier"
 #define ADDONSMENUITEM_STRING_CONTEXT                   "Context"
 #define ADDONSMENUITEM_STRING_SUBMENU                   "Submenu"

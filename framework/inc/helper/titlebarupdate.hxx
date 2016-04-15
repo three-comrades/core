@@ -36,12 +36,12 @@
 
 namespace framework{
 
-/*-************************************************************************************************************
+/*
     @short          helps our frame on setting title/icon on the titlebar (including updates)
 
     @devstatus      draft
     @threadsafe     yes
-*//*-*************************************************************************************************************/
+*/
 class TitleBarUpdate : public  ::cppu::WeakImplHelper<
                                    css::lang::XInitialization
                                  , css::frame::XTitleChangeListener // => XEventListener

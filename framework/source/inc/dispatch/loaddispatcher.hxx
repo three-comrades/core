@@ -27,7 +27,7 @@
 
 #include <cppuhelper/implbase.hxx>
 
-namespace framework{
+namespace framework {
 
 /** @short      implements a dispatch object which can be used to load
                 non-visible components (by using the mechanism of ContentHandler)
@@ -51,10 +51,10 @@ class LoadDispatcher : public  ::cppu::WeakImplHelper< css::frame::XNotifyingDis
         css::uno::WeakReference< css::frame::XFrame > m_xOwnerFrame;
 
         /** @short  TODO document me */
-        OUString m_sTarget;
+        OUString m_sRecipient;
 
         /** @short  TODO document me */
-        sal_Int32 m_nSearchFlags;
+        sal_Int32 m_nSearchOptions;
 
         /** @short  TODO document me */
         LoadEnv m_aLoader;
@@ -66,26 +66,26 @@ class LoadDispatcher : public  ::cppu::WeakImplHelper< css::frame::XNotifyingDis
         /** @short  creates a new instance and initialize it with all necessary parameters.
 
             @descr  Every instance of such LoadDispatcher can be used for the specified context only.
-                    That means: it can be used to load any further requested content into the here(!)
-                    specified target frame.
+                    That means: it can be used to load any further requested content into
+                    the specified recipient frame.
 
             @param  xContext
                     will be used to create own needed services on demand.
 
             @param  xOwnerFrame
-                    used as startpoint to locate the right target frame.
+                    used as startpoint to locate the recipient frame.
 
-            @param  sTargetName
-                    the name or the target frame for loading or a special qualifier
-                    which define such target.
+            @param  sRecipientName
+                    the name or the recipient frame for loading or a special qualifier
+                    which define such recipient.
 
-            @param  nSearchFlags
-                    used in case sTargetFrame isn't a special one.
+            @param  nSearchOptions
+                    used in case recipient isn't a special one.
          */
         LoadDispatcher(const css::uno::Reference< css::uno::XComponentContext >& xContext,
                        const css::uno::Reference< css::frame::XFrame >&          xOwnerFrame ,
-                       const OUString&                                           sTargetName ,
-                             sal_Int32                                           nSearchFlags);
+                       const OUString&                                           sRecipientName ,
+                             sal_Int32                                           nSearchOptions);
 
         /** @short  used to free internal resources.
          */

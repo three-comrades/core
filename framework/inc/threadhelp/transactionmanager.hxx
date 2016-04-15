@@ -31,7 +31,7 @@
 
 namespace framework{
 
-/*-************************************************************************************************************
+/*
     @descr          Describe different states of a feature of following implementation.
                     During lifetime of an object different working states occur:
                         initialization - working - closing - closed
@@ -40,7 +40,7 @@ namespace framework{
                     call an interface method (initialize phase means startup time from creating object till
                     calling specified first method e.g. XInitialization::initialze()!) then you should refuse
                     this call. The same for closing/disposing the object!
-*//*-*************************************************************************************************************/
+*/
 enum EWorkingMode
 {
     E_INIT       ,   // We stand in a init method   -> some calls are accepted - some one are rejected
@@ -49,7 +49,7 @@ enum EWorkingMode
     E_CLOSE          // Object is dead!             -> all calls are rejected!
 };
 
-/*-************************************************************************************************************
+/*
     @descr          A transaction object should support throwing exceptions if user used it at wrong working mode.
                     e.g. We can throw a DisposedException if user try to work and our mode is E_CLOSE!
                     But sometimes he doesn't need this feature - will handle it by himself.
@@ -78,14 +78,14 @@ enum EWorkingMode
                                                 Normally (if E_HARDEXCEPTIONS was used!) creation of guard
                                                 will throw an exception ... but using of E_SOFTEXCEPTIONS suppress it
                                                 and member "A" can be set.
-*//*-*************************************************************************************************************/
+*/
 enum EExceptionMode
 {
     E_HARDEXCEPTIONS,
     E_SOFTEXCEPTIONS
 };
 
-/*-************************************************************************************************************
+/*
     @short          implement a transaction manager to support non breakable interface methods
     @descr          Use it to support non breakable interface methods without using any thread
                     synchronization like e.g. mutex, rw-lock!
@@ -94,7 +94,7 @@ enum EExceptionMode
                     and react for it. You can enable automatically throwing of exceptions too.
 
     @devstatus      draft
-*//*-*************************************************************************************************************/
+*/
 class FWI_DLLPUBLIC TransactionManager
 {
 

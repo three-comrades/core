@@ -33,7 +33,7 @@
 
 namespace framework{
 
-/*-************************************************************************************************************
+/*
     @short          implement a helper for a oneway enumeration of components
     @descr          You can step during this list only for one time! Its a snapshot.
                     Don't forget to release the reference. You are the owner of an instance of this implementation.
@@ -48,7 +48,7 @@ namespace framework{
 
     @devstatus      ready to use
     @threadsafe     yes
-*//*-*************************************************************************************************************/
+*/
 
 class OComponentEnumeration :   public ::cppu::WeakImplHelper< css::container::XEnumeration,css::lang::XEventListener >
 {
@@ -59,19 +59,19 @@ class OComponentEnumeration :   public ::cppu::WeakImplHelper< css::container::X
 
         //  constructor / destructor
 
-        /*-****************************************************************************************************
+        /*
             @short      constructor to initialize this enumeration
             @descr      An enumeration is a list with oneway-access! You can get every member only for one time.
                         This method allow to initialize this oneway list with values.
             @param      "seqComponents" is a sequence of interfaces, which are components.
             @onerror    Do nothing and reset this object to default with an empty list.
-        *//*-*****************************************************************************************************/
+        */
 
          OComponentEnumeration( const std::vector< css::uno::Reference< css::lang::XComponent > >& seqComponents );
 
         //  XEventListener
 
-        /*-****************************************************************************************************
+        /*
             @short      last chance to release all references and free memory
             @descr      This method is called, if the enumeration is used completely and has no more elements.
                         Then we must destroy our list and release all references to other objects.
@@ -79,13 +79,13 @@ class OComponentEnumeration :   public ::cppu::WeakImplHelper< css::container::X
             @seealso    interface XEventListener
 
             @param      "aEvent" describe the source of this event.
-        *//*-*****************************************************************************************************/
+        */
 
         virtual void SAL_CALL disposing( const css::lang::EventObject& aEvent ) throw( css::uno::RuntimeException, std::exception ) override;
 
         //  XEnumeration
 
-        /*-****************************************************************************************************
+        /*
             @short      check count of accessible elements of enumeration
             @descr      You can call this method to get information about accessible elements in future.
                         Elements you have already gotten are not accessible!
@@ -96,11 +96,11 @@ class OComponentEnumeration :   public ::cppu::WeakImplHelper< css::container::X
 
             @onerror    sal_False<BR>
                         (List is emtpy and there no accessible elements ...)
-        *//*-*****************************************************************************************************/
+        */
 
         virtual sal_Bool SAL_CALL hasMoreElements() throw( css::uno::RuntimeException, std::exception ) override;
 
-        /*-****************************************************************************************************
+        /*
             @short      give the next element, if some exist
             @descr      If a call "hasMoreElements()" return true, you can get the next element of list.
 
@@ -108,7 +108,7 @@ class OComponentEnumeration :   public ::cppu::WeakImplHelper< css::container::X
             @return     A Reference to a component, safed in an Any-structure.
 
             @onerror    If end of enumeration is arrived or there are no elements in list => a NoSuchElementException is thrown.
-        *//*-*****************************************************************************************************/
+        */
 
         virtual css::uno::Any SAL_CALL nextElement() throw( css::container::NoSuchElementException  ,
                                                              css::lang::WrappedTargetException      ,
@@ -118,16 +118,16 @@ class OComponentEnumeration :   public ::cppu::WeakImplHelper< css::container::X
 
     protected:
 
-        /*-****************************************************************************************************
+        /*
             @short      standard destructor
             @descr      This method destruct an instance of this class and clear some member.
                         We make it protected, because its not supported to use this class as normal instance!
                         You must create it dynamical in memory and use a pointer.
-        *//*-*****************************************************************************************************/
+        */
 
         virtual ~OComponentEnumeration();
 
-        /*-****************************************************************************************************
+        /*
             @short      reset instance to default values
 
             @descr      There are two ways to delete an instance of this class.<BR>
@@ -137,7 +137,7 @@ class OComponentEnumeration :   public ::cppu::WeakImplHelper< css::container::X
 
             @seealso    method dispose()
             @seealso    destructor ~TaskEnumeration()
-        *//*-*****************************************************************************************************/
+        */
 
         void impl_resetObject();
 
@@ -147,7 +147,7 @@ class OComponentEnumeration :   public ::cppu::WeakImplHelper< css::container::X
     //  debug methods
     //  (should be private everyway!)
 
-        /*-****************************************************************************************************
+        /*
             @short      debug-method to check incoming parameter of some other mehods of this class
             @descr      The following methods are used to check parameters for other methods
                         of this class. The return value is used directly for an ASSERT(...).
@@ -157,7 +157,7 @@ class OComponentEnumeration :   public ::cppu::WeakImplHelper< css::container::X
             @param      references to checking variables
             @return     sal_False on invalid parameter<BR>
                         sal_True  otherway
-        *//*-*****************************************************************************************************/
+        */
 
     private:
 

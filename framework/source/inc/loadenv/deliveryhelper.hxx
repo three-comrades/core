@@ -17,29 +17,26 @@
  *   the License at http://www.apache.org/licenses/LICENSE-2.0 .
  */
 
-#ifndef INCLUDED_FRAMEWORK_SOURCE_INC_LOADENV_TARGETHELPER_HXX
-#define INCLUDED_FRAMEWORK_SOURCE_INC_LOADENV_TARGETHELPER_HXX
+#ifndef INCLUDED_FRAMEWORK_SOURCE_INC_LOADENV_DELIVERYHELPER_HXX
+#define INCLUDED_FRAMEWORK_SOURCE_INC_LOADENV_DELIVERYHELPER_HXX
 
 #include <sal/types.h>
 #include <rtl/ustring.hxx>
-#include <targets.h>
+#include <recipients.h>
 
-namespace framework{
+namespace framework {
 
-/** @short  can be used to detect, if a target name (used e.g. for XFrame.findFrame())
-            has a special meaning or can be used as normal frame name (e.g. for XFrame.setName()).
+/** @short  use to check if a name (used e.g. for XFrame.findFrame()) has a special meaning
+            or not thus can be used as frame’s name (e.g. for XFrame.setName())
 
     @author as96863
  */
-class TargetHelper
+class DeliveryHelper
 {
 
     public:
 
-        /** @short  its used at the following interfaces to classify
-                    target names.
-         */
-        enum ESpecialTarget
+        enum ESpecialRecipient
         {
             E_NOT_SPECIAL   ,
             E_SELF          ,
@@ -56,29 +53,29 @@ class TargetHelper
 
     public:
 
-        /** @short  it checks the given unknown target name,
+        /** @short  it checks the given unknown recipient name
                     if it's the expected special one.
 
-            @note   An empty target is similar to "_self"!
+            @note   An empty name is similar to "_self"
 
-            @param  sCheckTarget
-                    must be the unknown target name, which should be checked.
+            @param  sName
+                    the name to check.
 
-            @param  eSpecialTarget
-                    represent the expected target.
+            @param  eSpecial
+                    represent the expected type.
 
-            @return It returns <TRUE/> if <var>sCheckTarget</var> represent
-                    the expected <var>eSpecialTarget</var> value; <FALSE/> otherwise.
+            @return It returns <TRUE/> if <var>sName</var> represent
+                    the expected <var>eSpecial</var> value; <FALSE/> otherwise.
          */
-        static bool matchSpecialTarget(const OUString& sCheckTarget  ,
-                                                 ESpecialTarget   eSpecialTarget);
+        static bool isSpecialRecipient( const OUString& sName,
+                                              ESpecialRecipient eSpecial );
 
         /** @short  it checks, if the given name can be used
                     to set it at a frame using XFrame.setName() method.
 
-            @descr  Because we handle special targets in a hard coded way
+            @descr  Because we handle special cases in a hard coded way
                     (means we do not check the real name of a frame then)
-                    such named frames will never be found!
+                    such named frames will never be found
 
                     And in case such special names can exists one times only
                     by definition inside the same frame tree (e.g. _beamer and
@@ -87,7 +84,7 @@ class TargetHelper
                     Of course we can't check unknown names, which are not special ones.
                     But we decide, that it's not allowed to use "_" as first sign
                     (because we reserve this letter for our own purposes!)
-                    and the value must not a well known special target.
+                    and the value must not a well known special recipient
 
             @param  sName
                     the new frame name, which should be checked.
@@ -97,6 +94,6 @@ class TargetHelper
 
 } // namespace framework
 
-#endif // INCLUDED_FRAMEWORK_SOURCE_INC_LOADENV_TARGETHELPER_HXX
+#endif // INCLUDED_FRAMEWORK_SOURCE_INC_LOADENV_DELIVERYHELPER_HXX
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

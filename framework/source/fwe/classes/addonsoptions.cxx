@@ -52,18 +52,17 @@ using namespace ::com::sun::star;
 
 #define PROPERTYNAME_URL                                ADDONSMENUITEM_STRING_URL
 #define PROPERTYNAME_TITLE                              ADDONSMENUITEM_STRING_TITLE
-#define PROPERTYNAME_TARGET                             ADDONSMENUITEM_STRING_TARGET
+#define PROPERTYNAME_RECIPIENT                          ADDONSMENUITEM_STRING_RECIPIENT
 #define PROPERTYNAME_IMAGEIDENTIFIER                    ADDONSMENUITEM_STRING_IMAGEIDENTIFIER
 #define PROPERTYNAME_CONTEXT                            ADDONSMENUITEM_STRING_CONTEXT
 #define PROPERTYNAME_SUBMENU                            ADDONSMENUITEM_STRING_SUBMENU
 
 #define IMAGES_NODENAME                                 OUString("UserDefinedImages" )
 
-// The following order is mandatory. Please add properties at the end!
 #define INDEX_URL               0
 #define INDEX_TITLE             1
 #define INDEX_IMAGEIDENTIFIER   2
-#define INDEX_TARGET            3
+#define INDEX_RECIPIENT         3
 #define INDEX_CONTEXT           4
 #define INDEX_SUBMENU           5
 #define INDEX_CONTROLTYPE       6
@@ -73,33 +72,29 @@ using namespace ::com::sun::star;
 #define INDEX_OWNERDRAW         10
 #define PROPERTYCOUNT_INDEX     11
 
-// The following order is mandatory. Please add properties at the end!
 #define PROPERTYCOUNT_MENUITEM                          6
 #define OFFSET_MENUITEM_URL                             0
 #define OFFSET_MENUITEM_TITLE                           1
 #define OFFSET_MENUITEM_IMAGEIDENTIFIER                 2
-#define OFFSET_MENUITEM_TARGET                          3
+#define OFFSET_MENUITEM_RECIPIENT                       3
 #define OFFSET_MENUITEM_CONTEXT                         4
 #define OFFSET_MENUITEM_SUBMENU                         5
 
-// The following order is mandatory. Please add properties at the end!
 #define PROPERTYCOUNT_POPUPMENU                         4
 #define OFFSET_POPUPMENU_TITLE                          0
 #define OFFSET_POPUPMENU_CONTEXT                        1
 #define OFFSET_POPUPMENU_SUBMENU                        2
 #define OFFSET_POPUPMENU_URL                            3   // Used for property set
 
-// The following order is mandatory. Please add properties at the end!
 #define PROPERTYCOUNT_TOOLBARITEM                       7
 #define OFFSET_TOOLBARITEM_URL                          0
 #define OFFSET_TOOLBARITEM_TITLE                        1
 #define OFFSET_TOOLBARITEM_IMAGEIDENTIFIER              2
-#define OFFSET_TOOLBARITEM_TARGET                       3
+#define OFFSET_TOOLBARITEM_RECIPIENT                    3
 #define OFFSET_TOOLBARITEM_CONTEXT                      4
 #define OFFSET_TOOLBARITEM_CONTROLTYPE                  5
 #define OFFSET_TOOLBARITEM_WIDTH                        6
 
-// The following order is mandatory. Please add properties at the end!
 #define PROPERTYCOUNT_STATUSBARITEM                     7
 #define OFFSET_STATUSBARITEM_URL                        0
 #define OFFSET_STATUSBARITEM_TITLE                      1
@@ -109,7 +104,6 @@ using namespace ::com::sun::star;
 #define OFFSET_STATUSBARITEM_OWNERDRAW                  5
 #define OFFSET_STATUSBARITEM_WIDTH                      6
 
-// The following order is mandatory. Please add properties at the end!
 #define PROPERTYCOUNT_IMAGES                            8
 #define PROPERTYCOUNT_EMBEDDED_IMAGES                   4
 #define OFFSET_IMAGES_SMALL                             0
@@ -146,11 +140,10 @@ using namespace ::com::sun::star;
 #define OFFSET_MERGESTATUSBAR_MERGECONTEXT              4
 #define OFFSET_MERGESTATUSBAR_STATUSBARITEMS            5
 
-//  private declarations!
 
-/*-****************************************************************************************************************
+/*
     @descr  struct to hold information about one menu entry.
-****************************************************************************************************************-*/
+*/
 
 namespace framework
 {
@@ -169,7 +162,7 @@ class AddonsOptions_Impl : public ConfigItem
 
         //  overridden methods of baseclass
 
-        /*-****************************************************************************************************
+        /*
             @short      called for notify of configmanager
             @descr      These method is called from the ConfigManager before application ends or from the
                          PropertyChangeListener if the sub tree broadcasts changes. You must update your
@@ -178,17 +171,17 @@ class AddonsOptions_Impl : public ConfigItem
             @seealso    baseclass ConfigItem
 
             @param      "lPropertyNames" is the list of properties which should be updated.
-        *//*-*****************************************************************************************************/
+        */
 
         virtual void Notify( const Sequence< OUString >& lPropertyNames ) override;
 
         //  public interface
 
-        /*-****************************************************************************************************
+        /*
             @short      base implementation of public interface for "SvtDynamicMenuOptions"!
             @descr      These class is used as static member of "SvtDynamicMenuOptions" ...
                         => The code exist only for one time and isn't duplicated for every instance!
-        *//*-*****************************************************************************************************/
+        */
 
         bool                                            HasAddonsMenu        () const;
         sal_Int32                                       GetAddonsToolBarCount() const;
@@ -234,13 +227,13 @@ class AddonsOptions_Impl : public ConfigItem
         typedef std::vector< Sequence< Sequence< PropertyValue > > > AddonToolBars;
         typedef std::unordered_map< OUString, MergeToolbarInstructionContainer, OUStringHash > ToolbarMergingInstructions;
 
-        /*-****************************************************************************************************
+        /*
             @short      return list of key names of our configuration management which represent oue module tree
             @descr      These methods return the current list of key names! We need it to get needed values from our
                         configuration management!
             @param      "nCount"     ,   returns count of menu entries for "new"
             @return     A list of configuration key names is returned.
-        *//*-*****************************************************************************************************/
+        */
 
         void                 ReadAddonMenuSet( Sequence< Sequence< PropertyValue > >& aAddonMenuSeq );
         void                 ReadOfficeMenuBarSet( Sequence< Sequence< PropertyValue > >& aAddonOfficeMenuBarSeq );
@@ -257,7 +250,7 @@ class AddonsOptions_Impl : public ConfigItem
         bool                 ReadMergeStatusbarData( const OUString& aMergeAddonInstructionBase, Sequence< Sequence< PropertyValue > >& rMergeStatusbar );
         bool                 ReadMenuItem( const OUString& aMenuItemNodeName, Sequence< PropertyValue >& aMenuItem, bool bIgnoreSubMenu = false );
         bool                 ReadPopupMenu( const OUString& aPopupMenuNodeName, Sequence< PropertyValue >& aPopupMenu );
-        void                 AppendPopupMenu( Sequence< PropertyValue >& aTargetPopupMenu, const Sequence< PropertyValue >& rSourcePopupMenu );
+        void                 AppendPopupMenu( Sequence< PropertyValue >& aPopupMenu, const Sequence< PropertyValue >& rSourcePopupMenu );
         bool                 ReadToolBarItem( const OUString& aToolBarItemNodeName, Sequence< PropertyValue >& aToolBarItem );
         bool                 ReadStatusBarItem( const OUString& aStatusbarItemNodeName, Sequence< PropertyValue >& aStatusbarItem );
         ImageEntry*          ReadImageData( const OUString& aImagesNodeName );
@@ -322,7 +315,7 @@ AddonsOptions_Impl::AddonsOptions_Impl()
     // initialize array with fixed property names
     m_aPropNames[ INDEX_URL             ] = PROPERTYNAME_URL;
     m_aPropNames[ INDEX_TITLE           ] = PROPERTYNAME_TITLE;
-    m_aPropNames[ INDEX_TARGET          ] = PROPERTYNAME_TARGET;
+    m_aPropNames[ INDEX_RECIPIENT       ] = PROPERTYNAME_RECIPIENT;
     m_aPropNames[ INDEX_IMAGEIDENTIFIER ] = PROPERTYNAME_IMAGEIDENTIFIER;
     m_aPropNames[ INDEX_CONTEXT         ] = PROPERTYNAME_CONTEXT;
     m_aPropNames[ INDEX_SUBMENU         ] = PROPERTYNAME_SUBMENU; // Submenu set!
@@ -548,10 +541,10 @@ void AddonsOptions_Impl::ReadAddonMenuSet( Sequence< Sequence< PropertyValue > >
     // Init the property value sequence
     aMenuItem[ OFFSET_MENUITEM_URL              ].Name = m_aPropNames[ INDEX_URL            ];
     aMenuItem[ OFFSET_MENUITEM_TITLE            ].Name = m_aPropNames[ INDEX_TITLE          ];
-    aMenuItem[ OFFSET_MENUITEM_TARGET           ].Name = m_aPropNames[ INDEX_TARGET         ];
+    aMenuItem[ OFFSET_MENUITEM_RECIPIENT        ].Name = m_aPropNames[ INDEX_RECIPIENT      ];
     aMenuItem[ OFFSET_MENUITEM_IMAGEIDENTIFIER  ].Name = m_aPropNames[ INDEX_IMAGEIDENTIFIER];
     aMenuItem[ OFFSET_MENUITEM_CONTEXT          ].Name = m_aPropNames[ INDEX_CONTEXT        ];
-    aMenuItem[ OFFSET_MENUITEM_SUBMENU          ].Name = m_aPropNames[ INDEX_SUBMENU        ];  // Submenu set!
+    aMenuItem[ OFFSET_MENUITEM_SUBMENU          ].Name = m_aPropNames[ INDEX_SUBMENU        ];  // Submenu set
 
     for ( sal_uInt32 n = 0; n < nCount; n++ )
     {
@@ -582,10 +575,10 @@ void AddonsOptions_Impl::ReadOfficeHelpSet( Sequence< Sequence< PropertyValue > 
     // Init the property value sequence
     aMenuItem[ OFFSET_MENUITEM_URL              ].Name = m_aPropNames[ INDEX_URL            ];
     aMenuItem[ OFFSET_MENUITEM_TITLE            ].Name = m_aPropNames[ INDEX_TITLE          ];
-    aMenuItem[ OFFSET_MENUITEM_TARGET           ].Name = m_aPropNames[ INDEX_TARGET         ];
+    aMenuItem[ OFFSET_MENUITEM_RECIPIENT        ].Name = m_aPropNames[ INDEX_RECIPIENT      ];
     aMenuItem[ OFFSET_MENUITEM_IMAGEIDENTIFIER  ].Name = m_aPropNames[ INDEX_IMAGEIDENTIFIER];
     aMenuItem[ OFFSET_MENUITEM_CONTEXT          ].Name = m_aPropNames[ INDEX_CONTEXT        ];
-    aMenuItem[ OFFSET_MENUITEM_SUBMENU          ].Name = m_aPropNames[ INDEX_SUBMENU        ];  // Submenu set!
+    aMenuItem[ OFFSET_MENUITEM_SUBMENU          ].Name = m_aPropNames[ INDEX_SUBMENU        ];  // Submenu set
 
     for ( sal_uInt32 n = 0; n < nCount; n++ )
     {
@@ -682,7 +675,7 @@ bool AddonsOptions_Impl::ReadToolBarItemSet( const OUString& rToolBarItemSetNode
     aToolBarItem[ OFFSET_TOOLBARITEM_URL                ].Name = m_aPropNames[ INDEX_URL            ];
     aToolBarItem[ OFFSET_TOOLBARITEM_TITLE              ].Name = m_aPropNames[ INDEX_TITLE          ];
     aToolBarItem[ OFFSET_TOOLBARITEM_IMAGEIDENTIFIER    ].Name = m_aPropNames[ INDEX_IMAGEIDENTIFIER];
-    aToolBarItem[ OFFSET_TOOLBARITEM_TARGET             ].Name = m_aPropNames[ INDEX_TARGET         ];
+    aToolBarItem[ OFFSET_TOOLBARITEM_RECIPIENT          ].Name = m_aPropNames[ INDEX_RECIPIENT      ];
     aToolBarItem[ OFFSET_TOOLBARITEM_CONTEXT            ].Name = m_aPropNames[ INDEX_CONTEXT        ];
     aToolBarItem[ OFFSET_TOOLBARITEM_CONTROLTYPE        ].Name = m_aPropNames[ INDEX_CONTROLTYPE    ];
     aToolBarItem[ OFFSET_TOOLBARITEM_WIDTH              ].Name = m_aPropNames[ INDEX_WIDTH          ];
@@ -1078,7 +1071,7 @@ bool AddonsOptions_Impl::ReadMenuItem( const OUString& aMenuNodeName, Sequence< 
             // A popup menu must have a title and can have a URL and ImageIdentifier
             // Set the other property values to empty
             aMenuItem[ OFFSET_MENUITEM_URL              ].Value <<= aPopupMenuURL;
-            aMenuItem[ OFFSET_MENUITEM_TARGET           ].Value <<= m_aEmpty;
+            aMenuItem[ OFFSET_MENUITEM_RECIPIENT        ].Value <<= m_aEmpty;
             aMenuItem[ OFFSET_MENUITEM_IMAGEIDENTIFIER  ].Value <<= aPopupMenuImageId;
             aMenuItem[ OFFSET_MENUITEM_CONTEXT          ].Value <<= aMenuItemNodePropValues[ OFFSET_MENUITEM_CONTEXT ];
 
@@ -1100,7 +1093,7 @@ bool AddonsOptions_Impl::ReadMenuItem( const OUString& aMenuNodeName, Sequence< 
              ReadAndAssociateImages( aStrValue, aMenuImageId );
 
             aMenuItem[ OFFSET_MENUITEM_URL              ].Value <<= aStrValue;
-            aMenuItem[ OFFSET_MENUITEM_TARGET           ].Value <<= aMenuItemNodePropValues[ OFFSET_MENUITEM_TARGET         ];
+            aMenuItem[ OFFSET_MENUITEM_RECIPIENT        ].Value <<= aMenuItemNodePropValues[ OFFSET_MENUITEM_RECIPIENT      ];
             aMenuItem[ OFFSET_MENUITEM_IMAGEIDENTIFIER  ].Value <<= aMenuImageId;
             aMenuItem[ OFFSET_MENUITEM_CONTEXT          ].Value <<= aMenuItemNodePropValues[ OFFSET_MENUITEM_CONTEXT        ];
             aMenuItem[ OFFSET_MENUITEM_SUBMENU          ].Value <<= Sequence< Sequence< PropertyValue > >(); // Submenu set!
@@ -1113,7 +1106,7 @@ bool AddonsOptions_Impl::ReadMenuItem( const OUString& aMenuNodeName, Sequence< 
     {
         // Separator
         aMenuItem[ OFFSET_MENUITEM_URL              ].Value <<= aStrValue;
-        aMenuItem[ OFFSET_MENUITEM_TARGET           ].Value <<= m_aEmpty;
+        aMenuItem[ OFFSET_MENUITEM_RECIPIENT        ].Value <<= m_aEmpty;
         aMenuItem[ OFFSET_MENUITEM_IMAGEIDENTIFIER  ].Value <<= m_aEmpty;
         aMenuItem[ OFFSET_MENUITEM_CONTEXT          ].Value <<= m_aEmpty;
         aMenuItem[ OFFSET_MENUITEM_SUBMENU          ].Value <<= Sequence< Sequence< PropertyValue > >(); // Submenu set!
@@ -1161,19 +1154,19 @@ bool AddonsOptions_Impl::ReadPopupMenu( const OUString& aPopupMenuNodeName, Sequ
     return bResult;
 }
 
-void AddonsOptions_Impl::AppendPopupMenu( Sequence< PropertyValue >& rTargetPopupMenu, const Sequence< PropertyValue >& rSourcePopupMenu )
+void AddonsOptions_Impl::AppendPopupMenu( Sequence< PropertyValue >& rPopupMenu, const Sequence< PropertyValue >& rOriginPopupMenu )
 {
-    Sequence< Sequence< PropertyValue > > aTargetSubMenuSeq;
-    Sequence< Sequence< PropertyValue > > aSourceSubMenuSeq;
+    Sequence< Sequence< PropertyValue > > aToSubMenuSeq;
+    Sequence< Sequence< PropertyValue > > aFromSubMenuSeq;
 
-    if (( rTargetPopupMenu[ OFFSET_POPUPMENU_SUBMENU ].Value >>= aTargetSubMenuSeq ) &&
-        ( rSourcePopupMenu[ OFFSET_POPUPMENU_SUBMENU ].Value >>= aSourceSubMenuSeq ))
+    if (( rPopupMenu[ OFFSET_POPUPMENU_SUBMENU ].Value >>= aToSubMenuSeq ) &&
+        ( rOriginPopupMenu[ OFFSET_POPUPMENU_SUBMENU ].Value >>= aFromSubMenuSeq ))
     {
-        sal_uInt32 nIndex = aTargetSubMenuSeq.getLength();
-        aTargetSubMenuSeq.realloc( nIndex + aSourceSubMenuSeq.getLength() );
-        for ( sal_uInt32 i = 0; i < sal_uInt32( aSourceSubMenuSeq.getLength() ); i++ )
-            aTargetSubMenuSeq[nIndex++] = aSourceSubMenuSeq[i];
-        rTargetPopupMenu[ OFFSET_POPUPMENU_SUBMENU ].Value <<= aTargetSubMenuSeq;
+        sal_uInt32 nIndex = aToSubMenuSeq.getLength();
+        aToSubMenuSeq.realloc( nIndex + aFromSubMenuSeq.getLength() );
+        for ( sal_uInt32 i = 0; i < sal_uInt32( aFromSubMenuSeq.getLength() ); i++ )
+            aToSubMenuSeq[ nIndex++ ] = aFromSubMenuSeq[i];
+        rPopupMenu[ OFFSET_POPUPMENU_SUBMENU ].Value <<= aToSubMenuSeq;
     }
 }
 
@@ -1188,14 +1181,14 @@ bool AddonsOptions_Impl::ReadToolBarItem( const OUString& aToolBarItemNodeName, 
     aToolBarItemNodePropValues = GetProperties( GetPropertyNamesToolBarItem( aAddonToolBarItemTreeNode ) );
 
     // A toolbar item must have a command URL
-    if (( aToolBarItemNodePropValues[ OFFSET_TOOLBARITEM_URL ] >>= aURL ) && !aURL.isEmpty() )
+    if ( ( aToolBarItemNodePropValues[ OFFSET_TOOLBARITEM_URL ] >>= aURL ) && !aURL.isEmpty() )
     {
         if ( aURL == SEPARATOR_URL )
         {
             // A speparator toolbar item only needs a URL
             aToolBarItem[ OFFSET_TOOLBARITEM_URL                ].Value <<= aURL;
             aToolBarItem[ OFFSET_TOOLBARITEM_TITLE              ].Value <<= m_aEmpty;
-            aToolBarItem[ OFFSET_TOOLBARITEM_TARGET             ].Value <<= m_aEmpty;
+            aToolBarItem[ OFFSET_TOOLBARITEM_RECIPIENT          ].Value <<= m_aEmpty;
             aToolBarItem[ OFFSET_TOOLBARITEM_IMAGEIDENTIFIER    ].Value <<= m_aEmpty;
             aToolBarItem[ OFFSET_TOOLBARITEM_CONTEXT            ].Value <<= m_aEmpty;
             aToolBarItem[ OFFSET_TOOLBARITEM_CONTROLTYPE        ].Value <<= m_aEmpty;
@@ -1214,7 +1207,7 @@ bool AddonsOptions_Impl::ReadToolBarItem( const OUString& aToolBarItemNodeName, 
 
             aToolBarItem[ OFFSET_TOOLBARITEM_URL                ].Value <<= aURL;
             aToolBarItem[ OFFSET_TOOLBARITEM_TITLE              ].Value <<= aTitle;
-            aToolBarItem[ OFFSET_TOOLBARITEM_TARGET             ].Value <<= aToolBarItemNodePropValues[ OFFSET_TOOLBARITEM_TARGET      ];
+            aToolBarItem[ OFFSET_TOOLBARITEM_RECIPIENT          ].Value <<= aToolBarItemNodePropValues[ OFFSET_TOOLBARITEM_RECIPIENT   ];
             aToolBarItem[ OFFSET_TOOLBARITEM_IMAGEIDENTIFIER    ].Value <<= aImageId;
             aToolBarItem[ OFFSET_TOOLBARITEM_CONTEXT            ].Value <<= aToolBarItemNodePropValues[ OFFSET_TOOLBARITEM_CONTEXT     ];
             aToolBarItem[ OFFSET_TOOLBARITEM_CONTROLTYPE        ].Value <<= aToolBarItemNodePropValues[ OFFSET_TOOLBARITEM_CONTROLTYPE ];
@@ -1238,7 +1231,7 @@ void AddonsOptions_Impl::ReadSubMenuEntries( const Sequence< OUString >& aSubMen
     // Init the property value sequence
     aMenuItem[ OFFSET_MENUITEM_URL              ].Name = PROPERTYNAME_URL;
     aMenuItem[ OFFSET_MENUITEM_TITLE            ].Name = PROPERTYNAME_TITLE;
-    aMenuItem[ OFFSET_MENUITEM_TARGET           ].Name = PROPERTYNAME_TARGET;
+    aMenuItem[ OFFSET_MENUITEM_RECIPIENT        ].Name = PROPERTYNAME_RECIPIENT;
     aMenuItem[ OFFSET_MENUITEM_IMAGEIDENTIFIER  ].Name = PROPERTYNAME_IMAGEIDENTIFIER;
     aMenuItem[ OFFSET_MENUITEM_CONTEXT          ].Name = PROPERTYNAME_CONTEXT;
     aMenuItem[ OFFSET_MENUITEM_SUBMENU          ].Name = PROPERTYNAME_SUBMENU;  // Submenu set!
@@ -1402,7 +1395,7 @@ Sequence< OUString > AddonsOptions_Impl::GetPropertyNamesMenuItem( const OUStrin
     lResult[OFFSET_MENUITEM_URL]             = aPropertyRootNode + m_aPropNames[ INDEX_URL          ];
     lResult[OFFSET_MENUITEM_TITLE]           = aPropertyRootNode + m_aPropNames[ INDEX_TITLE            ];
     lResult[OFFSET_MENUITEM_IMAGEIDENTIFIER] = aPropertyRootNode + m_aPropNames[ INDEX_IMAGEIDENTIFIER ];
-    lResult[OFFSET_MENUITEM_TARGET]          = aPropertyRootNode + m_aPropNames[ INDEX_TARGET           ];
+    lResult[OFFSET_MENUITEM_RECIPIENT]          = aPropertyRootNode + m_aPropNames[ INDEX_RECIPIENT ];
     lResult[OFFSET_MENUITEM_CONTEXT]         = aPropertyRootNode + m_aPropNames[ INDEX_CONTEXT      ];
     lResult[OFFSET_MENUITEM_SUBMENU]         = aPropertyRootNode + m_aPropNames[ INDEX_SUBMENU      ];
 
@@ -1430,7 +1423,7 @@ Sequence< OUString > AddonsOptions_Impl::GetPropertyNamesToolBarItem( const OUSt
     lResult[0] = aPropertyRootNode + m_aPropNames[ INDEX_URL             ];
     lResult[1] = aPropertyRootNode + m_aPropNames[ INDEX_TITLE       ];
     lResult[2] = aPropertyRootNode + m_aPropNames[ INDEX_IMAGEIDENTIFIER];
-    lResult[3] = aPropertyRootNode + m_aPropNames[ INDEX_TARGET          ];
+    lResult[3] = aPropertyRootNode + m_aPropNames[ INDEX_RECIPIENT ];
     lResult[4] = aPropertyRootNode + m_aPropNames[ INDEX_CONTEXT         ];
     lResult[5] = aPropertyRootNode + m_aPropNames[ INDEX_CONTROLTYPE     ];
     lResult[6] = aPropertyRootNode + m_aPropNames[ INDEX_WIDTH       ];

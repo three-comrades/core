@@ -179,10 +179,10 @@ public class Interceptor implements XDispatch,
     /** XDispatchProvider
      */
     public synchronized XDispatch queryDispatch(URL    aURL,
-                                                String sTargetFrameName,
-                                                int    nSearchFlags)
+                                                String sRecipientFrameName,
+                                                int    nSearchOptions)
     {
-        System.out.println("Interceptor.queryDispatch('"+aURL.Complete+"', '"+sTargetFrameName+"', "+nSearchFlags+") called");
+        System.out.println("Interceptor.queryDispatch('"+aURL.Complete+"', '"+sRecipientFrameName+"', "+nSearchOptions+") called");
 
         checkNoSolarMutexHeld();
 
@@ -195,7 +195,7 @@ public class Interceptor implements XDispatch,
         if (m_xSlave != null)
         {
             System.out.println("Interceptor.queryDispatch(): ask slave ...");
-            return m_xSlave.queryDispatch(aURL, sTargetFrameName, nSearchFlags);
+            return m_xSlave.queryDispatch(aURL, sRecipientFrameName, nSearchOptions);
         }
 
         System.out.println("Interceptor.queryDispatch(): no idea => returns this");
@@ -216,7 +216,7 @@ public class Interceptor implements XDispatch,
         {
             lResults[i] = queryDispatch(lRequests[i].FeatureURL ,
                                         lRequests[i].FrameName  ,
-                                        lRequests[i].SearchFlags);
+                                        lRequests[i].SearchOptions);
         }
 
         return lResults;

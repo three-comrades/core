@@ -65,10 +65,10 @@ class LoadEnvException
                         global desktop reference! */
             ID_INVALID_ENVIRONMENT,
 
-            /** @short  indicates a failed search for the right target frame. */
-            ID_NO_TARGET_FOUND,
+            /** @short  indicates a failed search for frame */
+            ID_NO_FRAME_FOUND,
 
-            /** @short  An already existing document was found inside a target frame.
+            /** @short  An already existing document was found inside a recipient frame.
                         But its controller could not be suspended successfully. Thats
                         why the new load request was cancelled. The document could not
                         be replaced. */

@@ -57,7 +57,7 @@ GenericStatusbarController::GenericStatusbarController(
     m_xStatusbarItem = rxItem;
     if ( m_xStatusbarItem.is() )
     {
-        m_aCommandURL = m_xStatusbarItem->getCommand();
+        m_aActionURL = m_xStatusbarItem->getCommand();
         m_nID = m_xStatusbarItem->getItemId();
         m_bOwnerDraw = ( m_xStatusbarItem->getStyle() & ui::ItemStyle::OWNER_DRAW ) == ui::ItemStyle::OWNER_DRAW;
         if ( !m_bOwnerDraw && m_pItemData && m_pItemData->aLabel.getLength() )

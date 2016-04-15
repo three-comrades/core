@@ -58,8 +58,8 @@ namespace framework
             CmdImageList(const css::uno::Reference< css::uno::XComponentContext >& rxContext, const OUString& aModuleIdentifier);
             virtual ~CmdImageList();
 
-            virtual Image getImageFromCommandURL(vcl::ImageType nImageType, const OUString& rCommandURL);
-            virtual bool hasImage(vcl::ImageType nImageType, const OUString& rCommandURL);
+            virtual Image getImageFromActionURL( vcl::ImageType nImageType, const OUString& rActionURL );
+            virtual bool hasImage( vcl::ImageType nImageType, const OUString& rActionURL );
             virtual std::vector<OUString>& getImageCommandNames();
 
         protected:
@@ -79,8 +79,8 @@ namespace framework
             explicit GlobalImageList(const css::uno::Reference< css::uno::XComponentContext >& rxContext);
             virtual ~GlobalImageList();
 
-            virtual Image                           getImageFromCommandURL( vcl::ImageType nImageType, const OUString& rCommandURL ) override;
-            virtual bool                            hasImage( vcl::ImageType nImageType, const OUString& rCommandURL ) override;
+            virtual Image                           getImageFromActionURL( vcl::ImageType nImageType, const OUString& rActionURL ) override;
+            virtual bool                            hasImage( vcl::ImageType nImageType, const OUString& rActionURL ) override;
             virtual ::std::vector< OUString >&      getImageCommandNames() override;
     };
 
@@ -100,11 +100,11 @@ namespace framework
             // XImageManager
             void reset() throw (css::uno::RuntimeException, css::lang::IllegalAccessException);
             css::uno::Sequence< OUString > getAllImageNames( ::sal_Int16 nImageType ) throw (css::uno::RuntimeException);
-            bool hasImage( ::sal_Int16 nImageType, const OUString& aCommandURL ) throw (css::lang::IllegalArgumentException, css::uno::RuntimeException);
-            css::uno::Sequence< css::uno::Reference< css::graphic::XGraphic > > getImages( ::sal_Int16 nImageType, const css::uno::Sequence< OUString >& aCommandURLSequence ) throw (css::lang::IllegalArgumentException, css::uno::RuntimeException);
-            void replaceImages( ::sal_Int16 nImageType, const css::uno::Sequence< OUString >& aCommandURLSequence, const css::uno::Sequence< css::uno::Reference< css::graphic::XGraphic > >& aGraphicsSequence ) throw (css::lang::IllegalArgumentException, css::lang::IllegalAccessException, css::uno::RuntimeException, std::exception);
+            bool hasImage( ::sal_Int16 nImageType, const OUString& aActionURL ) throw (css::lang::IllegalArgumentException, css::uno::RuntimeException);
+            css::uno::Sequence< css::uno::Reference< css::graphic::XGraphic > > getImages( ::sal_Int16 nImageType, const css::uno::Sequence< OUString >& aActionURLSequence ) throw (css::lang::IllegalArgumentException, css::uno::RuntimeException);
+            void replaceImages( ::sal_Int16 nImageType, const css::uno::Sequence< OUString >& aActionURLSequence, const css::uno::Sequence< css::uno::Reference< css::graphic::XGraphic > >& aGraphicsSequence ) throw (css::lang::IllegalArgumentException, css::lang::IllegalAccessException, css::uno::RuntimeException, std::exception);
             void removeImages( ::sal_Int16 nImageType, const css::uno::Sequence< OUString >& aResourceURLSequence ) throw (css::lang::IllegalArgumentException, css::lang::IllegalAccessException, css::uno::RuntimeException);
-            void insertImages( ::sal_Int16 nImageType, const css::uno::Sequence< OUString >& aCommandURLSequence, const css::uno::Sequence< css::uno::Reference< css::graphic::XGraphic > >& aGraphicSequence ) throw (css::container::ElementExistException, css::lang::IllegalArgumentException, css::lang::IllegalAccessException, css::uno::RuntimeException);
+            void insertImages( ::sal_Int16 nImageType, const css::uno::Sequence< OUString >& aActionURLSequence, const css::uno::Sequence< css::uno::Reference< css::graphic::XGraphic > >& aGraphicSequence ) throw (css::container::ElementExistException, css::lang::IllegalArgumentException, css::lang::IllegalAccessException, css::uno::RuntimeException);
 
             // XUIConfiguration
             void addConfigurationListener( const css::uno::Reference< css::ui::XUIConfigurationListener >& Listener ) throw (css::uno::RuntimeException);

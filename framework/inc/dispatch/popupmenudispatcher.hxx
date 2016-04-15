@@ -52,7 +52,7 @@ namespace framework{
 typedef cppu::OMultiTypeInterfaceContainerHelperVar<OUString>
     IMPL_ListenerHashContainer;
 
-/*-************************************************************************************************************
+/*
     @short          helper for desktop only(!) to create new tasks on demand for dispatches
     @descr          Use this class as member only! Never use it as baseclass.
                     XInterface will be ambigous and we hold a weakcss::uno::Reference to our OWNER - not to our SUPERCLASS!
@@ -65,7 +65,7 @@ typedef cppu::OMultiTypeInterfaceContainerHelperVar<OUString>
     @base           OWeakObject
 
     @devstatus      ready to use
-*//*-*************************************************************************************************************/
+*/
 class PopupMenuDispatcher :     public  ::cppu::WeakImplHelper<
                                            css::lang::XServiceInfo,
                                            css::frame::XDispatchProvider,
@@ -90,8 +90,8 @@ class PopupMenuDispatcher :     public  ::cppu::WeakImplHelper<
         // XDispatchProvider
         virtual css::uno::Reference< css::frame::XDispatch > SAL_CALL queryDispatch(
             const css::util::URL&  aURL        ,
-            const OUString& sTarget     ,
-            sal_Int32              nFlags      )
+            const OUString& sRecipient     ,
+            sal_Int32              nOptions      )
         throw( css::uno::RuntimeException, std::exception ) override;
 
         virtual css::uno::Sequence< css::uno::Reference< css::frame::XDispatch > > SAL_CALL queryDispatches(
@@ -133,9 +133,9 @@ class PopupMenuDispatcher :     public  ::cppu::WeakImplHelper<
         bool                                                    m_bAlreadyDisposed;   /// Protection against multiple disposing calls.
         bool                                                    m_bActivateListener;   /// dispatcher is listener for frame activation
 
-}; //  class PopupMenuDispatcher
+};
 
-}       //  namespace framework
+}
 
 #endif // INCLUDED_FRAMEWORK_INC_DISPATCH_POPUPMENUDISPATCHER_HXX
 

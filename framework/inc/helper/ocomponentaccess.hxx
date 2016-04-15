@@ -37,7 +37,7 @@
 
 namespace framework{
 
-/*-************************************************************************************************************
+/*
     @short          implement XEnumerationAccess interface as helper to create many oneway enumeration of components
     @descr          We share mutex and framecontainer with our owner and have full access to his child tasks.
                     (Our owner can be the Desktop only!) We create oneway enumerations on demand. These "lists"
@@ -52,7 +52,7 @@ namespace framework{
     @base           OWeakObject
 
     @devstatus      ready to use
-*//*-*************************************************************************************************************/
+*/
 
 class OComponentAccess  :   public ::cppu::WeakImplHelper< css::container::XEnumerationAccess >
 {
@@ -63,7 +63,7 @@ class OComponentAccess  :   public ::cppu::WeakImplHelper< css::container::XEnum
 
         //  constructor / destructor
 
-        /*-****************************************************************************************************
+        /*
             @short      constructor to initialize this instance
             @descr      A desktop will create an enumeration-access-object. An enumeration is a oneway-list and a
                         snapshot of the components of current tasks under the desktop.
@@ -74,13 +74,13 @@ class OComponentAccess  :   public ::cppu::WeakImplHelper< css::container::XEnum
 
             @param      "xOwner" is a reference to our owner and must be the desktop!
             @onerror    Do nothing and reset this object to default with an empty list.
-        *//*-*****************************************************************************************************/
+        */
 
         OComponentAccess( const css::uno::Reference< css::frame::XDesktop >& xOwner );
 
         //  XEnumerationAccess
 
-        /*-****************************************************************************************************
+        /*
             @short      create a new enumeration of components
             @descr      You can call this method to get a new snapshot from all components of all tasks of the desktop as an enumeration.
 
@@ -89,27 +89,27 @@ class OComponentAccess  :   public ::cppu::WeakImplHelper< css::container::XEnum
             @seealso    class Desktop
             @return     If the desktop and some components exist => a valid reference to an enumeration<BR>
                         An NULL-reference, other way.
-        *//*-*****************************************************************************************************/
+        */
 
         virtual css::uno::Reference< css::container::XEnumeration > SAL_CALL createEnumeration() throw( css::uno::RuntimeException, std::exception ) override;
 
         //  XElementAccess
 
-        /*-****************************************************************************************************
+        /*
             @short      get the type of elements in enumeration
             @seealso    interface XElementAccess
             @seealso    class OComponentEnumeration
             @return     The uno-type XComponent.
-        *//*-*****************************************************************************************************/
+        */
 
         virtual css::uno::Type SAL_CALL getElementType() throw( css::uno::RuntimeException, std::exception ) override;
 
-        /*-****************************************************************************************************
+        /*
             @short      get state of componentlist of enumeration.
             @seealso    interface XElementAccess
             @return     sal_True  ,if more than 0 elements exist.
             @return     sal_False ,otherwise.
-        *//*-*****************************************************************************************************/
+        */
 
         virtual sal_Bool SAL_CALL hasElements() throw( css::uno::RuntimeException, std::exception ) override;
 
@@ -117,7 +117,7 @@ class OComponentAccess  :   public ::cppu::WeakImplHelper< css::container::XEnum
 
     protected:
 
-        /*-****************************************************************************************************
+        /*
             @short      standard destructor
             @descr      This method destruct an instance of this class and clear some member.
                         Don't use an instance of this class as normal member. Use it dynamicly with a pointer.
@@ -125,14 +125,14 @@ class OComponentAccess  :   public ::cppu::WeakImplHelper< css::container::XEnum
                         Thats the reason for a protected dtor.
 
             @seealso    class Desktop
-        *//*-*****************************************************************************************************/
+        */
 
         virtual ~OComponentAccess();
 
 
     private:
 
-        /*-****************************************************************************************************
+        /*
             @short      recursive method (!) to collect all components of all frames from the subtree of given node
             @descr      This is necessary to create the enumeration.
 
@@ -141,12 +141,12 @@ class OComponentAccess  :   public ::cppu::WeakImplHelper< css::container::XEnum
             @param      "xNode"        , root of subtree and start point of search
             @param      "seqComponents", result list of search. We can't use a return value, we search recursive
                                          and must collect all information.
-        *//*-*****************************************************************************************************/
+        */
 
         void impl_collectAllChildComponents(    const   css::uno::Reference< css::frame::XFramesSupplier >&            xNode           ,
                                                         std::vector< css::uno::Reference< css::lang::XComponent > >&   seqComponents   );
 
-        /*-****************************************************************************************************
+        /*
             @short      get the component of a frame
             @descr      The component of a frame can be the window, the controller or the model.
 
@@ -156,39 +156,17 @@ class OComponentAccess  :   public ::cppu::WeakImplHelper< css::container::XEnum
             @return     A reference to the component of given frame.
 
             @onerror    A null reference is returned.
-        *//*-*****************************************************************************************************/
+        */
 
         css::uno::Reference< css::lang::XComponent > impl_getFrameComponent( const css::uno::Reference< css::frame::XFrame >& xFrame ) const;
 
-    //  debug methods
-    //  (should be private everyway!)
-
-        /*-****************************************************************************************************
-            @short      debug-method to check incoming parameter of some other mehods of this class
-            @descr      The following methods are used to check parameters for other methods
-                        of this class. The return value is used directly for an ASSERT(...).
-
-            @seealso    ASSERTs in implementation!
-
-            @param      references to checking variables
-            @return     sal_False ,on invalid parameter.
-            @return     sal_True  ,otherwise
-        *//*-*****************************************************************************************************/
-
     private:
 
-        static bool impldbg_checkParameter_OComponentAccessCtor( const css::uno::Reference< css::frame::XDesktop >& xOwner );
+        css::uno::WeakReference< css::frame::XDesktop >     m_xOwner;   /// weak reference to the desktop object
 
-    //  variables
-    //  (should be private everyway!)
+};
 
-    private:
-
-        css::uno::WeakReference< css::frame::XDesktop >     m_xOwner;   /// weak reference to the desktop object!
-
-};      //  class OComponentAccess
-
-}       //  namespace framework
+}
 
 #endif // INCLUDED_FRAMEWORK_INC_HELPER_OCOMPONENTACCESS_HXX
 

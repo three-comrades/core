@@ -61,7 +61,7 @@ ButtonToolbarController::ButtonToolbarController(
     cppu::OWeakObject(),
     m_bInitialized( false ),
     m_bDisposed( false ),
-    m_aCommandURL( aCommand ),
+    m_aActionURL( aCommand ),
     m_xContext( rxContext ),
     m_pToolbar( pToolBar )
 {
@@ -126,9 +126,15 @@ throw (css::uno::Exception, css::uno::RuntimeException, std::exception)
             if ( aArguments[i] >>= aPropValue )
             {
                 if ( aPropValue.Name == "Frame" )
-                    m_xFrame.set(aPropValue.Value,UNO_QUERY);
+                    m_xFrame.set( aPropValue.Value, UNO_QUERY );
+                else if ( aPropValue.Name == "ActionURL" )
+                    aPropValue.Value >>= m_aActionURL;
                 else if ( aPropValue.Name == "CommandURL" )
-                    aPropValue.Value >>= m_aCommandURL;
+                {
+                    SAL_WARN( "framework", "\"CommandURL\" to \"ActionURL\" in ButtonToolbarController::initialize" );
+                    aPropValue.Value >>= m_aActionURL;
+                    aPropValue.Name = "ActionURL";
+                }
                 else if ( aPropValue.Name == "ServiceManager" )
                 {
                     Reference<XMultiServiceFactory> xServiceManager(aPropValue.Value,UNO_QUERY);
@@ -212,8 +218,8 @@ throw (css::uno::RuntimeException, std::exception)
     uno::Reference< frame::XDispatch >      xDispatch;
     uno::Reference< frame::XFrame >         xFrame;
     uno::Reference< util::XURLTransformer > xURLTransformer;
-    OUString                           aCommandURL;
-    css::util::URL             aTargetURL;
+    OUString                           aActionURL;
+    css::util::URL             aRecipientURL;
 
     {
         SolarMutexGuard aSolarMutexGuard;
@@ -224,7 +230,7 @@ throw (css::uno::RuntimeException, std::exception)
         if ( m_bInitialized &&
              m_xFrame.is() &&
              m_xContext.is() &&
-             !m_aCommandURL.isEmpty() )
+             !m_aActionURL.isEmpty() )
         {
             if ( !m_xURLTransformer.is() )
             {
@@ -232,7 +238,7 @@ throw (css::uno::RuntimeException, std::exception)
             }
 
             xFrame          = m_xFrame;
-            aCommandURL     = m_aCommandURL;
+            aActionURL     = m_aActionURL;
             xURLTransformer = m_xURLTransformer;
         }
     }
@@ -240,9 +246,9 @@ throw (css::uno::RuntimeException, std::exception)
     uno::Reference< frame::XDispatchProvider > xDispatchProvider( xFrame, uno::UNO_QUERY );
     if ( xDispatchProvider.is() )
     {
-        aTargetURL.Complete = aCommandURL;
-        xURLTransformer->parseStrict( aTargetURL );
-        xDispatch = xDispatchProvider->queryDispatch( aTargetURL, OUString(), 0 );
+        aRecipientURL.Complete = aActionURL;
+        xURLTransformer->parseStrict( aRecipientURL );
+        xDispatch = xDispatchProvider->queryDispatch( aRecipientURL, OUString(), 0 );
     }
 
     if ( xDispatch.is() )
@@ -255,7 +261,7 @@ throw (css::uno::RuntimeException, std::exception)
             aArgs[0].Name   = "KeyModifier";
             aArgs[0].Value  <<= KeyModifier;
 
-            xDispatch->dispatch( aTargetURL, aArgs );
+            xDispatch->dispatch( aRecipientURL, aArgs );
         }
         catch ( const DisposedException& )
         {

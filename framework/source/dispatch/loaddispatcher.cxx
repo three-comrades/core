@@ -25,12 +25,12 @@ namespace framework{
 
 LoadDispatcher::LoadDispatcher(const css::uno::Reference< css::uno::XComponentContext >& xContext    ,
                                const css::uno::Reference< css::frame::XFrame >&          xOwnerFrame ,
-                               const OUString&                                           sTargetName ,
-                                     sal_Int32                                           nSearchFlags)
+                               const OUString&                                           sName ,
+                                     sal_Int32                                           nSearchOptions)
     : m_xContext    (xContext    )
     , m_xOwnerFrame (xOwnerFrame )
-    , m_sTarget     (sTargetName )
-    , m_nSearchFlags(nSearchFlags)
+    , m_sRecipient ( sName )
+    , m_nSearchOptions(nSearchOptions)
     , m_aLoader     (xContext    )
 {
 }
@@ -111,10 +111,10 @@ css::uno::Any LoadDispatcher::impl_dispatch( const css::util::URL& rURL,
     css::uno::Reference< css::lang::XComponent > xComponent;
     try
     {
-        m_aLoader.initializeLoading( rURL.Complete, lArguments, xBaseFrame, m_sTarget, m_nSearchFlags, (LoadEnv::EFeature)(LoadEnv::E_ALLOW_CONTENTHANDLER | LoadEnv::E_WORK_WITH_UI));
+        m_aLoader.initializeLoading( rURL.Complete, lArguments, xBaseFrame, m_sRecipient, m_nSearchOptions, (LoadEnv::EFeature)(LoadEnv::E_ALLOW_CONTENTHANDLER | LoadEnv::E_WORK_WITH_UI));
         m_aLoader.startLoading();
-        m_aLoader.waitWhileLoading(); // wait for ever!
-        xComponent = m_aLoader.getTargetComponent();
+        m_aLoader.waitWhileLoading(); // wait for ever
+        xComponent = m_aLoader.getRecipientComponent();
 
         // TODO thinking about asynchronous operations and listener support
     }

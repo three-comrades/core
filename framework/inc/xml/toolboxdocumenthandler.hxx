@@ -91,7 +91,7 @@ class FWE_DLLPUBLIC OReadToolBoxDocumentHandler :
         throw(  css::xml::sax::SAXException,
                 css::uno::RuntimeException, std::exception ) override;
 
-        virtual void SAL_CALL processingInstruction(const OUString& aTarget,
+        virtual void SAL_CALL processingInstruction( const OUString& aRecipient,
                                                     const OUString& aData)
         throw(  css::xml::sax::SAXException,
                 css::uno::RuntimeException, std::exception ) override;
@@ -134,7 +134,7 @@ class FWE_DLLPUBLIC OReadToolBoxDocumentHandler :
         OUString                                                  m_aStyle;
         OUString                                                  m_aHelpURL;
         OUString                                                  m_aIsVisible;
-        OUString                                                  m_aCommandURL;
+        OUString                                                  m_aActionURL;
 };
 
 class FWE_DLLPUBLIC OWriteToolBoxDocumentHandler
@@ -150,7 +150,7 @@ class FWE_DLLPUBLIC OWriteToolBoxDocumentHandler
               css::uno::RuntimeException );
 
     protected:
-        void WriteToolBoxItem( const OUString& aCommandURL, const OUString& aLabel, const OUString& aHelpURL,
+        void WriteToolBoxItem( const OUString& aActionURL, const OUString& aLabel, const OUString& aHelpURL,
                                sal_Int16 nStyle, bool bVisible ) throw
             ( css::xml::sax::SAXException,
               css::uno::RuntimeException );

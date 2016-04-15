@@ -49,7 +49,7 @@ static const char MENU_SHORTCUT[]     = "~N. ";
 
 struct LoadRecentFile
 {
-    util::URL                               aTargetURL;
+    util::URL                               aURL;
     uno::Sequence< beans::PropertyValue >   aArgSeq;
     uno::Reference< frame::XDispatch >      xDispatch;
 };
@@ -91,7 +91,7 @@ public:
     virtual void SAL_CALL itemActivated( const awt::MenuEvent& rEvent ) throw (uno::RuntimeException, std::exception) override;
 
     // XDispatchProvider
-    virtual uno::Reference< frame::XDispatch > SAL_CALL queryDispatch( const util::URL& aURL, const OUString& sTarget, sal_Int32 nFlags ) throw( uno::RuntimeException, std::exception ) override;
+    virtual uno::Reference< frame::XDispatch > SAL_CALL queryDispatch( const util::URL& aURL, const OUString& sRecipient, sal_Int32 nOptions ) throw( uno::RuntimeException, std::exception ) override;
 
     // XDispatch
     virtual void SAL_CALL dispatch( const util::URL& aURL, const uno::Sequence< beans::PropertyValue >& seqProperties ) throw( uno::RuntimeException, std::exception ) override;
@@ -271,7 +271,7 @@ void RecentFilesMenuController::executeEntry( sal_Int32 nIndex )
 {
     Reference< XDispatch >            xDispatch;
     Reference< XDispatchProvider >    xDispatchProvider;
-    css::util::URL                    aTargetURL;
+    css::util::URL                    aURL;
     Sequence< PropertyValue >         aArgsList;
 
     osl::ClearableMutexGuard aLock( m_aMutex );
@@ -283,8 +283,8 @@ void RecentFilesMenuController::executeEntry( sal_Int32 nIndex )
     {
         const RecentFile& rRecentFile = m_aRecentFilesItems[ nIndex ];
 
-        aTargetURL.Complete = rRecentFile.aURL;
-        m_xURLTransformer->parseStrict( aTargetURL );
+        aURL.Complete = rRecentFile.aURL;
+        m_xURLTransformer->parseStrict( aURL );
 
         sal_Int32 nSize = 2;
         aArgsList.realloc( nSize );
@@ -303,7 +303,7 @@ void RecentFilesMenuController::executeEntry( sal_Int32 nIndex )
             aArgsList[nSize-1].Value <<= m_aModuleName;
         }
 
-        xDispatch = xDispatchProvider->queryDispatch( aTargetURL, "_default", 0 );
+        xDispatch = xDispatchProvider->queryDispatch( aURL, "_default", 0 );
     }
 
     if ( xDispatch.is() )
@@ -313,7 +313,7 @@ void RecentFilesMenuController::executeEntry( sal_Int32 nIndex )
         // after select!!!
         LoadRecentFile* pLoadRecentFile = new LoadRecentFile;
         pLoadRecentFile->xDispatch  = xDispatch;
-        pLoadRecentFile->aTargetURL = aTargetURL;
+        pLoadRecentFile->aURL = aURL;
         pLoadRecentFile->aArgSeq    = aArgsList;
 
         Application::PostUserEvent( LINK(nullptr, RecentFilesMenuController, ExecuteHdl_Impl), pLoadRecentFile );
@@ -388,8 +388,8 @@ void RecentFilesMenuController::impl_setPopupMenu()
 // XDispatchProvider
 Reference< XDispatch > SAL_CALL RecentFilesMenuController::queryDispatch(
     const URL& aURL,
-    const OUString& /*sTarget*/,
-    sal_Int32 /*nFlags*/ )
+    const OUString& /*sRecipient*/,
+    sal_Int32 /*nOptions*/ )
 throw( RuntimeException, std::exception )
 {
     osl::MutexGuard aLock( m_aMutex );
@@ -446,7 +446,7 @@ IMPL_STATIC_LINK_TYPED( RecentFilesMenuController, ExecuteHdl_Impl, void*, p, vo
         // Asynchronous execution as this can lead to our own destruction!
         // Framework can recycle our current frame and the layout manager disposes all user interface
         // elements if a component gets detached from its frame!
-        pLoadRecentFile->xDispatch->dispatch( pLoadRecentFile->aTargetURL, pLoadRecentFile->aArgSeq );
+        pLoadRecentFile->xDispatch->dispatch( pLoadRecentFile->aURL, pLoadRecentFile->aArgSeq );
     }
     catch ( const Exception& )
     {

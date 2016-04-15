@@ -37,8 +37,8 @@ InterceptionHelper::~InterceptionHelper()
 }
 
 css::uno::Reference< css::frame::XDispatch > SAL_CALL InterceptionHelper::queryDispatch(const css::util::URL&  aURL            ,
-                                                                                        const OUString& sTargetFrameName,
-                                                                                              sal_Int32        nSearchFlags    )
+                                                                                        const OUString& sRecipientFrameName,
+                                                                                              sal_Int32        nSearchOptions    )
     throw(css::uno::RuntimeException, std::exception)
 {
     // SAFE {
@@ -80,7 +80,7 @@ css::uno::Reference< css::frame::XDispatch > SAL_CALL InterceptionHelper::queryD
 
     css::uno::Reference< css::frame::XDispatch > xReturn;
     if (xInterceptor.is())
-        xReturn = xInterceptor->queryDispatch(aURL, sTargetFrameName, nSearchFlags);
+        xReturn = xInterceptor->queryDispatch(aURL, sRecipientFrameName, nSearchOptions);
     return xReturn;
 }
 
@@ -93,7 +93,7 @@ css::uno::Sequence< css::uno::Reference< css::frame::XDispatch > > SAL_CALL Inte
     const css::frame::DispatchDescriptor*                                    pDescriptor = lDescriptor.getConstArray();
 
     for (sal_Int32 i=0; i<c; ++i)
-        pDispatches[i] = queryDispatch(pDescriptor[i].FeatureURL, pDescriptor[i].FrameName, pDescriptor[i].SearchFlags);
+        pDispatches[i] = queryDispatch(pDescriptor[i].FeatureURL, pDescriptor[i].FrameName, pDescriptor[i].SearchOptions);
 
     return lDispatches;
 }

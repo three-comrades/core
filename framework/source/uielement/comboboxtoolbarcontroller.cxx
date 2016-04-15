@@ -262,7 +262,7 @@ void ComboboxToolbarController::executeControlCommand( const css::frame::Control
                 // send notification
                 uno::Sequence< beans::NamedValue > aInfo { { "List", css::uno::makeAny(aList) } };
                 addNotifyInfo( "ListChanged",
-                               getDispatchFromCommand( m_aCommandURL ),
+                               getDispatchFromCommand( m_aActionURL ),
                                aInfo );
 
                 break;

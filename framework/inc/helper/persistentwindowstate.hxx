@@ -36,7 +36,7 @@
 
 namespace framework{
 
-/*-************************************************************************************************************
+/*
     @short          listener for closing document frames to make her window state persistent
     @descr          It's a feature of our office. If a document window was created by ourself (and not from
                     any external process e.g. the office bean) we save and restore the window state of it
@@ -51,7 +51,7 @@ namespace framework{
 
     @devstatus      ready
     @threadsafe     yes
-*//*-*************************************************************************************************************/
+*/
 class PersistentWindowState :   public  ::cppu::WeakImplHelper<
                                            css::lang::XInitialization,
                                            css::frame::XFrameActionListener > // => XEventListener

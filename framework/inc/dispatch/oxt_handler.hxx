@@ -39,17 +39,15 @@
 
 namespace framework{
 
-/*-************************************************************************************************************
-    @short          handler to detect and play sounds ("wav" and "au" only!)
-    @descr          Register this implementation as a content handler to detect and/or play wav- and au-sounds.
-                    It doesn't depend from the target platform. But one instance of this class
-                    can play one sound at the same time only. Means every new dispatch request will stop the
-                    might still running one. So we support one operation/one URL/one listener at the same time
-                    only.
+/*
+    @short          handler to detect and play sounds (only "wav" and "au" yet)
+    @descr          Register this implementation as a content handler to detect and/or play wav and au sounds.
+                    One instance of this class can play one sound at the same time only.
+                    Means every new dispatch request will stop the still running one.
 
     @devstatus      ready
     @threadsafe     yes
-*//*-*************************************************************************************************************/
+*/
 class Oxt_Handler  :    public  ::cppu::WeakImplHelper<
                                     css::lang::XServiceInfo,
                                     css::frame::XNotifyingDispatch, // => XDispatch

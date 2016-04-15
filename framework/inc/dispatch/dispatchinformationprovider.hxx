@@ -34,9 +34,9 @@
 
 namespace framework{
 
-/*-************************************************************************************************************
+/*
     @short          a helper to merge dispatch information of different sources together.
-*//*-*************************************************************************************************************/
+*/
 class DispatchInformationProvider : public  ::cppu::WeakImplHelper< css::frame::XDispatchInformationProvider >
 {
 
@@ -65,9 +65,9 @@ class DispatchInformationProvider : public  ::cppu::WeakImplHelper< css::frame::
 
         css::uno::Sequence< css::uno::Reference< css::frame::XDispatchInformationProvider > > implts_getAllSubProvider();
 
-}; // class DispatchInformationProvider
+};
 
-} // namespace framework
+}
 
 #endif // INCLUDED_FRAMEWORK_INC_DISPATCH_DISPATCHINFORMATIONPROVIDER_HXX
 

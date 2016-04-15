@@ -42,17 +42,17 @@ namespace framework
 struct AddonsParams
 {
     OUString aImageId;
-    OUString aTarget;
+    OUString aRecipient;
     OUString aControlType;
     sal_uInt16 nWidth;
 };
 
 struct AddonToolbarItem
 {
-    OUString aCommandURL;
+    OUString aActionURL;
     OUString aLabel;
     OUString aImageIdentifier;
-    OUString aTarget;
+    OUString aRecipient;
     OUString aContext;
     OUString aControlType;
     sal_uInt16 nWidth;
@@ -76,10 +76,10 @@ class ToolBarMerger
                                                  AddonToolbarItemContainer& rContainer );
 
         static void       ConvertSequenceToValues( const css::uno::Sequence< css::beans::PropertyValue >& rSequence,
-                                                   OUString& rCommandURL,
+                                                   OUString& rActionURL,
                                                    OUString& rLabel,
                                                    OUString& rImageIdentifier,
-                                                   OUString& rTarget,
+                                                   OUString& rRecipient,
                                                    OUString& rContext,
                                                    OUString& rControlType,
                                                    sal_uInt16& rWidth );
@@ -128,7 +128,7 @@ class ToolBarMerger
             const css::uno::Reference< css::uno::XComponentContext > & rxContext,
             const css::uno::Reference< css::frame::XFrame > & xFrame,
             ToolBox*        pToolbar,
-            const OUString& rCommandURL,
+            const OUString& rActionURL,
             sal_uInt16      nId,
             sal_uInt16      nWidth,
             const OUString& rControlType );

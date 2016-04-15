@@ -41,7 +41,7 @@ namespace framework{
 
 typedef ::std::vector< css::uno::Reference< css::frame::XFrame > >  TFrameContainer;
 
-/*-************************************************************************************************************
+/*
     @short          implement a container to hold children of frame, task or desktop
     @descr          Every object of frame, task or desktop hold reference to his children. These container is used as helper
                     to do this. Some helper-classes like OFrames or OTasksAccess use it to. They hold a pointer to an instance
@@ -51,11 +51,9 @@ typedef ::std::vector< css::uno::Reference< css::frame::XFrame > >  TFrameContai
 
     @devstatus      ready to use
     @threadsafe     yes
-*//*-*************************************************************************************************************/
+*/
 class FrameContainer
 {
-
-    // member
 
     private:
 
@@ -68,7 +66,6 @@ class FrameContainer
 
     public:
 
-        /// constructor / destructor
                  FrameContainer();
         virtual ~FrameContainer();
 
@@ -76,14 +73,14 @@ class FrameContainer
         void                                      append     ( const css::uno::Reference< css::frame::XFrame >& xFrame );
         void                                      remove     ( const css::uno::Reference< css::frame::XFrame >& xFrame );
         void                                      setActive  ( const css::uno::Reference< css::frame::XFrame >& xFrame );
-        css::uno::Reference< css::frame::XFrame > getActive  (                                                         ) const;
+        css::uno::Reference< css::frame::XFrame > getActive  ( ) const;
 
         /// checks and free memory
-        bool exist      ( const css::uno::Reference< css::frame::XFrame >& xFrame ) const;
-        void     clear      (                                                         );
+        bool exist ( const css::uno::Reference< css::frame::XFrame >& xFrame ) const;
+        void clear ( );
 
-        /// deprecated IndexAccess!
-        sal_uInt32                                getCount  (                   ) const;
+        /// deprecated IndexAccess
+        sal_uInt32 getCount ( ) const;
         css::uno::Reference< css::frame::XFrame > operator[]( sal_uInt32 nIndex ) const;
 
         /// replacement for deprecated index access
@@ -93,9 +90,9 @@ class FrameContainer
         css::uno::Reference< css::frame::XFrame > searchOnAllChildrens   ( const OUString& sName ) const;
         css::uno::Reference< css::frame::XFrame > searchOnDirectChildrens( const OUString& sName ) const;
 
-}; // class FrameContainer
+};
 
-} // namespace framework
+}
 
 #endif // INCLUDED_FRAMEWORK_INC_CLASSES_FRAMECONTAINER_HXX
 

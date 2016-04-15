@@ -88,19 +88,19 @@ PresetHandler::PresetHandler(const css::uno::Reference< css::uno::XComponentCont
 PresetHandler::PresetHandler(const PresetHandler& rCopy)
     : m_aLanguageTag( rCopy.m_aLanguageTag)
 {
-    m_xContext              = rCopy.m_xContext;
-    m_eConfigType           = rCopy.m_eConfigType;
-    m_sResourceType         = rCopy.m_sResourceType;
-    m_sModule               = rCopy.m_sModule;
-    m_xWorkingStorageShare  = rCopy.m_xWorkingStorageShare;
+    m_xContext = rCopy.m_xContext;
+    m_eConfigType = rCopy.m_eConfigType;
+    m_sResourceType = rCopy.m_sResourceType;
+    m_sModule = rCopy.m_sModule;
+    m_xWorkingStorageShare = rCopy.m_xWorkingStorageShare;
     m_xWorkingStorageNoLang = rCopy.m_xWorkingStorageNoLang;
-    m_xWorkingStorageUser   = rCopy.m_xWorkingStorageUser;
-    m_lPresets              = rCopy.m_lPresets;
-    m_lTargets              = rCopy.m_lTargets;
-    m_lDocumentStorages     = rCopy.m_lDocumentStorages;
-    m_sRelPathShare         = rCopy.m_sRelPathShare;
-    m_sRelPathNoLang        = rCopy.m_sRelPathNoLang;
-    m_sRelPathUser          = rCopy.m_sRelPathUser;
+    m_xWorkingStorageUser = rCopy.m_xWorkingStorageUser;
+    m_lPresets = rCopy.m_lPresets;
+    m_lRecipients = rCopy.m_lRecipients;
+    m_lDocumentStorages = rCopy.m_lDocumentStorages;
+    m_sRelPathShare = rCopy.m_sRelPathShare;
+    m_sRelPathNoLang = rCopy.m_sRelPathNoLang;
+    m_sRelPathUser = rCopy.m_sRelPathUser;
 }
 
 PresetHandler::~PresetHandler()
@@ -456,14 +456,14 @@ void PresetHandler::connectToResource(      PresetHandler::EConfigType          
         sRelPathUser  = sLocalizedUserPath;
     }
 
-    // read content of level 3 (presets, targets)
+    // read content of level 3 (presets, recipients)
           css::uno::Reference< css::container::XNameAccess > xAccess;
           css::uno::Sequence< OUString >              lNames;
     const OUString*                                   pNames;
           sal_Int32                                          c;
           sal_Int32                                          i;
           std::vector<OUString> lPresets;
-          std::vector<OUString> lTargets;
+          std::vector<OUString> lRecipients;
 
     // read preset names of share layer
     xAccess.set(xShare, css::uno::UNO_QUERY);
@@ -497,7 +497,7 @@ void PresetHandler::connectToResource(      PresetHandler::EConfigType          
             sal_Int32       nPos  = sTemp.indexOf(".xml");
             if (nPos > -1)
                 sTemp = sTemp.copy(0,nPos);
-            lTargets.push_back(sTemp);
+            lRecipients.push_back(sTemp);
         }
     }
 
@@ -507,7 +507,7 @@ void PresetHandler::connectToResource(      PresetHandler::EConfigType          
         m_xWorkingStorageNoLang= xNoLang;
         m_xWorkingStorageUser  = xUser;
         m_lPresets             = lPresets;
-        m_lTargets             = lTargets;
+        m_lRecipients = lRecipients;
         m_sRelPathShare        = sRelPathShare;
         m_sRelPathNoLang       = sRelPathNoLang;
         m_sRelPathUser         = sRelPathUser;
@@ -522,11 +522,10 @@ void PresetHandler::connectToResource(      PresetHandler::EConfigType          
     }
 }
 
-void PresetHandler::copyPresetToTarget(const OUString& sPreset,
-                                       const OUString& sTarget)
+void PresetHandler::copyPresetToRecipient( const OUString& sPreset,
+                                       const OUString& sRecipient )
 {
-    // don't check our preset list, if element exists
-    // We try to open it and forward all errors to the user!
+    // don't check preset list if element exists
 
     css::uno::Reference< css::embed::XStorage > xWorkingShare;
     css::uno::Reference< css::embed::XStorage > xWorkingNoLang;
@@ -534,35 +533,34 @@ void PresetHandler::copyPresetToTarget(const OUString& sPreset,
     {
         SolarMutexGuard g;
         xWorkingShare = m_xWorkingStorageShare;
-        xWorkingNoLang= m_xWorkingStorageNoLang;
-        xWorkingUser  = m_xWorkingStorageUser;
+        xWorkingNoLang = m_xWorkingStorageNoLang;
+        xWorkingUser = m_xWorkingStorageUser;
     }
 
-    // e.g. module without any config data ?!
     if (
-        (!xWorkingShare.is()) ||
-        (!xWorkingUser.is() )
+         ( !xWorkingShare.is() ) ||
+         ( !xWorkingUser.is() )
        )
     {
-       return;
+        SAL_WARN( "framework", "e.g. module without any config data ?" );
+        return;
     }
 
     OUString sPresetFile(sPreset);
     sPresetFile += ".xml";
 
-    OUString sTargetFile(sTarget);
-    sTargetFile += ".xml";
+    OUString sRecipientFile(sRecipient);
+    sRecipientFile += ".xml";
 
     // remove existing elements before you try to copy the preset to that location ...
-    // Otherwise w will get an ElementExistException inside copyElementTo()!
+    // Otherwise will get an ElementExistException inside copyElementTo()
     css::uno::Reference< css::container::XNameAccess > xCheckingUser(xWorkingUser, css::uno::UNO_QUERY_THROW);
-    if (xCheckingUser->hasByName(sTargetFile))
-        xWorkingUser->removeElement(sTargetFile);
+    if (  xCheckingUser->hasByName( sRecipientFile ) )
+        xWorkingUser->removeElement( sRecipientFile );
 
-    xWorkingShare->copyElementTo(sPresetFile, xWorkingUser, sTargetFile);
+    xWorkingShare->copyElementTo( sPresetFile, xWorkingUser, sRecipientFile );
 
-    // If our storages work in transacted mode, we have
-    // to commit all changes from bottom to top!
+    // If storages work as transacted, commit all changes from bottom to top
     commitUserChanges();
 }
 
@@ -586,7 +584,7 @@ css::uno::Reference< css::io::XStream > PresetHandler::openPreset(const OUString
     return xStream;
 }
 
-css::uno::Reference< css::io::XStream > PresetHandler::openTarget(const OUString& sTarget)
+css::uno::Reference< css::io::XStream > PresetHandler::openRecipient( const OUString& sRecipient )
 {
     css::uno::Reference< css::embed::XStorage > xFolder;
     {
@@ -598,7 +596,7 @@ css::uno::Reference< css::io::XStream > PresetHandler::openTarget(const OUString
     if (!xFolder.is())
        return css::uno::Reference< css::io::XStream >();
 
-    OUString sFile(sTarget);
+    OUString sFile(sRecipient);
     sFile += ".xml";
 
     // try it in read/write mode first and ignore errors.

@@ -137,7 +137,7 @@ void SubToolBarController::statusChanged( const css::frame::FeatureStateEvent& E
         nItemBits &= ~ToolBoxItemBits::CHECKABLE;
         TriState eTri = TRISTATE_FALSE;
 
-        if ( Event.FeatureURL.Complete == m_aCommandURL )
+        if ( Event.FeatureURL.Complete == m_aActionURL )
         {
             pToolBox->EnableItem( nId, Event.IsEnabled );
 
@@ -147,7 +147,7 @@ void SubToolBarController::statusChanged( const css::frame::FeatureStateEvent& E
             {
                 // Enum command, such as the current custom shape,
                 // toggle checked state.
-                if ( m_aLastCommand == ( m_aCommandURL + "." + aStrValue ) )
+                if ( m_aLastCommand == ( m_aActionURL + "." + aStrValue ) )
                 {
                     eTri = TRISTATE_TRUE;
                     nItemBits |= ToolBoxItemBits::CHECKABLE;

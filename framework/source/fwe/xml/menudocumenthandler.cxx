@@ -72,8 +72,8 @@
 #define ATTRIBUTE_ITEMSTYLE_RADIO    "radio"
 
 // Property names of a menu/menu item ItemDescriptor
-static const char ITEM_DESCRIPTOR_COMMANDURL[]  = "CommandURL";
-static const char ITEM_DESCRIPTOR_HELPURL[]     = "HelpURL";
+static const char ITEM_DESCRIPTOR_ACTIONURL[] = "ActionURL";
+static const char ITEM_DESCRIPTOR_HELPURL[]    = "HelpURL";
 static const char ITEM_DESCRIPTOR_CONTAINER[]   = "ItemDescriptorContainer";
 static const char ITEM_DESCRIPTOR_LABEL[]       = "Label";
 static const char ITEM_DESCRIPTOR_TYPE[]        = "Type";
@@ -110,7 +110,7 @@ const MenuStyleItem MenuItemStyles[ ] = {
 sal_Int32 nMenuStyleItemEntries = SAL_N_ELEMENTS(MenuItemStyles);
 
 static void ExtractMenuParameters( const Sequence< PropertyValue >& rProp,
-                                   OUString&                       rCommandURL,
+                                   OUString&                       rActionURL,
                                    OUString&                       rLabel,
                                    OUString&                       rHelpURL,
                                    Reference< XIndexAccess >&      rSubMenu,
@@ -119,10 +119,16 @@ static void ExtractMenuParameters( const Sequence< PropertyValue >& rProp,
 {
     for ( sal_Int32 i = 0; i < rProp.getLength(); i++ )
     {
-        if ( rProp[i].Name == ITEM_DESCRIPTOR_COMMANDURL )
+        if ( rProp[i].Name == ITEM_DESCRIPTOR_ACTIONURL )
         {
-            rProp[i].Value >>= rCommandURL;
-            rCommandURL = rCommandURL.intern();
+            rProp[i].Value >>= rActionURL;
+            rActionURL = rActionURL.intern();
+        }
+        else if ( rProp[i].Name == "CommandURL" )
+        {
+            SAL_WARN( "framework.fwe", "\"CommandURL\" into \"ActionURL\" in ExtractMenuParameters" );
+            rProp[i].Value >>= rActionURL;
+            ///rProp[i].Name = ITEM_DESCRIPTOR_ACTIONURL;
         }
         else if ( rProp[i].Name == ITEM_DESCRIPTOR_HELPURL )
         {
@@ -156,7 +162,7 @@ ReadMenuDocumentHandlerBase::ReadMenuDocumentHandlerBase() :
     m_aLabel( ITEM_DESCRIPTOR_LABEL ),
     m_aContainer( ITEM_DESCRIPTOR_CONTAINER ),
     m_aHelpURL( ITEM_DESCRIPTOR_HELPURL ),
-    m_aCommandURL( ITEM_DESCRIPTOR_COMMANDURL ),
+    m_aActionURL( ITEM_DESCRIPTOR_ACTIONURL ),
     m_aStyle( ITEM_DESCRIPTOR_STYLE )
 {
 }
@@ -172,7 +178,7 @@ throw( SAXException, RuntimeException, std::exception )
 }
 
 void SAL_CALL ReadMenuDocumentHandlerBase::processingInstruction(
-    const OUString& /*aTarget*/, const OUString& /*aData*/ )
+    const OUString& /*aRecipient*/, const OUString& /*aData*/ )
 throw( SAXException, RuntimeException, std::exception )
 {
 }
@@ -197,10 +203,10 @@ OUString ReadMenuDocumentHandlerBase::getErrorLineString()
 }
 
 void ReadMenuDocumentHandlerBase::initPropertyCommon(
-    Sequence< PropertyValue > &rProps, const OUString &rCommandURL,
+    Sequence< PropertyValue > &rProps, const OUString &rActionURL,
     const OUString &rHelpId, const OUString &rLabel, sal_Int16 nItemStyleBits )
 {
-    rProps[0].Name = m_aCommandURL;
+    rProps[0].Name = m_aActionURL;
     rProps[1].Name = m_aHelpURL;
     rProps[2].Name = m_aContainer;
     rProps[3].Name = m_aLabel;
@@ -208,7 +214,7 @@ void ReadMenuDocumentHandlerBase::initPropertyCommon(
     rProps[5].Name = m_aType;
 
     // Common values
-    rProps[0].Value <<= rCommandURL.intern();
+    rProps[0].Value <<= rActionURL.intern();
     rProps[1].Value <<= rHelpId;
     rProps[2].Value <<= Reference< XIndexContainer >();
     rProps[3].Value <<= rLabel;
@@ -704,7 +710,7 @@ void SAL_CALL OReadMenuPopupHandler::endElement( const OUString& aName )
             if ( aName != ELEMENT_MENU )
             {
                 OUString aErrorMessage = getErrorLineString();
-                aErrorMessage += "closing element menu expected!";
+                aErrorMessage += "bottom menu is expected here";
                 throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
             }
         }
@@ -718,7 +724,7 @@ void SAL_CALL OReadMenuPopupHandler::endElement( const OUString& aName )
             if ( aName != ELEMENT_MENUITEM )
             {
                 OUString aErrorMessage = getErrorLineString();
-                aErrorMessage += "closing element menuitem expected!";
+                aErrorMessage += "bottom menuitem is expected here";
                 throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
             }
         }
@@ -727,7 +733,7 @@ void SAL_CALL OReadMenuPopupHandler::endElement( const OUString& aName )
             if ( aName != ELEMENT_MENUSEPARATOR )
             {
                 OUString aErrorMessage = getErrorLineString();
-                aErrorMessage += "closing element menuseparator expected!";
+                aErrorMessage += "bottom menuseparator is expected here";
                 throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
             }
         }
@@ -763,7 +769,7 @@ throw ( SAXException, RuntimeException )
 
     m_xWriteDocumentHandler->startDocument();
 
-    // write DOCTYPE line!
+    // write DOCTYPE line
     Reference< XExtendedDocumentHandler > xExtendedDocHandler( m_xWriteDocumentHandler, UNO_QUERY );
     if ( m_bIsMenuBar /*FIXME*/ && xExtendedDocHandler.is() )
     {
@@ -809,30 +815,30 @@ throw ( SAXException, RuntimeException )
         aAny = rMenuContainer->getByIndex( nItemPos );
         if ( aAny >>= aProps )
         {
-            OUString    aCommandURL;
+            OUString    aActionURL;
             OUString    aLabel;
             OUString    aHelpURL;
             sal_Int16   nType( css::ui::ItemType::DEFAULT );
             sal_Int16   nItemBits( 0 );
             Reference< XIndexAccess > xSubMenu;
 
-            ExtractMenuParameters( aProps, aCommandURL, aLabel, aHelpURL, xSubMenu, nType, nItemBits );
+            ExtractMenuParameters( aProps, aActionURL, aLabel, aHelpURL, xSubMenu, nType, nItemBits );
             if ( xSubMenu.is() )
             {
-                if ( aCommandURL == ADDDIRECT_CMD ||
-                    aCommandURL == AUTOPILOTMENU_CMD )
+                if ( aActionURL == ADDDIRECT_CMD ||
+                    aActionURL == AUTOPILOTMENU_CMD )
                 {
-                    WriteMenuItem( aCommandURL, aLabel, aHelpURL, nItemBits );
+                    WriteMenuItem( aActionURL, aLabel, aHelpURL, nItemBits );
                     bSeparator = false;
                 }
-                else if ( !aCommandURL.isEmpty() && !AddonPopupMenu::IsCommandURLPrefix( aCommandURL ))
+                else if ( !aActionURL.isEmpty() && !AddonPopupMenu::IsActionURLPrefix( aActionURL ))
                 {
                     ::comphelper::AttributeList* pListMenu = new ::comphelper::AttributeList;
                     Reference< XAttributeList > xListMenu( static_cast<XAttributeList *>(pListMenu) , UNO_QUERY );
 
                     pListMenu->AddAttribute( ATTRIBUTE_NS_ID,
                                             m_aAttributeType,
-                                            aCommandURL );
+                                            aActionURL );
 
                     if ( !aLabel.isEmpty() )
                         pListMenu->AddAttribute( ATTRIBUTE_NS_LABEL,
@@ -859,10 +865,10 @@ throw ( SAXException, RuntimeException )
             {
                 if ( nType == css::ui::ItemType::DEFAULT )
                 {
-                    if ( !aCommandURL.isEmpty() )
+                    if ( !aActionURL.isEmpty() )
                     {
                         bSeparator = false;
-                        WriteMenuItem( aCommandURL, aLabel, aHelpURL, nItemBits );
+                        WriteMenuItem( aActionURL, aLabel, aHelpURL, nItemBits );
                     }
                 }
                 else if ( !bSeparator )
@@ -876,14 +882,14 @@ throw ( SAXException, RuntimeException )
     }
 }
 
-void OWriteMenuDocumentHandler::WriteMenuItem( const OUString& aCommandURL, const OUString& aLabel, const OUString& aHelpURL, sal_Int16 nStyle )
+void OWriteMenuDocumentHandler::WriteMenuItem( const OUString& aActionURL, const OUString& aLabel, const OUString& aHelpURL, sal_Int16 nStyle )
 {
     ::comphelper::AttributeList* pList = new ::comphelper::AttributeList;
     Reference< XAttributeList > xList( static_cast<XAttributeList *>(pList) , UNO_QUERY );
 
     pList->AddAttribute( ATTRIBUTE_NS_ID,
                                 m_aAttributeType,
-                                aCommandURL );
+                                aActionURL );
 
     if ( !aHelpURL.isEmpty() )
     {

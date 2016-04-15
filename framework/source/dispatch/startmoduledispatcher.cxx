@@ -21,7 +21,7 @@
 
 #include <pattern/frame.hxx>
 #include <framework/framelistanalyzer.hxx>
-#include <targets.h>
+#include <recipients.h>
 #include <services.h>
 #include <general.h>
 #include <isstartmoduledispatch.hxx>
@@ -133,7 +133,7 @@ bool StartModuleDispatcher::implts_isBackingModePossible()
 bool StartModuleDispatcher::implts_establishBackingMode()
 {
     css::uno::Reference< css::frame::XDesktop2> xDesktop       = css::frame::Desktop::create( m_xContext );
-    css::uno::Reference< css::frame::XFrame > xFrame           = xDesktop->findFrame(SPECIALTARGET_BLANK, 0);
+    css::uno::Reference< css::frame::XFrame > xFrame           = xDesktop->findFrame( SPECIAL_BLANK, 0 );
     css::uno::Reference< css::awt::XWindow  > xContainerWindow = xFrame->getContainerWindow();
 
     css::uno::Reference< css::frame::XController > xStartModule = css::frame::StartModule::createWithParentWindow(m_xContext, xContainerWindow);

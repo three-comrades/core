@@ -33,16 +33,11 @@ using namespace ::com::sun::star::uno;
 using namespace ::cppu;
 using namespace ::osl;
 
-//  constructor
-
 OComponentAccess::OComponentAccess( const css::uno::Reference< XDesktop >& xOwner )
         :   m_xOwner        ( xOwner                        )
 {
-    // Safe impossible cases
-    SAL_WARN_IF( !impldbg_checkParameter_OComponentAccessCtor( xOwner ), "fwk", "OComponentAccess::OComponentAccess(): Invalid parameter detected!" );
+    SAL_WARN_IF( !xOwner.is(), "fwk", "OComponentAccess(): met a null xOwner" );
 }
-
-//  destructor
 
 OComponentAccess::~OComponentAccess()
 {
@@ -116,7 +111,7 @@ void OComponentAccess::impl_collectAllChildComponents(  const css::uno::Referenc
         // and go down to next level in tree (recursive!).
 
         const css::uno::Reference< XFrames >                xContainer  = xNode->getFrames();
-        const Sequence< css::uno::Reference< XFrame > > seqFrames   = xContainer->queryFrames( FrameSearchFlag::CHILDREN );
+        const Sequence< css::uno::Reference< XFrame > > seqFrames   = xContainer->queryFrames( FrameSearchOption::Children );
 
         const sal_Int32 nFrameCount = seqFrames.getLength();
         for( sal_Int32 nFrame=0; nFrame<nFrameCount; ++nFrame )
@@ -161,23 +156,6 @@ css::uno::Reference< XComponent > OComponentAccess::impl_getFrameComponent( cons
     return xComponent;
 }
 
-//  debug methods
-
-/*-----------------------------------------------------------------------------------------------------------------
-    The follow methods checks the parameter for other functions. If a parameter or his value is non valid,
-    we return "sal_False". (else sal_True) This mechanism is used to throw an ASSERT!
-
-    ATTENTION
-
-        If you miss a test for one of this parameters, contact the author or add it himself !(?)
-        But ... look for right testing! See using of this methods!
------------------------------------------------------------------------------------------------------------------*/
-
-bool OComponentAccess::impldbg_checkParameter_OComponentAccessCtor( const   css::uno::Reference< XDesktop >&      xOwner  )
-{
-    return xOwner.is();
 }
-
-}       //  namespace framework
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

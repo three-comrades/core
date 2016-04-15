@@ -137,7 +137,7 @@ throw ( css::uno::Exception, css::uno::RuntimeException, std::exception )
 
     osl::MutexGuard aGuard( m_aMutex );
     if ( !m_aPopupCommand.getLength() )
-        m_aPopupCommand = m_aCommandURL;
+        m_aPopupCommand = m_aActionURL;
 
     try
     {
@@ -377,7 +377,7 @@ void SaveToolbarController::initialize( const css::uno::Sequence< css::uno::Any 
 
     ToolBox* pToolBox = nullptr;
     sal_uInt16 nId = 0;
-    if ( getToolboxId( nId, &pToolBox ) && pToolBox->GetItemCommand( nId ) != m_aCommandURL )
+    if ( getToolboxId( nId, &pToolBox ) && pToolBox->GetItemCommand( nId ) != m_aActionURL )
     {
         m_bSaveAsModeAllowed = false;
         pToolBox->SetItemBits( nId, pToolBox->GetItemBits( nId ) & ~ ToolBoxItemBits::DROPDOWN );
@@ -447,7 +447,7 @@ void SaveToolbarController::updateImage()
     }
 
     if ( !aImage )
-        aImage = vcl::CommandInfoProvider::Instance().GetImageForCommand( m_aCommandURL, bLargeIcons, m_xFrame );
+        aImage = vcl::CommandInfoProvider::Instance().GetImageForCommand( m_aActionURL, bLargeIcons, m_xFrame );
 
     if ( !!aImage )
         pToolBox->SetItemImage( nId, aImage );
@@ -467,7 +467,7 @@ void SaveToolbarController::statusChanged( const css::frame::FeatureStateEvent& 
     {
         m_bSaveAsModeActive = !m_bSaveAsModeActive;
         pToolBox->SetQuickHelpText( nId,
-            vcl::CommandInfoProvider::Instance().GetTooltipForCommand( rEvent.IsEnabled ? m_aCommandURL : OUString( ".uno:SaveAs" ), m_xFrame ) );
+            vcl::CommandInfoProvider::Instance().GetTooltipForCommand( rEvent.IsEnabled ? m_aActionURL : OUString( ".uno:SaveAs" ), m_xFrame ) );
         pToolBox->SetItemBits( nId, pToolBox->GetItemBits( nId ) & ~( rEvent.IsEnabled ? ToolBoxItemBits::DROPDOWNONLY : ToolBoxItemBits::DROPDOWN ) );
         pToolBox->SetItemBits( nId, pToolBox->GetItemBits( nId ) |  ( rEvent.IsEnabled ? ToolBoxItemBits::DROPDOWN : ToolBoxItemBits::DROPDOWNONLY ) );
         updateImage();
@@ -612,7 +612,7 @@ throw ( css::uno::RuntimeException, std::exception )
     if ( !m_aLastURL.getLength() )
         return;
 
-    OUString aTarget( "_default" );
+    OUString aRecipient( "_default" );
     if ( m_xPopupMenu.is() )
     {
         // TODO investigate how to wrap Get/SetUserValue in css::awt::XMenu
@@ -629,14 +629,14 @@ throw ( css::uno::RuntimeException, std::exception )
                 pVCLPopupMenu->GetUserValue( pVCLPopupMenu->GetCurItemId() ) );
 
         if ( pMenuAttributes )
-            aTarget = pMenuAttributes->aTargetFrame;
+            aRecipient = pMenuAttributes->aRecipientFrame;
     }
 
     css::uno::Sequence< css::beans::PropertyValue > aArgs( 1 );
     aArgs[0].Name = "Referer";
     aArgs[0].Value <<= OUString( "private:user" );
 
-    dispatchCommand( m_aLastURL, aArgs, aTarget );
+    dispatchCommand( m_aLastURL, aArgs, aRecipient );
 }
 
 void NewToolbarController::functionExecuted( const OUString &rCommand )

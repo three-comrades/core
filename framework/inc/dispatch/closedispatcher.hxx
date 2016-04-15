@@ -82,8 +82,8 @@ class CloseDispatcher : public  ::cppu::WeakImplHelper<
                    uno resources. */
         css::uno::Reference< css::uno::XComponentContext > m_xContext;
 
-        /** @short  reference to the target frame, which should be
-                    closed by this dispatch. */
+        /** @short  reference to the frame which is going to be closed
+                    by this dispatch */
         css::uno::WeakReference< css::frame::XFrame > m_xCloseFrame;
 
         /** @short  used for asynchronous callbacks within the main thread.
@@ -119,12 +119,12 @@ class CloseDispatcher : public  ::cppu::WeakImplHelper<
             @param  xFrame
                     the frame where the corresponding dispatch was started.
 
-            @param  sTarget
-                    help us to find the right target for this close operation.
+            @param  sRecipient
+                    help us to find the recipient for this close dispatch.
          */
         CloseDispatcher(const css::uno::Reference< css::uno::XComponentContext >& rxContext  ,
                         const css::uno::Reference< css::frame::XFrame >&          xFrame ,
-                        const OUString&                                           sTarget);
+                        const OUString&  sRecipient );
 
         /** @short  does nothing real. */
         virtual ~CloseDispatcher();
@@ -243,27 +243,26 @@ class CloseDispatcher : public  ::cppu::WeakImplHelper<
                                                sal_Int16                                                   nState   ,
                                          const css::uno::Any&                                              aResult  );
 
-        /** @short  try to find the right target frame where this close request
-                    must be really done.
+        /** @short  try to find the recipient frame where this close request
+                    is going to be really done.
 
             @descr  The problem behind: closing some resources depends sometimes from the
                     context where its dispatched. Sometimes the start frame of the dispatch
-                    has to be closed itself (target=_self) ... sometimes its parent frame
+                    has to be closed itself (recipient=_self) ... sometimes its parent frame
                     has to be closed - BUT(!) it means a parent frame containing a top level
                     window. _top can't be used then for dispatch - because it address TopFrames
                     not frames containg top level windows. So normally _magic (which btw does not
-                    exists at the moment .-) ) should be used. So we interpret target=<empty>
+                    exists at the moment .-) ) should be used. So we interpret recipient=<empty>
                     as _magic !
 
             @param  xFrame
                     start point for search of right dispatch frame.
 
-            @param  sTarget
-                    give us an idea how this target frame must be searched.
+            @param  sRecipient
+                    give us an idea how this recipient frame is going to be searched.
         */
-
-        static css::uno::Reference< css::frame::XFrame > static_impl_searchRightTargetFrame(const css::uno::Reference< css::frame::XFrame >& xFrame ,
-                                                                                            const OUString&                           sTarget);
+        static css::uno::Reference< css::frame::XFrame > impl_lookForRecipientFrame( const css::uno::Reference< css::frame::XFrame >& xFrame ,
+                                                                                     const OUString& sRecipient );
 
 }; // class CloseDispatcher
 

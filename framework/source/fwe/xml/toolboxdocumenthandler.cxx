@@ -47,7 +47,7 @@ namespace framework
 {
 
 // Property names of a menu/menu item ItemDescriptor
-static const char ITEM_DESCRIPTOR_COMMANDURL[]  = "CommandURL";
+static const char ITEM_DESCRIPTOR_ACTIONURL[]   = "ActionURL";
 static const char ITEM_DESCRIPTOR_HELPURL[]     = "HelpURL";
 static const char ITEM_DESCRIPTOR_LABEL[]       = "Label";
 static const char ITEM_DESCRIPTOR_TYPE[]        = "Type";
@@ -55,7 +55,7 @@ static const char ITEM_DESCRIPTOR_STYLE[]       = "Style";
 static const char ITEM_DESCRIPTOR_VISIBLE[]     = "IsVisible";
 
 static void ExtractToolbarParameters( const Sequence< PropertyValue >& rProp,
-                                      OUString&                        rCommandURL,
+                                      OUString&                        rActionURL,
                                       OUString&                        rLabel,
                                       OUString&                        rHelpURL,
                                       sal_Int16&                       rStyle,
@@ -64,10 +64,17 @@ static void ExtractToolbarParameters( const Sequence< PropertyValue >& rProp,
 {
     for ( sal_Int32 i = 0; i < rProp.getLength(); i++ )
     {
-        if ( rProp[i].Name == ITEM_DESCRIPTOR_COMMANDURL )
+        if ( rProp[i].Name == ITEM_DESCRIPTOR_ACTIONURL )
         {
-            rProp[i].Value >>= rCommandURL;
-            rCommandURL = rCommandURL.intern();
+            rProp[i].Value >>= rActionURL;
+            rActionURL = rActionURL.intern();
+        }
+        else if ( rProp[i].Name == "CommandURL" )
+        {
+            SAL_WARN( "framework.fwe", "\"CommandURL\" to \"ActionURL\" in ExtractToolbarParameters" );
+            rProp[i].Value >>= rActionURL;
+            rActionURL = rActionURL.intern();
+            ///rProp[i].Name = ITEM_DESCRIPTOR_ACTIONURL;
         }
         else if ( rProp[i].Name == ITEM_DESCRIPTOR_HELPURL )
             rProp[i].Value >>= rHelpURL;
@@ -129,7 +136,7 @@ OReadToolBoxDocumentHandler::OReadToolBoxDocumentHandler( const Reference< XInde
     m_aStyle( ITEM_DESCRIPTOR_STYLE ),
     m_aHelpURL( ITEM_DESCRIPTOR_HELPURL ),
     m_aIsVisible( ITEM_DESCRIPTOR_VISIBLE ),
-    m_aCommandURL( ITEM_DESCRIPTOR_COMMANDURL )
+    m_aActionURL( ITEM_DESCRIPTOR_ACTIONURL )
  {
     OUString aNamespaceToolBar( XMLNS_TOOLBAR );
     OUString aNamespaceXLink( XMLNS_XLINK );
@@ -192,7 +199,7 @@ throw(  SAXException, RuntimeException, std::exception )
         ( !m_bToolBarStartFound && m_bToolBarEndFound )     )
     {
         OUString aErrorMessage = getErrorLineString();
-        aErrorMessage += "No matching start or end element 'toolbar' found!";
+        aErrorMessage += "No top or bottom toolbar found";
         throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
     }
 }
@@ -213,7 +220,7 @@ throw(  SAXException, RuntimeException, std::exception )
                 if ( m_bToolBarStartFound )
                 {
                     OUString aErrorMessage = getErrorLineString();
-                    aErrorMessage += "Element 'toolbar:toolbar' cannot be embedded into 'toolbar:toolbar'!";
+                    aErrorMessage += "toolbar:toolbar is embedded into toolbar:toolbar? no way";
                     throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
                 }
                 else
@@ -261,7 +268,7 @@ throw(  SAXException, RuntimeException, std::exception )
                 if ( !m_bToolBarStartFound )
                 {
                     OUString aErrorMessage = getErrorLineString();
-                    aErrorMessage += "Element 'toolbar:toolbaritem' must be embedded into element 'toolbar:toolbar'!";
+                    aErrorMessage += "toolbar:toolbaritem is supposed to be embedded into toolbar:toolbar";
                     throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
                 }
 
@@ -271,7 +278,7 @@ throw(  SAXException, RuntimeException, std::exception )
                      m_bToolBarItemStartFound )
                 {
                     OUString aErrorMessage = getErrorLineString();
-                    aErrorMessage += "Element toolbar:toolbaritem is not a container!";
+                    aErrorMessage += "toolbar:toolbaritem is not a container";
                     throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
                 }
 
@@ -279,7 +286,7 @@ throw(  SAXException, RuntimeException, std::exception )
 
                 m_bToolBarItemStartFound = true;
                 OUString        aLabel;
-                OUString        aCommandURL;
+                OUString        aActionURL;
                 OUString        aHelpURL;
                 sal_uInt16      nItemBits( 0 );
                 bool            bVisible( true );
@@ -300,7 +307,7 @@ throw(  SAXException, RuntimeException, std::exception )
                             case TB_ATTRIBUTE_URL:
                             {
                                 bAttributeURL   = true;
-                                aCommandURL     = xAttribs->getValueByIndex( n ).intern();
+                                aActionURL     = xAttribs->getValueByIndex( n ).intern();
                             }
                             break;
 
@@ -313,7 +320,7 @@ throw(  SAXException, RuntimeException, std::exception )
                                 else
                                 {
                                     OUString aErrorMessage = getErrorLineString();
-                                    aErrorMessage += "Attribute toolbar:visible must have value 'true' or 'false'!";
+                                    aErrorMessage += "value of attribute toolbar:visible is either `true' or `false'";
                                     throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
                                 }
                             }
@@ -368,14 +375,14 @@ throw(  SAXException, RuntimeException, std::exception )
                 if ( !bAttributeURL )
                 {
                     OUString aErrorMessage = getErrorLineString();
-                    aErrorMessage += "Required attribute toolbar:url must have a value!";
+                    aErrorMessage += "where's a value for attribute toolbar:url?";
                     throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
                 }
 
-                if ( !aCommandURL.isEmpty() )
+                if ( !aActionURL.isEmpty() )
                 {
                     Sequence< PropertyValue > aToolbarItemProp( 6 );
-                    aToolbarItemProp[0].Name = m_aCommandURL;
+                    aToolbarItemProp[0].Name = m_aActionURL;
                     aToolbarItemProp[1].Name = m_aHelpURL;
                     aToolbarItemProp[2].Name = m_aLabel;
                     aToolbarItemProp[3].Name = m_aType;
@@ -385,21 +392,21 @@ throw(  SAXException, RuntimeException, std::exception )
                     //fix for fdo#39370
                     /// check whether RTL interface or not
                     if(AllSettings::GetLayoutRTL()){
-                        if (aCommandURL == ".uno:ParaLeftToRight")
-                            aCommandURL = ".uno:ParaRightToLeft";
-                        else if (aCommandURL == ".uno:ParaRightToLeft")
-                            aCommandURL = ".uno:ParaLeftToRight";
-                        else if (aCommandURL == ".uno:LeftPara")
-                            aCommandURL = ".uno:RightPara";
-                        else if (aCommandURL == ".uno:RightPara")
-                            aCommandURL = ".uno:LeftPara";
-                        else if (aCommandURL == ".uno:AlignLeft")
-                            aCommandURL = ".uno:AlignRight";
-                        else if (aCommandURL == ".uno:AlignRight")
-                            aCommandURL = ".uno:AlignLeft";
+                        if (aActionURL == ".uno:ParaLeftToRight")
+                            aActionURL = ".uno:ParaRightToLeft";
+                        else if (aActionURL == ".uno:ParaRightToLeft")
+                            aActionURL = ".uno:ParaLeftToRight";
+                        else if (aActionURL == ".uno:LeftPara")
+                            aActionURL = ".uno:RightPara";
+                        else if (aActionURL == ".uno:RightPara")
+                            aActionURL = ".uno:LeftPara";
+                        else if (aActionURL == ".uno:AlignLeft")
+                            aActionURL = ".uno:AlignRight";
+                        else if (aActionURL == ".uno:AlignRight")
+                            aActionURL = ".uno:AlignLeft";
                     }
 
-                    aToolbarItemProp[0].Value <<= aCommandURL;
+                    aToolbarItemProp[0].Value <<= aActionURL;
                     aToolbarItemProp[1].Value <<= aHelpURL;
                     aToolbarItemProp[2].Value <<= aLabel;
                     aToolbarItemProp[3].Value = makeAny( css::ui::ItemType::DEFAULT );
@@ -419,14 +426,14 @@ throw(  SAXException, RuntimeException, std::exception )
                      m_bToolBarItemStartFound )
                 {
                     OUString aErrorMessage = getErrorLineString();
-                    aErrorMessage += "Element toolbar:toolbarspace is not a container!";
+                    aErrorMessage += "toolbar:toolbarspace is not a container";
                     throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
                 }
 
                 m_bToolBarSpaceStartFound = true;
 
                 Sequence< PropertyValue > aToolbarItemProp( 2 );
-                aToolbarItemProp[0].Name = m_aCommandURL;
+                aToolbarItemProp[0].Name = m_aActionURL;
                 aToolbarItemProp[1].Name = m_aType;
 
                 aToolbarItemProp[0].Value <<= OUString();
@@ -444,14 +451,14 @@ throw(  SAXException, RuntimeException, std::exception )
                      m_bToolBarItemStartFound )
                 {
                     OUString aErrorMessage = getErrorLineString();
-                    aErrorMessage += "Element toolbar:toolbarbreak is not a container!";
+                    aErrorMessage += "toolbar:toolbarbreak is not a container";
                     throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
                 }
 
                 m_bToolBarBreakStartFound = true;
 
                 Sequence< PropertyValue > aToolbarItemProp( 2 );
-                aToolbarItemProp[0].Name = m_aCommandURL;
+                aToolbarItemProp[0].Name = m_aActionURL;
                 aToolbarItemProp[1].Name = m_aType;
 
                 aToolbarItemProp[0].Value <<= OUString();
@@ -469,14 +476,14 @@ throw(  SAXException, RuntimeException, std::exception )
                      m_bToolBarItemStartFound )
                 {
                     OUString aErrorMessage = getErrorLineString();
-                    aErrorMessage += "Element toolbar:toolbarseparator is not a container!";
+                    aErrorMessage += "toolbar:toolbarseparator is not a container";
                     throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
                 }
 
                 m_bToolBarSeparatorStartFound = true;
 
                 Sequence< PropertyValue > aToolbarItemProp( 2 );
-                aToolbarItemProp[0].Name = m_aCommandURL;
+                aToolbarItemProp[0].Name = m_aActionURL;
                 aToolbarItemProp[1].Name = m_aType;
 
                 aToolbarItemProp[0].Value <<= OUString();
@@ -507,7 +514,7 @@ throw(  SAXException, RuntimeException, std::exception )
                 if ( !m_bToolBarStartFound )
                 {
                     OUString aErrorMessage = getErrorLineString();
-                    aErrorMessage += "End element 'toolbar' found, but no start element 'toolbar'";
+                    aErrorMessage += "bottom element `toolbar' found but no top one";
                     throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
                 }
 
@@ -520,7 +527,7 @@ throw(  SAXException, RuntimeException, std::exception )
                 if ( !m_bToolBarItemStartFound )
                 {
                     OUString aErrorMessage = getErrorLineString();
-                    aErrorMessage += "End element 'toolbar:toolbaritem' found, but no start element 'toolbar:toolbaritem'";
+                    aErrorMessage += "bottom element `toolbar:toolbaritem' found but no top one";
                     throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
                 }
 
@@ -533,7 +540,7 @@ throw(  SAXException, RuntimeException, std::exception )
                 if ( !m_bToolBarBreakStartFound )
                 {
                     OUString aErrorMessage = getErrorLineString();
-                    aErrorMessage += "End element 'toolbar:toolbarbreak' found, but no start element 'toolbar:toolbarbreak'";
+                    aErrorMessage += "bottom element `toolbar:toolbarbreak' found but no top one";
                     throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
                 }
 
@@ -546,7 +553,7 @@ throw(  SAXException, RuntimeException, std::exception )
                 if ( !m_bToolBarSpaceStartFound )
                 {
                     OUString aErrorMessage = getErrorLineString();
-                    aErrorMessage += "End element 'toolbar:toolbarspace' found, but no start element 'toolbar:toolbarspace'";
+                    aErrorMessage += "bottom element `toolbar:toolbarspace' found but no top one";
                     throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
                 }
 
@@ -559,7 +566,7 @@ throw(  SAXException, RuntimeException, std::exception )
                 if ( !m_bToolBarSeparatorStartFound )
                 {
                     OUString aErrorMessage = getErrorLineString();
-                    aErrorMessage += "End element 'toolbar:toolbarseparator' found, but no start element 'toolbar:toolbarseparator'";
+                    aErrorMessage += "bottom element `toolbar:toolbarseparator' found but no top one";
                     throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
                 }
 
@@ -584,7 +591,7 @@ throw(  SAXException, RuntimeException, std::exception )
 }
 
 void SAL_CALL OReadToolBoxDocumentHandler::processingInstruction(
-    const OUString& /*aTarget*/, const OUString& /*aData*/ )
+    const OUString& /*aRecipient*/, const OUString& /*aData*/ )
 throw(  SAXException, RuntimeException, std::exception )
 {
 }
@@ -687,16 +694,16 @@ void OWriteToolBoxDocumentHandler::WriteToolBoxDocument() throw
         aAny = m_rItemAccess->getByIndex( nItemPos );
         if ( aAny >>= aProps )
         {
-            OUString    aCommandURL;
+            OUString    aActionURL;
             OUString    aLabel;
             OUString    aHelpURL;
             bool    bVisible( true );
             sal_Int16   nType( css::ui::ItemType::DEFAULT );
             sal_Int16   nStyle( 0 );
 
-            ExtractToolbarParameters( aProps, aCommandURL, aLabel, aHelpURL, nStyle, bVisible, nType );
+            ExtractToolbarParameters( aProps, aActionURL, aLabel, aHelpURL, nStyle, bVisible, nType );
             if ( nType == css::ui::ItemType::DEFAULT )
-                WriteToolBoxItem( aCommandURL, aLabel, aHelpURL, nStyle, bVisible );
+                WriteToolBoxItem( aActionURL, aLabel, aHelpURL, nStyle, bVisible );
             else if ( nType == css::ui::ItemType::SEPARATOR_SPACE )
                 WriteToolBoxSpace();
             else if ( nType == css::ui::ItemType::SEPARATOR_LINE )
@@ -715,7 +722,7 @@ void OWriteToolBoxDocumentHandler::WriteToolBoxDocument() throw
 //  protected member functions
 
 void OWriteToolBoxDocumentHandler::WriteToolBoxItem(
-    const OUString& rCommandURL,
+    const OUString& rActionURL,
     const OUString& rLabel,
     const OUString& rHelpURL,
     sal_Int16       nStyle,
@@ -731,7 +738,7 @@ throw ( SAXException, RuntimeException )
     }
 
     // save required attribute (URL)
-    pList->AddAttribute( m_aAttributeURL, m_aAttributeType, rCommandURL );
+    pList->AddAttribute( m_aAttributeURL, m_aAttributeType, rActionURL );
 
     if ( !rLabel.isEmpty() )
     {

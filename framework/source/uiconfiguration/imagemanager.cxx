@@ -114,46 +114,46 @@ throw (css::uno::RuntimeException, std::exception)
     return m_pImpl->getAllImageNames( nImageType );
 }
 
-sal_Bool SAL_CALL ImageManager::hasImage( ::sal_Int16 nImageType, const OUString& aCommandURL )
+sal_Bool SAL_CALL ImageManager::hasImage( ::sal_Int16 nImageType, const OUString& aActionURL )
 throw (css::lang::IllegalArgumentException, css::uno::RuntimeException, std::exception)
 {
-    return m_pImpl->hasImage(nImageType,aCommandURL);
+    return m_pImpl->hasImage( nImageType, aActionURL );
 }
 
 Sequence< uno::Reference< XGraphic > > SAL_CALL ImageManager::getImages(
     ::sal_Int16 nImageType,
-    const Sequence< OUString >& aCommandURLSequence )
+    const Sequence< OUString >& aActionURLSequence )
 throw ( css::lang::IllegalArgumentException, css::uno::RuntimeException, std::exception )
 {
-    return m_pImpl->getImages(nImageType,aCommandURLSequence);
+    return m_pImpl->getImages( nImageType, aActionURLSequence );
 }
 
 void SAL_CALL ImageManager::replaceImages(
     ::sal_Int16 nImageType,
-    const Sequence< OUString >& aCommandURLSequence,
+    const Sequence< OUString >& aActionURLSequence,
     const Sequence< uno::Reference< XGraphic > >& aGraphicsSequence )
 throw ( css::lang::IllegalArgumentException,
         css::lang::IllegalAccessException,
         css::uno::RuntimeException, std::exception)
 {
-    m_pImpl->replaceImages(nImageType,aCommandURLSequence,aGraphicsSequence);
+    m_pImpl->replaceImages( nImageType, aActionURLSequence, aGraphicsSequence );
 }
 
-void SAL_CALL ImageManager::removeImages( ::sal_Int16 nImageType, const Sequence< OUString >& aCommandURLSequence )
+void SAL_CALL ImageManager::removeImages( ::sal_Int16 nImageType, const Sequence< OUString >& aActionURLSequence )
 throw ( css::lang::IllegalArgumentException,
         css::lang::IllegalAccessException,
         css::uno::RuntimeException, std::exception)
 {
-    m_pImpl->removeImages(nImageType,aCommandURLSequence);
+    m_pImpl->removeImages( nImageType, aActionURLSequence );
 }
 
-void SAL_CALL ImageManager::insertImages( ::sal_Int16 nImageType, const Sequence< OUString >& aCommandURLSequence, const Sequence< uno::Reference< XGraphic > >& aGraphicSequence )
+void SAL_CALL ImageManager::insertImages( ::sal_Int16 nImageType, const Sequence< OUString >& aActionURLSequence, const Sequence< uno::Reference< XGraphic > >& aGraphicSequence )
 throw ( css::container::ElementExistException,
         css::lang::IllegalArgumentException,
         css::lang::IllegalAccessException,
         css::uno::RuntimeException, std::exception)
 {
-    m_pImpl->insertImages(nImageType,aCommandURLSequence,aGraphicSequence);
+    m_pImpl->insertImages( nImageType, aActionURLSequence, aGraphicSequence );
 }
 
 // XUIConfiguration

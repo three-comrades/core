@@ -81,8 +81,8 @@ class DispatchHelper : public ::cppu::WeakImplHelper< css::lang::XServiceInfo,cs
         virtual css::uno::Any SAL_CALL executeDispatch(
                                         const css::uno::Reference< css::frame::XDispatchProvider >& xDispatchProvider ,
                                         const OUString&                                      sURL              ,
-                                        const OUString&                                      sTargetFrameName  ,
-                                              sal_Int32                                             nSearchFlags      ,
+                                        const OUString&                                      sRecipientFrameName  ,
+                                              sal_Int32                                             nSearchOptions      ,
                                         const css::uno::Sequence< css::beans::PropertyValue >&      lArguments        )
         throw(css::uno::RuntimeException, std::exception) override;
 

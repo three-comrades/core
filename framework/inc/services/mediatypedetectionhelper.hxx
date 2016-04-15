@@ -33,7 +33,7 @@
 
 namespace framework{
 
-/*-************************************************************************************************************
+/*
     @implements     XInterface
                     XTypeProvider
                     XServiceInfo
@@ -41,29 +41,27 @@ namespace framework{
     @base           OWeakObject
 
     @devstatus      deprecated
-*//*-*************************************************************************************************************/
+*/
 
 class MediaTypeDetectionHelper  :   public ::cppu::WeakImplHelper< css::util::XStringMapping, css::lang::XServiceInfo>
 {
-
-    //  public methods
 
     public:
 
         //  constructor / destructor
 
-        /*-****************************************************************************************************
+        /*
             @short      standard ctor
             @descr      These initialize a new instance of this class with all needed information for work.
             @param      "xFactory", reference to factory which has created our owner(!). We can use these to create new uno-services.
-        *//*-*****************************************************************************************************/
+        */
 
          MediaTypeDetectionHelper( const css::uno::Reference< css::lang::XMultiServiceFactory >& xFactory );
 
-        /*-****************************************************************************************************
+        /*
             @short      standard destructor
             @descr      This method destruct an instance of this class and clear some member.
-        *//*-*****************************************************************************************************/
+        */
 
         virtual ~MediaTypeDetectionHelper();
 
@@ -72,9 +70,6 @@ class MediaTypeDetectionHelper  :   public ::cppu::WeakImplHelper< css::util::XS
         DECLARE_XSERVICEINFO
 
         //  XStringMapping
-
-        /*-****************************************************************************************************
-        *//*-*****************************************************************************************************/
 
         virtual sal_Bool SAL_CALL mapStrings(css::uno::Sequence< OUString >& seqParameter)
             throw (css::uno::RuntimeException, std::exception) override;

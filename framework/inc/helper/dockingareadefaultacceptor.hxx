@@ -36,9 +36,7 @@ class DockingAreaDefaultAcceptor    :   public ::cppu::WeakImplHelper< css::ui::
 {
     public:
 
-        //  constructor / destructor
-
-        /*-****************************************************************************************************
+        /*
             @short      constructor to initialize this instance
             @descr      A docking area acceptor
                         But we need a instance to create more than one enumerations to the same tasklist!
@@ -49,7 +47,7 @@ class DockingAreaDefaultAcceptor    :   public ::cppu::WeakImplHelper< css::ui::
             @param      "xOwner" is a reference to our owner and must be the desktop!
             @param      "pTasks" is a pointer to the taskcontainer of the desktop. We need it to create a new enumeration.
             @onerror    Do nothing and reset this object to default with an empty list.
-        *//*-*****************************************************************************************************/
+        */
 
          DockingAreaDefaultAcceptor(    const css::uno::Reference< css::frame::XFrame >& xOwner );
         virtual ~DockingAreaDefaultAcceptor();
@@ -60,15 +58,12 @@ class DockingAreaDefaultAcceptor    :   public ::cppu::WeakImplHelper< css::ui::
         virtual sal_Bool SAL_CALL requestDockingAreaSpace( const css::awt::Rectangle& RequestedSpace ) throw (css::uno::RuntimeException, std::exception) override;
         virtual void SAL_CALL setDockingAreaSpace( const css::awt::Rectangle& BorderSpace ) throw (css::uno::RuntimeException, std::exception) override;
 
-    //  variables
-    //  (should be private everyway!)
-
     private:
 
-        css::uno::WeakReference< css::frame::XFrame >       m_xOwner;   /// weak reference to our frame object!
+        css::uno::WeakReference< css::frame::XFrame >       m_xOwner;   /// weak reference to our frame object
 };
 
-} // namespace framework
+}
 
 #endif // INCLUDED_FRAMEWORK_INC_HELPER_DOCKINGAREADEFAULTACCEPTOR_HXX
 

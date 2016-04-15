@@ -95,8 +95,8 @@ throw ( RuntimeException, std::exception )
 {
     Reference< XDispatch >       xDispatch;
     Reference< XURLTransformer > xURLTransformer;
-    OUString                     aCommandURL;
-    css::util::URL  aTargetURL;
+    OUString                     aActionURL;
+    css::util::URL  aRecipientURL;
     Sequence<PropertyValue> aArgs;
 
     {
@@ -107,24 +107,24 @@ throw ( RuntimeException, std::exception )
 
         if ( m_bInitialized &&
              m_xFrame.is() &&
-             !m_aCommandURL.isEmpty() )
+             !m_aActionURL.isEmpty() )
         {
             xURLTransformer = m_xURLTransformer;
-            xDispatch = getDispatchFromCommand( m_aCommandURL );
-            aCommandURL = m_aCommandURL;
-            aTargetURL = getInitializedURL();
+            xDispatch = getDispatchFromCommand( m_aActionURL );
+            aActionURL = m_aActionURL;
+            aRecipientURL = getInitializedURL();
             aArgs = getExecuteArgs(KeyModifier);
         }
     }
 
-    if ( xDispatch.is() && !aTargetURL.Complete.isEmpty() )
+    if ( xDispatch.is() && !aRecipientURL.Complete.isEmpty() )
     {
         // Execute dispatch asynchronously
-        ExecuteInfo* pExecuteInfo = new ExecuteInfo;
-        pExecuteInfo->xDispatch     = xDispatch;
-        pExecuteInfo->aTargetURL    = aTargetURL;
-        pExecuteInfo->aArgs         = aArgs;
-        Application::PostUserEvent( LINK(nullptr, ComplexToolbarController , ExecuteHdl_Impl), pExecuteInfo );
+        GoInfo* pGoInfo = new GoInfo;
+        pGoInfo->xDispatch     = xDispatch;
+        pGoInfo->aRecipientURL    = aRecipientURL;
+        pGoInfo->aArgs         = aArgs;
+        Application::PostUserEvent( LINK(nullptr, ComplexToolbarController , ExecuteHdl_Impl), pGoInfo );
     }
 }
 
@@ -198,20 +198,20 @@ throw ( RuntimeException, std::exception )
 
 IMPL_STATIC_LINK_TYPED( ComplexToolbarController, ExecuteHdl_Impl, void*, p, void )
 {
-   ExecuteInfo* pExecuteInfo = static_cast<ExecuteInfo*>(p);
+   GoInfo* pGoInfo = static_cast<GoInfo*>(p);
    SolarMutexReleaser aReleaser;
    try
    {
-       // Asynchronous execution as this can lead to our own destruction!
-       // Framework can recycle our current frame and the layout manager disposes all user interface
-       // elements if a component gets detached from its frame!
-       pExecuteInfo->xDispatch->dispatch( pExecuteInfo->aTargetURL, pExecuteInfo->aArgs );
+       // Asynchronous execution as this can lead to destruction of self.
+       // Framework can recycle the current frame and the layout manager disposes all user interface
+       // elements if a component gets detached from its frame
+       pGoInfo->xDispatch->dispatch( pGoInfo->aRecipientURL, pGoInfo->aArgs );
    }
    catch ( const Exception& )
    {
    }
 
-   delete pExecuteInfo;
+   delete pGoInfo;
 }
 
 IMPL_STATIC_LINK_TYPED( ComplexToolbarController, Notify_Impl, void*, p, void )
@@ -293,7 +293,7 @@ const css::util::URL& ComplexToolbarController::getInitializedURL()
 {
     if ( m_aURL.Complete.isEmpty() )
     {
-        m_aURL.Complete = m_aCommandURL;
+        m_aURL.Complete = m_aActionURL;
         m_xURLTransformer->parseStrict( m_aURL );
     }
     return m_aURL;
@@ -304,7 +304,7 @@ void ComplexToolbarController::notifyFocusGet()
     // send focus get notification
     uno::Sequence< beans::NamedValue > aInfo;
     addNotifyInfo( "FocusSet",
-                    getDispatchFromCommand( m_aCommandURL ),
+                    getDispatchFromCommand( m_aActionURL ),
                     aInfo );
 }
 
@@ -313,7 +313,7 @@ void ComplexToolbarController::notifyFocusLost()
     // send focus lost notification
     uno::Sequence< beans::NamedValue > aInfo;
     addNotifyInfo( "FocusLost",
-                    getDispatchFromCommand( m_aCommandURL ),
+                    getDispatchFromCommand( m_aActionURL ),
                     aInfo );
 }
 
@@ -322,7 +322,7 @@ void ComplexToolbarController::notifyTextChanged( const OUString& aText )
     // send text changed notification
     uno::Sequence< beans::NamedValue > aInfo { { "Text", css::uno::makeAny(aText) } };
     addNotifyInfo( "TextChanged",
-                   getDispatchFromCommand( m_aCommandURL ),
+                   getDispatchFromCommand( m_aActionURL ),
                    aInfo );
 }
 

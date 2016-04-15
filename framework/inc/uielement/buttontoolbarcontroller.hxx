@@ -87,7 +87,7 @@ class ButtonToolbarController : public css::frame::XStatusListener,
     private:
         bool                                                   m_bInitialized : 1,
                                                                m_bDisposed : 1;
-        OUString                                               m_aCommandURL;
+        OUString                                               m_aActionURL;
         css::uno::Reference< css::frame::XFrame >              m_xFrame;
         css::uno::Reference< css::uno::XComponentContext >     m_xContext;
         css::uno::Reference< css::util::XURLTransformer >      m_xURLTransformer;

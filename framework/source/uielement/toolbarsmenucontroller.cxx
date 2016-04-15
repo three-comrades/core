@@ -149,23 +149,23 @@ ToolbarsMenuController::~ToolbarsMenuController()
 }
 
 void ToolbarsMenuController::addCommand(
-    Reference< css::awt::XPopupMenu >& rPopupMenu, const OUString& rCommandURL, const OUString& rLabel )
+    Reference< css::awt::XPopupMenu >& rPopupMenu, const OUString& rActionURL, const OUString& rLabel )
 {
     sal_uInt16        nItemId    = m_xPopupMenu->getItemCount()+1;
 
     OUString aLabel;
     if ( rLabel.isEmpty() )
-        aLabel = vcl::CommandInfoProvider::Instance().GetMenuLabelForCommand( rCommandURL, m_xFrame );
+        aLabel = vcl::CommandInfoProvider::Instance().GetMenuLabelForCommand( rActionURL, m_xFrame );
     else
         aLabel = rLabel;
 
     rPopupMenu->insertItem( nItemId, aLabel, 0, nItemId );
-    rPopupMenu->setCommand( nItemId, rCommandURL );
+    rPopupMenu->setCommand( nItemId, rActionURL );
 
-    bool bInternal = rCommandURL.startsWith( STATIC_INTERNAL_CMD_PART );
+    bool bInternal = rActionURL.startsWith( STATIC_INTERNAL_CMD_PART );
     if ( !bInternal )
     {
-        if ( !getDispatchFromCommandURL( rCommandURL ).is() )
+        if ( !getDispatchFromActionURL( rActionURL ).is() )
             m_xPopupMenu->enableItem( nItemId, false );
     }
 
@@ -175,7 +175,7 @@ void ToolbarsMenuController::addCommand(
     const StyleSettings& rSettings = Application::GetSettings().GetStyleSettings();
 
     if ( rSettings.GetUseImagesInMenus() )
-        aImage = vcl::CommandInfoProvider::Instance().GetImageForCommand( rCommandURL, false, m_xFrame );
+        aImage = vcl::CommandInfoProvider::Instance().GetImageForCommand( rActionURL, false, m_xFrame );
 
     VCLXPopupMenu* pPopupMenu = static_cast<VCLXPopupMenu *>(VCLXPopupMenu::GetImplementation( rPopupMenu ));
     if ( pPopupMenu )
@@ -185,12 +185,12 @@ void ToolbarsMenuController::addCommand(
             pVCLPopupMenu->SetItemImage( nItemId, aImage );
     }
 
-    m_aCommandVector.push_back( rCommandURL );
+    m_aCommandVector.push_back( rActionURL );
 }
 
-Reference< XDispatch > ToolbarsMenuController::getDispatchFromCommandURL( const OUString& rCommandURL )
+Reference< XDispatch > ToolbarsMenuController::getDispatchFromActionURL( const OUString& rActionURL )
 {
-    URL                          aTargetURL;
+    URL                          aURL;
     Reference< XURLTransformer > xURLTransformer;
     Reference< XFrame >          xFrame;
 
@@ -200,11 +200,11 @@ Reference< XDispatch > ToolbarsMenuController::getDispatchFromCommandURL( const 
         xFrame = m_xFrame;
     }
 
-    aTargetURL.Complete = rCommandURL;
-    xURLTransformer->parseStrict( aTargetURL );
+    aURL.Complete = rActionURL;
+    xURLTransformer->parseStrict( aURL );
     Reference< XDispatchProvider > xDispatchProvider( xFrame, UNO_QUERY );
     if ( xDispatchProvider.is() )
-        return xDispatchProvider->queryDispatch( aTargetURL, OUString(), 0 );
+        return xDispatchProvider->queryDispatch( aURL, OUString(), 0 );
     else
         return Reference< XDispatch >();
 }
@@ -652,22 +652,22 @@ void SAL_CALL ToolbarsMenuController::itemSelected( const css::awt::MenuEvent& r
             }
             else if ( aCmd.indexOf( STATIC_CMD_PART ) < 0 )
             {
-                URL                     aTargetURL;
+                URL aURL;
                 Sequence<PropertyValue> aArgs;
 
-                aTargetURL.Complete = aCmd;
-                xURLTransformer->parseStrict( aTargetURL );
+                aURL.Complete = aCmd;
+                xURLTransformer->parseStrict( aURL );
                 Reference< XDispatchProvider > xDispatchProvider( m_xFrame, UNO_QUERY );
                 if ( xDispatchProvider.is() )
                 {
                     Reference< XDispatch > xDispatch = xDispatchProvider->queryDispatch(
-                                                            aTargetURL, OUString(), 0 );
+                                                            aURL, OUString(), 0 );
 
-                    ExecuteInfo* pExecuteInfo = new ExecuteInfo;
-                    pExecuteInfo->xDispatch     = xDispatch;
-                    pExecuteInfo->aTargetURL    = aTargetURL;
-                    pExecuteInfo->aArgs         = aArgs;
-                    Application::PostUserEvent( LINK(nullptr, ToolbarsMenuController, ExecuteHdl_Impl), pExecuteInfo );
+                    GoInfo* pGoInfo = new GoInfo;
+                    pGoInfo->xDispatch = xDispatch;
+                    pGoInfo->aURL = aURL;
+                    pGoInfo->aArgs = aArgs;
+                    Application::PostUserEvent( LINK(nullptr, ToolbarsMenuController, ExecuteHdl_Impl), pGoInfo );
                 }
             }
             else
@@ -722,14 +722,14 @@ void SAL_CALL ToolbarsMenuController::itemActivated( const css::awt::MenuEvent& 
 
         if ( !bInternal )
         {
-            URL aTargetURL;
-            aTargetURL.Complete = aCmdVector[i];
-            xURLTransformer->parseStrict( aTargetURL );
-            Reference< XDispatch > xDispatch = xDispatchProvider->queryDispatch( aTargetURL, OUString(), 0 );
+            URL aURL;
+            aURL.Complete = aCmdVector[i];
+            xURLTransformer->parseStrict( aURL );
+            Reference< XDispatch > xDispatch = xDispatchProvider->queryDispatch( aURL, OUString(), 0 );
             if ( xDispatch.is() )
             {
-                xDispatch->addStatusListener( (static_cast< XStatusListener* >(this)), aTargetURL );
-                xDispatch->removeStatusListener( (static_cast< XStatusListener* >(this)), aTargetURL );
+                xDispatch->addStatusListener( (static_cast< XStatusListener* >(this)), aURL );
+                xDispatch->removeStatusListener( (static_cast< XStatusListener* >(this)), aURL );
             }
         }
         else if ( aCmdVector[i] == CMD_RESTOREVISIBILITY )
@@ -807,22 +807,22 @@ void SAL_CALL ToolbarsMenuController::initialize( const Sequence< Any >& aArgume
 
 IMPL_STATIC_LINK_TYPED( ToolbarsMenuController, ExecuteHdl_Impl, void*, p, void )
 {
-    ExecuteInfo* pExecuteInfo = static_cast<ExecuteInfo*>(p);
+    GoInfo* pGoInfo = static_cast<GoInfo*>(p);
     try
     {
         // Asynchronous execution as this can lead to our own destruction!
         // Framework can recycle our current frame and the layout manager disposes all user interface
         // elements if a component gets detached from its frame!
-        if ( pExecuteInfo->xDispatch.is() )
+        if ( pGoInfo->xDispatch.is() )
         {
-            pExecuteInfo->xDispatch->dispatch( pExecuteInfo->aTargetURL, pExecuteInfo->aArgs );
+            pGoInfo->xDispatch->dispatch( pGoInfo->aURL, pGoInfo->aArgs );
         }
     }
     catch ( const Exception& )
     {
     }
 
-    delete pExecuteInfo;
+    delete pGoInfo;
 }
 
 }

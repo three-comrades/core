@@ -188,11 +188,11 @@ void FontMenuController::impl_setPopupMenu()
 {
     Reference< XDispatchProvider > xDispatchProvider( m_xFrame, UNO_QUERY );
 
-    css::util::URL aTargetURL;
+    css::util::URL aURL;
     // Register for font list updates to get the current font list from the controller
-    aTargetURL.Complete = ".uno:FontNameList";
-    m_xURLTransformer->parseStrict( aTargetURL );
-    m_xFontListDispatch = xDispatchProvider->queryDispatch( aTargetURL, OUString(), 0 );
+    aURL.Complete = ".uno:FontNameList";
+    m_xURLTransformer->parseStrict( aURL );
+    m_xFontListDispatch = xDispatchProvider->queryDispatch( aURL, OUString(), 0 );
 }
 
 void SAL_CALL FontMenuController::updatePopupMenu() throw ( css::uno::RuntimeException, std::exception )
@@ -201,15 +201,15 @@ void SAL_CALL FontMenuController::updatePopupMenu() throw ( css::uno::RuntimeExc
 
     osl::ClearableMutexGuard aLock( m_aMutex );
     Reference< XDispatch > xDispatch( m_xFontListDispatch );
-    css::util::URL aTargetURL;
-    aTargetURL.Complete = ".uno:FontNameList";
-    m_xURLTransformer->parseStrict( aTargetURL );
+    css::util::URL aURL;
+    aURL.Complete = ".uno:FontNameList";
+    m_xURLTransformer->parseStrict( aURL );
     aLock.clear();
 
     if ( xDispatch.is() )
     {
-        xDispatch->addStatusListener( (static_cast< XStatusListener* >(this)), aTargetURL );
-        xDispatch->removeStatusListener( (static_cast< XStatusListener* >(this)), aTargetURL );
+        xDispatch->addStatusListener( (static_cast< XStatusListener* >(this)), aURL );
+        xDispatch->removeStatusListener( (static_cast< XStatusListener* >(this)), aURL );
     }
 }
 

@@ -202,41 +202,41 @@ void HandlerCFGAccess::read( HandlerHash** ppHandler ,
 {
     // list of all uno implementation names without encoding
     css::uno::Sequence< OUString > lNames = GetNodeNames( SETNAME_HANDLER, ::utl::CONFIG_NAME_LOCAL_PATH );
-    sal_Int32 nSourceCount = lNames.getLength();
-    sal_Int32 nTargetCount = nSourceCount;
+    sal_Int32 nOriginCount = lNames.getLength();
+    sal_Int32 nRecipientCount = nOriginCount;
     // list of all full qualified path names of configuration entries
-    css::uno::Sequence< OUString > lFullNames ( nTargetCount );
+    css::uno::Sequence< OUString > lFullNames ( nRecipientCount );
 
     // expand names to full path names
-    sal_Int32 nSource=0;
-    sal_Int32 nTarget=0;
-    for( nSource=0; nSource<nSourceCount; ++nSource )
+    sal_Int32 nOrigin = 0;
+    sal_Int32 nRecipient = 0;
+    for( nOrigin = 0; nOrigin < nOriginCount; ++nOrigin )
     {
         OUStringBuffer sPath( SETNAME_HANDLER );
         sPath.append(CFG_PATH_SEPARATOR);
-        sPath.append(lNames[nSource]);
+        sPath.append( lNames[ nOrigin ] );
         sPath.append(CFG_PATH_SEPARATOR);
         sPath.append(PROPERTY_PROTOCOLS);
 
-        lFullNames[nTarget]  = sPath.makeStringAndClear();
-        ++nTarget;
+        lFullNames[ nRecipient ] = sPath.makeStringAndClear();
+        ++nRecipient;
     }
 
     // get values at all
     css::uno::Sequence< css::uno::Any > lValues = GetProperties( lFullNames );
-    SAL_WARN_IF( lFullNames.getLength()!=lValues.getLength(), "fwk", "HandlerCFGAccess::read(): Miss some configuration values of handler set!" );
+    SAL_WARN_IF( lFullNames.getLength()!=lValues.getLength(), "fwk", "HandlerCFGAccess::read(): Miss some configuration values of handler set" );
 
     // fill structures
-    nSource = 0;
-    for( nTarget=0; nTarget<nTargetCount; ++nTarget )
+    nOrigin = 0;
+    for( nRecipient = 0; nRecipient < nRecipientCount; ++nRecipient )
     {
-        // create it new for every loop to guarantee a real empty object!
+        // create it new for every loop to guarantee a real empty object
         ProtocolHandler aHandler;
-        aHandler.m_sUNOName = ::utl::extractFirstFromConfigurationPath(lNames[nSource]);
+        aHandler.m_sUNOName = ::utl::extractFirstFromConfigurationPath( lNames[ nOrigin ] );
 
         // unpack all values of this handler
         css::uno::Sequence< OUString > lTemp;
-        lValues[nTarget] >>= lTemp;
+        lValues[ nRecipient ] >>= lTemp;
         aHandler.m_lProtocols = Converter::convert_seqOUString2OUStringList(lTemp);
 
         // register his pattern into the performance search hash
@@ -244,12 +244,12 @@ void HandlerCFGAccess::read( HandlerHash** ppHandler ,
                                     pItem!=aHandler.m_lProtocols.end();
                                     ++pItem                             )
         {
-            (**ppPattern)[*pItem] = lNames[nSource];
+            (**ppPattern)[*pItem] = lNames[ nOrigin ];
         }
 
         // insert the handler info into the normal handler cache
-        (**ppHandler)[lNames[nSource]] = aHandler;
-        ++nSource;
+        (**ppHandler)[lNames[ nOrigin ]] = aHandler;
+        ++nOrigin;
     }
 }
 

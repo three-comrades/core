@@ -91,7 +91,7 @@ class FWE_DLLPUBLIC OReadStatusBarDocumentHandler :
         throw(  css::xml::sax::SAXException,
                 css::uno::RuntimeException, std::exception ) override;
 
-        virtual void SAL_CALL processingInstruction(const OUString& aTarget,
+        virtual void SAL_CALL processingInstruction( const OUString& aRecipient,
                                                     const OUString& aData)
         throw(  css::xml::sax::SAXException,
                 css::uno::RuntimeException, std::exception ) override;
@@ -132,7 +132,7 @@ class FWE_DLLPUBLIC OWriteStatusBarDocumentHandler
 
     protected:
         void WriteStatusBarItem(
-            const OUString& rCommandURL,
+            const OUString& rActionURL,
             const OUString& rHelpURL,
             sal_Int16            nOffset,
             sal_Int16            nStyle,

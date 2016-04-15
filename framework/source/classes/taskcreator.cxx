@@ -18,7 +18,7 @@
  */
 
 #include <classes/taskcreator.hxx>
-#include <loadenv/targethelper.hxx>
+#include <loadenv/deliveryhelper.hxx>
 #include <services.h>
 #include <taskcreatordefs.hxx>
 
@@ -33,30 +33,30 @@
 
 namespace framework{
 
-/*-****************************************************************************************************
+/*
     @short      initialize instance with necessary information
     @descr      We need a valid uno service manager to create or instanciate new services.
                 All other information to create frames or tasks come in on right interface methods.
 
     @param      xContext
                     points to the valid uno service manager
-*//*-*****************************************************************************************************/
+*/
 TaskCreator::TaskCreator( const css::uno::Reference< css::uno::XComponentContext >& xContext )
     : m_xContext    ( xContext )
 {
 }
 
-/*-****************************************************************************************************
+/*
     @short      deinitialize instance
     @descr      We should release all used resource which are not needed any longer.
-*//*-*****************************************************************************************************/
+*/
 TaskCreator::~TaskCreator()
 {
 }
 
-/*-****************************************************************************************************
+/*
     TODO document me
-*//*-*****************************************************************************************************/
+*/
 css::uno::Reference< css::frame::XFrame > TaskCreator::createTask( const OUString& sName )
 {
     css::uno::Reference< css::lang::XSingleServiceFactory > xCreator;
@@ -65,8 +65,8 @@ css::uno::Reference< css::frame::XFrame > TaskCreator::createTask( const OUStrin
     try
     {
         if (
-            ( TargetHelper::matchSpecialTarget(sName, TargetHelper::E_BLANK  ) ) ||
-            ( TargetHelper::matchSpecialTarget(sName, TargetHelper::E_DEFAULT) )
+            ( DeliveryHelper::isSpecialRecipient( sName, DeliveryHelper::E_BLANK  ) ) ||
+            ( DeliveryHelper::isSpecialRecipient( sName, DeliveryHelper::E_DEFAULT) )
            )
         {
 

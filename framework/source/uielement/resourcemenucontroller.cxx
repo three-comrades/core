@@ -259,7 +259,7 @@ void ResourceMenuController::fillToolbarData()
         {
             if ( m_xMenuContainer->getByIndex( i ) >>= aPropSequence )
             {
-                OUString aCommandURL;
+                OUString aActionURL;
                 OUString aLabel;
                 sal_uInt16 nType = css::ui::ItemType::DEFAULT;
                 bool bVisible = true;
@@ -267,7 +267,13 @@ void ResourceMenuController::fillToolbarData()
                 for ( const auto& aProp: aPropSequence )
                 {
                     if ( aProp.Name == "CommandURL" )
-                        aProp.Value >>= aCommandURL;
+                    {
+                        SAL_WARN( "framework", "\"CommandURL\" to \"ActionURL\" in fillToolbarData()" );
+                        aProp.Name = "ActionURL";
+                    }
+
+                    if ( aProp.Name == "ActionURL" )
+                        aProp.Value >>= aActionURL;
                     else if ( aProp.Name == "Label" )
                         aProp.Value >>= aLabel;
                     else if ( aProp.Name == "Type" )
@@ -282,7 +288,7 @@ void ResourceMenuController::fillToolbarData()
                     if ( bVisible )
                     {
                         pVCLMenu->InsertItem( m_nNewMenuId, aLabel );
-                        pVCLMenu->SetItemCommand( m_nNewMenuId++, aCommandURL );
+                        pVCLMenu->SetItemCommand( m_nNewMenuId++, aActionURL );
                     }
                     break;
                 case css::ui::ItemType::SEPARATOR_LINE:

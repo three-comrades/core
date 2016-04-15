@@ -27,10 +27,10 @@
 
 namespace framework{
 
-/*-************************************************************************************************************
+/*
     @short      standard ctor
     @descr      Initialize instance with right start values for correct working.
-*//*-*************************************************************************************************************/
+*/
 TransactionManager::TransactionManager()
     : m_eWorkingMode      ( E_INIT )
     , m_nTransactionCount ( 0      )
@@ -38,14 +38,14 @@ TransactionManager::TransactionManager()
     m_aBarrier.open();
 }
 
-/*-************************************************************************************************************
+/*
     @short      standard dtor
-*//*-*************************************************************************************************************/
+*/
 TransactionManager::~TransactionManager()
 {
 }
 
-/*-****************************************************************************************************
+/*
     @short      set new working mode
     @descr      These implementation knows for states of working: E_INIT, E_WORK, E_BEFORECLOSE, E_CLOSE
                 You can step during this ones only from the left to the right side and start at left side again!
@@ -66,7 +66,7 @@ TransactionManager::~TransactionManager()
                                         It's your decision to react in a right way.
     @param      "eMode", is the new mode - but we don't accept setting mode in wrong order!
     @onerror    We do nothing.
-*//*-*****************************************************************************************************/
+*/
 void  TransactionManager::setWorkingMode( EWorkingMode eMode )
 {
     // Safe member access.
@@ -99,7 +99,7 @@ void  TransactionManager::setWorkingMode( EWorkingMode eMode )
     }
 }
 
-/*-****************************************************************************************************
+/*
     @short      get current working mode
     @descr      If you stand in your close() or init() method ... but don't know
                 if you called more than ones(!) ... you can use this function to get
@@ -134,7 +134,7 @@ void  TransactionManager::setWorkingMode( EWorkingMode eMode )
     @return     Current set mode.
 
     @onerror    No error should occur.
-*//*-*****************************************************************************************************/
+*/
 EWorkingMode TransactionManager::getWorkingMode() const
 {
     // Synchronize access to internal member!
@@ -142,7 +142,7 @@ EWorkingMode TransactionManager::getWorkingMode() const
     return m_eWorkingMode;
 }
 
-/*-****************************************************************************************************
+/*
     @short      start new transaction
     @descr      A guard should use this method to start a new transaction. He should looks for rejected
                 calls to by using parameter eMode and eReason.
@@ -152,7 +152,7 @@ EWorkingMode TransactionManager::getWorkingMode() const
     @seealso    method unregisterTransaction()
 
     @param      "eMode"     ,used to enable/disable throwing exceptions automatically for rejected calls
-*//*-*****************************************************************************************************/
+*/
 void  TransactionManager::registerTransaction( EExceptionMode eMode ) throw( css::uno::RuntimeException, css::lang::DisposedException )
 {
     ::osl::MutexGuard aAccessGuard( m_aAccessLock );
@@ -192,12 +192,12 @@ void  TransactionManager::registerTransaction( EExceptionMode eMode ) throw( css
     }
 }
 
-/*-****************************************************************************************************
+/*
     @short      finish transaction
     @descr      A guard should call this method to release current transaction.
 
     @seealso    method registerTransaction()
-*//*-*****************************************************************************************************/
+*/
 void  TransactionManager::unregisterTransaction() throw( css::uno::RuntimeException, css::lang::DisposedException )
 {
     // This call could not rejected!

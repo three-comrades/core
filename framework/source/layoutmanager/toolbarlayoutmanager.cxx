@@ -1633,9 +1633,9 @@ void ToolbarLayoutManager::implts_writeWindowStateData( const UIElement& rElemen
     aWriteLock.clear();
 }
 
-/******************************************************************************
+/*
                         LOOKUP PART FOR TOOLBARS
-******************************************************************************/
+*/
 
 UIElement& ToolbarLayoutManager::impl_findToolbar( const OUString& aName )
 {
@@ -1736,9 +1736,9 @@ void ToolbarLayoutManager::implts_setToolbar( const UIElement& rUIElement )
         m_aUIElements.push_back( rUIElement );
 }
 
-/******************************************************************************
+/*
                         LAYOUT CODE PART FOR TOOLBARS
-******************************************************************************/
+*/
 
 awt::Point ToolbarLayoutManager::implts_findNextCascadeFloatingPos()
 {

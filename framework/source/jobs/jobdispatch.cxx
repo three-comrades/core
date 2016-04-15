@@ -115,8 +115,8 @@ public:
 
     // XDispatchProvider
     virtual css::uno::Reference< css::frame::XDispatch > SAL_CALL                       queryDispatch  ( const css::util::URL&                                       aURL             ,
-                                                                                                         const OUString&                                      sTargetFrameName ,
-                                                                                                               sal_Int32                                             nSearchFlags     ) throw(css::uno::RuntimeException, std::exception) override;
+                                                                                                         const OUString&                                      sRecipientFrameName ,
+                                                                                                               sal_Int32                                             nSearchOptions     ) throw(css::uno::RuntimeException, std::exception) override;
     virtual css::uno::Sequence< css::uno::Reference< css::frame::XDispatch > > SAL_CALL queryDispatches( const css::uno::Sequence< css::frame::DispatchDescriptor >& lDescriptor      ) throw(css::uno::RuntimeException, std::exception) override;
 
     // XNotifyingDispatch
@@ -197,17 +197,17 @@ void SAL_CALL JobDispatch::initialize( const css::uno::Sequence< css::uno::Any >
     @param  aURL
                 the queried URL, which should be checked
 
-    @param  sTargetFrameName
-                describes the target frame, in which context this handler will be used
+    @param  sRecipientFrameName
+                describes the recipient frame, in which context this handler will be used
                 Is mostly set to "", "_self", "_blank", "_default" or a non special one
                 using SELF/CREATE as search flags.
 
-    @param  nSearchFlags
-                Can be SELF or CREATE only and are set only if sTargetFrameName isn't a special target
+    @param  nSearchOptions
+                Can be SELF or CREATE only and are set only if sRecipientFrameName isn't a special case
 */
 css::uno::Reference< css::frame::XDispatch > SAL_CALL JobDispatch::queryDispatch( /*IN*/ const css::util::URL&  aURL             ,
-                                                                                  /*IN*/ const OUString& /*sTargetFrameName*/ ,
-                                                                                  /*IN*/       sal_Int32        /*nSearchFlags*/     ) throw(css::uno::RuntimeException, std::exception)
+                                                                                  /*IN*/ const OUString& /*sRecipientFrameName*/ ,
+                                                                                  /*IN*/       sal_Int32        /*nSearchOptions*/     ) throw(css::uno::RuntimeException, std::exception)
 {
     css::uno::Reference< css::frame::XDispatch > xDispatch;
 
@@ -239,7 +239,7 @@ css::uno::Sequence< css::uno::Reference< css::frame::XDispatch > > SAL_CALL JobD
     for (sal_Int32 i=0; i<nCount; ++i)
         lDispatches[i] = queryDispatch( lDescriptor[i].FeatureURL  ,
                                         lDescriptor[i].FrameName   ,
-                                        lDescriptor[i].SearchFlags );
+                                        lDescriptor[i].SearchOptions );
     return lDispatches;
 }
 

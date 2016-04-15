@@ -80,7 +80,7 @@ using namespace ::com::sun::star;
 namespace framework
 {
 
-static const char ITEM_DESCRIPTOR_COMMANDURL[] = "CommandURL";
+static const char ITEM_DESCRIPTOR_ACTIONURL[]  = "ActionURL";
 static const char ITEM_DESCRIPTOR_HELPURL[]    = "HelpURL";
 static const char ITEM_DESCRIPTOR_CONTAINER[]  = "ItemDescriptorContainer";
 static const char ITEM_DESCRIPTOR_LABEL[]      = "Label";
@@ -289,12 +289,12 @@ void ToolBarManager::RefreshImages()
         }
         else
         {
-            OUString aCommandURL = m_pToolBar->GetItemCommand( it.first );
-            Image aImage = vcl::CommandInfoProvider::Instance().GetImageForCommand(aCommandURL, bBigImages, m_xFrame);
+            OUString aActionURL = m_pToolBar->GetItemCommand( it.first );
+            Image aImage = vcl::CommandInfoProvider::Instance().GetImageForCommand( aActionURL, bBigImages, m_xFrame );
             // Try also to query for add-on images before giving up and use an
             // empty image.
             if ( !aImage )
-                aImage = framework::AddonsOptions().GetImageFromURL( aCommandURL, bBigImages );
+                aImage = framework::AddonsOptions().GetImageFromURL( aActionURL, bBigImages );
             m_pToolBar->SetItemImage( it.first, aImage );
         }
     }
@@ -656,15 +656,15 @@ void ToolBarManager::CreateControllers()
 
         svt::ToolboxController* pController( nullptr );
 
-        OUString aCommandURL( m_pToolBar->GetItemCommand( nId ) );
+        OUString aActionURL( m_pToolBar->GetItemCommand( nId ) );
         // Command can be just an alias to another command.
-        OUString aRealCommandURL( vcl::CommandInfoProvider::Instance().GetRealCommandForCommand( aCommandURL, m_xFrame ) );
-        if ( !aRealCommandURL.isEmpty() )
-            aCommandURL = aRealCommandURL;
+        OUString aRealActionURL( vcl::CommandInfoProvider::Instance().GetRealCommandForCommand( aActionURL, m_xFrame ) );
+        if ( !aRealActionURL.isEmpty() )
+            aActionURL = aRealActionURL;
 
         if ( bHasDisabledEntries )
         {
-            aURL.Complete = aCommandURL;
+            aURL.Complete = aActionURL;
             m_xURLTransformer->parseStrict( aURL );
             if ( aCmdOptions.Lookup( SvtCommandOptions::CMDOPTION_DISABLED, aURL.Path ))
             {
@@ -675,7 +675,7 @@ void ToolBarManager::CreateControllers()
         }
 
         if ( m_xToolbarControllerFactory.is() &&
-             m_xToolbarControllerFactory->hasController( aCommandURL, m_aModuleIdentifier ))
+             m_xToolbarControllerFactory->hasController( aActionURL, m_aModuleIdentifier ))
         {
             PropertyValue aPropValue;
             std::vector< Any > aPropertyVector;
@@ -698,17 +698,17 @@ void ToolBarManager::CreateControllers()
             aPropertyVector.push_back( uno::makeAny( aPropValue ) );
 
             Sequence< Any > aArgs( comphelper::containerToSequence( aPropertyVector ));
-            xController.set( m_xToolbarControllerFactory->createInstanceWithArgumentsAndContext( aCommandURL, aArgs, m_xContext ),
+            xController.set( m_xToolbarControllerFactory->createInstanceWithArgumentsAndContext( aActionURL, aArgs, m_xContext ),
                              UNO_QUERY );
             bInit = false; // Initialization is done through the factory service
         }
 
-        if (( aCommandURL == aLoadURL ) && ( !m_pToolBar->IsItemVisible(nId)))
+        if (( aActionURL == aLoadURL ) && ( !m_pToolBar->IsItemVisible(nId)))
             bCreate = false;
 
         if ( !xController.is() && bCreate )
         {
-            pController = CreateToolBoxController( m_xFrame, m_pToolBar, nId, aCommandURL );
+            pController = CreateToolBoxController( m_xFrame, m_pToolBar, nId, aActionURL );
             if ( !pController )
             {
                 if ( m_pToolBar->GetItemData( nId ) != nullptr )
@@ -721,7 +721,7 @@ void ToolBarManager::CreateControllers()
                         ToolBarMerger::CreateController( m_xContext,
                                                          m_xFrame,
                                                          m_pToolBar,
-                                                         aCommandURL,
+                                                         aActionURL,
                                                          nId,
                                                          nWidth,
                                                          aControlType ), UNO_QUERY );
@@ -734,16 +734,16 @@ void ToolBarManager::CreateControllers()
                     if ( it == m_aMenuMap.end() )
                     {
                         xController.set(
-                            new GenericToolbarController( m_xContext, m_xFrame, m_pToolBar, nId, aCommandURL ));
+                            new GenericToolbarController( m_xContext, m_xFrame, m_pToolBar, nId, aActionURL ));
 
                         // Accessibility support: Set toggle button role for specific commands
-                        sal_Int32 nProps = vcl::CommandInfoProvider::Instance().GetPropertiesForCommand(aCommandURL, m_xFrame);
+                        sal_Int32 nProps = vcl::CommandInfoProvider::Instance().GetPropertiesForCommand( aActionURL, m_xFrame );
                         if ( nProps & UICOMMANDDESCRIPTION_PROPERTIES_TOGGLEBUTTON )
                             m_pToolBar->SetItemBits( nId, m_pToolBar->GetItemBits( nId ) | ToolBoxItemBits::CHECKABLE );
                     }
                     else
                         xController.set(
-                            new MenuToolbarController( m_xContext, m_xFrame, m_pToolBar, nId, aCommandURL, m_aModuleIdentifier, m_aMenuMap[ nId ] ));
+                            new MenuToolbarController( m_xContext, m_xFrame, m_pToolBar, nId, aActionURL, m_aModuleIdentifier, m_aMenuMap[ nId ] ));
                 }
             }
             else if ( pController )
@@ -789,8 +789,8 @@ void ToolBarManager::CreateControllers()
                 aPropValue.Name = "Frame";
                 aPropValue.Value <<= m_xFrame;
                 aPropertyVector.push_back( makeAny( aPropValue ));
-                aPropValue.Name = "CommandURL";
-                aPropValue.Value <<= aCommandURL;
+                aPropValue.Name = "ActionURL";
+                aPropValue.Value <<= aActionURL;
                 aPropertyVector.push_back( makeAny( aPropValue ));
                 aPropValue.Name = "ServiceManager";
                 Reference<XMultiServiceFactory> xMSF(m_xContext->getServiceManager(), UNO_QUERY_THROW);
@@ -811,12 +811,12 @@ void ToolBarManager::CreateControllers()
 
                 if (pController)
                 {
-                    if(aCommandURL == ".uno:SwitchXFormsDesignMode" ||
-                       aCommandURL == ".uno:ViewDataSourceBrowser" ||
-                       aCommandURL == ".uno:ParaLeftToRight" ||
-                       aCommandURL == ".uno:ParaRightToLeft"
-                       )
-                        pController->setFastPropertyValue_NoBroadcast(1, makeAny(true));
+                    if( aActionURL == ".uno:SwitchXFormsDesignMode" ||
+                        aActionURL == ".uno:ViewDataSourceBrowser" ||
+                        aActionURL == ".uno:ParaLeftToRight" ||
+                        aActionURL == ".uno:ParaRightToLeft"
+                      )
+                        pController->setFastPropertyValue_NoBroadcast( 1, makeAny(true) );
                 }
             }
 
@@ -961,7 +961,7 @@ void ToolBarManager::FillToolbar( const Reference< XIndexAccess >& rItemContaine
     for ( sal_Int32 n = 0; n < rItemContainer->getCount(); n++ )
     {
         Sequence< PropertyValue >   aProp;
-        OUString                    aCommandURL;
+        OUString                    aActionURL;
         OUString                    aLabel;
         OUString                    aHelpURL;
         sal_uInt16                  nType( css::ui::ItemType::DEFAULT );
@@ -975,21 +975,23 @@ void ToolBarManager::FillToolbar( const Reference< XIndexAccess >& rItemContaine
                 bool bIsVisible( true );
                 for ( int i = 0; i < aProp.getLength(); i++ )
                 {
-                    if ( aProp[i].Name == ITEM_DESCRIPTOR_COMMANDURL )
+                    if ( aProp[i].Name == ITEM_DESCRIPTOR_ACTIONURL )
                     {
-                        aProp[i].Value >>= aCommandURL;
-                        if ( aCommandURL.startsWith(MENUPREFIX) )
+                        aProp[i].Value >>= aActionURL;
+                        if ( aActionURL.startsWith(MENUPREFIX) )
                         {
                             try
                             {
                                 Reference< XIndexAccess > xMenuContainer;
                                 if ( m_xDocUICfgMgr.is() &&
-                                     m_xDocUICfgMgr->hasSettings( aCommandURL ) )
-                                    xMenuContainer  = m_xDocUICfgMgr->getSettings( aCommandURL, false );
+                                     m_xDocUICfgMgr->hasSettings( aActionURL ) )
+                                    xMenuContainer  = m_xDocUICfgMgr->getSettings( aActionURL, false );
+
                                 if ( !xMenuContainer.is() &&
                                      m_xUICfgMgr.is() &&
-                                     m_xUICfgMgr->hasSettings( aCommandURL ) )
-                                    xMenuContainer = m_xUICfgMgr->getSettings( aCommandURL, false );
+                                     m_xUICfgMgr->hasSettings( aActionURL ) )
+                                    xMenuContainer = m_xUICfgMgr->getSettings( aActionURL, false );
+
                                 if ( xMenuContainer.is() && xMenuContainer->getCount() )
                                 {
                                     Sequence< PropertyValue > aProps;
@@ -1025,7 +1027,7 @@ void ToolBarManager::FillToolbar( const Reference< XIndexAccess >& rItemContaine
                         aProp[i].Value >>= nStyle;
                 }
 
-                if (( nType == css::ui::ItemType::DEFAULT ) && !aCommandURL.isEmpty() )
+                if (( nType == css::ui::ItemType::DEFAULT ) && !aActionURL.isEmpty() )
                 {
                     OUString aString(vcl::CommandInfoProvider::Instance().GetLabelForCommand(aCommandURL, m_xFrame));
 
@@ -1055,11 +1057,11 @@ void ToolBarManager::FillToolbar( const Reference< XIndexAccess >& rItemContaine
                     // Fill command map. It stores all our commands and from what
                     // image manager we got our image. So we can decide if we have to use an
                     // image from a notification message.
-                    CommandToInfoMap::iterator pIter = m_aCommandMap.find( aCommandURL );
+                    CommandToInfoMap::iterator pIter = m_aCommandMap.find( aActionURL );
                     if ( pIter == m_aCommandMap.end())
                     {
                         aCmdInfo.nId = nId;
-                        const CommandToInfoMap::value_type aValue( aCommandURL, aCmdInfo );
+                        const CommandToInfoMap::value_type aValue( aActionURL, aCmdInfo );
                         m_aCommandMap.insert( aValue );
                     }
                     else
@@ -1458,12 +1460,12 @@ bool ToolBarManager::MenuItemAllowed( sal_uInt16 ) const
             if ( m_pToolBar->GetItemType(nPos) == ToolBoxItemType::BUTTON )
             {
                 sal_uInt16 nId = m_pToolBar->GetItemId(nPos);
-                OUString aCommandURL = m_pToolBar->GetItemCommand( nId );
+                OUString aActionURL = m_pToolBar->GetItemCommand( nId );
                 pVisibleItemsPopupMenu->InsertItem( STARTID_CUSTOMIZE_POPUPMENU+nPos, m_pToolBar->GetItemText( nId ), MenuItemBits::CHECKABLE );
                 pVisibleItemsPopupMenu->CheckItem( STARTID_CUSTOMIZE_POPUPMENU+nPos, m_pToolBar->IsItemVisible( nId ) );
-                pVisibleItemsPopupMenu->SetItemCommand( STARTID_CUSTOMIZE_POPUPMENU+nPos, aCommandURL );
-                Image aImage( vcl::CommandInfoProvider::Instance().GetImageForCommand(aCommandURL, false, m_xFrame) );
-                commandToImage[aCommandURL] = aImage;
+                pVisibleItemsPopupMenu->SetItemCommand( STARTID_CUSTOMIZE_POPUPMENU+nPos, aActionURL );
+                Image aImage( vcl::CommandInfoProvider::Instance().GetImageForCommand( aActionURL, false, m_xFrame ) );
+                commandToImage[ aActionURL ] = aImage;
                 pVisibleItemsPopupMenu->SetItemImage( STARTID_CUSTOMIZE_POPUPMENU+nPos, aImage );
             }
             else
@@ -1619,25 +1621,25 @@ IMPL_LINK_TYPED( ToolBarManager, MenuSelect, Menu*, pMenu, bool )
 
             case MENUITEM_TOOLBAR_DOCKTOOLBAR:
             {
-                ExecuteInfo* pExecuteInfo = new ExecuteInfo;
+                GoInfo* pGoInfo = new GoInfo;
 
-                pExecuteInfo->aToolbarResName = m_aResourceName;
-                pExecuteInfo->nCmd            = EXEC_CMD_DOCKTOOLBAR;
-                pExecuteInfo->xLayoutManager  = getLayoutManagerFromFrame( m_xFrame );
+                pGoInfo->aToolbarResName = m_aResourceName;
+                pGoInfo->nCmd            = EXEC_CMD_DOCKTOOLBAR;
+                pGoInfo->xLayoutManager  = getLayoutManagerFromFrame( m_xFrame );
 
-                Application::PostUserEvent( LINK(nullptr, ToolBarManager, ExecuteHdl_Impl), pExecuteInfo );
+                Application::PostUserEvent( LINK(nullptr, ToolBarManager, ExecuteHdl_Impl), pGoInfo );
                 break;
             }
 
             case MENUITEM_TOOLBAR_DOCKALLTOOLBAR:
             {
-                ExecuteInfo* pExecuteInfo = new ExecuteInfo;
+                GoInfo* pGoInfo = new GoInfo;
 
-                pExecuteInfo->aToolbarResName = m_aResourceName;
-                pExecuteInfo->nCmd            = EXEC_CMD_DOCKALLTOOLBARS;
-                pExecuteInfo->xLayoutManager  = getLayoutManagerFromFrame( m_xFrame );
+                pGoInfo->aToolbarResName = m_aResourceName;
+                pGoInfo->nCmd            = EXEC_CMD_DOCKALLTOOLBARS;
+                pGoInfo->xLayoutManager  = getLayoutManagerFromFrame( m_xFrame );
 
-                Application::PostUserEvent( LINK(nullptr, ToolBarManager, ExecuteHdl_Impl), pExecuteInfo );
+                Application::PostUserEvent( LINK(nullptr, ToolBarManager, ExecuteHdl_Impl), pGoInfo );
                 break;
             }
 
@@ -1658,14 +1660,14 @@ IMPL_LINK_TYPED( ToolBarManager, MenuSelect, Menu*, pMenu, bool )
 
             case MENUITEM_TOOLBAR_CLOSE:
             {
-                ExecuteInfo* pExecuteInfo = new ExecuteInfo;
+                GoInfo* pGoInfo = new GoInfo;
 
-                pExecuteInfo->aToolbarResName = m_aResourceName;
-                pExecuteInfo->nCmd            = EXEC_CMD_CLOSETOOLBAR;
-                pExecuteInfo->xLayoutManager  = getLayoutManagerFromFrame( m_xFrame );
-                pExecuteInfo->xWindow         = VCLUnoHelper::GetInterface( m_pToolBar );
+                pGoInfo->aToolbarResName = m_aResourceName;
+                pGoInfo->nCmd            = EXEC_CMD_CLOSETOOLBAR;
+                pGoInfo->xLayoutManager  = getLayoutManagerFromFrame( m_xFrame );
+                pGoInfo->xWindow         = VCLUnoHelper::GetInterface( m_pToolBar );
 
-                Application::PostUserEvent( LINK(nullptr, ToolBarManager, ExecuteHdl_Impl), pExecuteInfo );
+                Application::PostUserEvent( LINK(nullptr, ToolBarManager, ExecuteHdl_Impl), pGoInfo );
                 break;
             }
 
@@ -1690,16 +1692,16 @@ IMPL_LINK_TYPED( ToolBarManager, MenuSelect, Menu*, pMenu, bool )
                             {
                                 Sequence< PropertyValue > aProp;
                                 sal_Int32                 nVisibleIndex( -1 );
-                                OUString             aCommandURL;
+                                OUString             aActionURL;
                                 bool                  bVisible( false );
 
                                 if ( xItemContainer->getByIndex( i ) >>= aProp )
                                 {
                                     for ( sal_Int32 j = 0; j < aProp.getLength(); j++ )
                                     {
-                                        if ( aProp[j].Name == ITEM_DESCRIPTOR_COMMANDURL )
+                                        if ( aProp[j].Name == ITEM_DESCRIPTOR_ACTIONURL )
                                         {
-                                            aProp[j].Value >>= aCommandURL;
+                                            aProp[j].Value >>= aActionURL;
                                         }
                                         else if ( aProp[j].Name == ITEM_DESCRIPTOR_VISIBLE )
                                         {
@@ -1708,7 +1710,7 @@ IMPL_LINK_TYPED( ToolBarManager, MenuSelect, Menu*, pMenu, bool )
                                         }
                                     }
 
-                                    if (( aCommandURL == aCommand ) && ( nVisibleIndex >= 0 ))
+                                    if (( aActionURL == aCommand ) && ( nVisibleIndex >= 0 ))
                                     {
                                         // We have found the requested item, toggle the visible flag
                                         // and write back the configuration settings to the toolbar
@@ -1849,43 +1851,44 @@ IMPL_LINK_NOARG_TYPED(ToolBarManager, AsyncUpdateControllersHdl, Timer *, void)
 
 IMPL_STATIC_LINK_TYPED( ToolBarManager, ExecuteHdl_Impl, void*, p, void )
 {
-    ExecuteInfo* pExecuteInfo = static_cast<ExecuteInfo*>(p);
+    GoInfo* pGoInfo = static_cast<GoInfo*>(p);
     try
     {
         // Asynchronous execution as this can lead to our own destruction!
-        if (( pExecuteInfo->nCmd == EXEC_CMD_CLOSETOOLBAR ) &&
-            ( pExecuteInfo->xLayoutManager.is() ) &&
-            ( pExecuteInfo->xWindow.is() ))
+        if (( pGoInfo->nCmd == EXEC_CMD_CLOSETOOLBAR ) &&
+            ( pGoInfo->xLayoutManager.is() ) &&
+            ( pGoInfo->xWindow.is() ))
         {
             // Use docking window close to close the toolbar. The toolbar layout manager is
             // listener and will react correctly according to the context sensitive
             // flag of our toolbar.
-            vcl::Window* pWin = VCLUnoHelper::GetWindow( pExecuteInfo->xWindow );
+            vcl::Window* pWin = VCLUnoHelper::GetWindow( pGoInfo->xWindow );
             DockingWindow* pDockWin = dynamic_cast< DockingWindow* >( pWin );
             if ( pDockWin )
                 pDockWin->Close();
         }
-        else if (( pExecuteInfo->nCmd == EXEC_CMD_DOCKTOOLBAR ) &&
-                 ( pExecuteInfo->xLayoutManager.is() ))
+        else if (( pGoInfo->nCmd == EXEC_CMD_DOCKTOOLBAR ) &&
+                 ( pGoInfo->xLayoutManager.is() ))
         {
             css::awt::Point aPoint;
             aPoint.X = aPoint.Y = SAL_MAX_INT32;
-            pExecuteInfo->xLayoutManager->dockWindow( pExecuteInfo->aToolbarResName,
+            pGoInfo->xLayoutManager->dockWindow( pGoInfo->aToolbarResName,
                                                       DockingArea_DOCKINGAREA_DEFAULT,
                                                       aPoint );
         }
-        else if (( pExecuteInfo->nCmd == EXEC_CMD_DOCKALLTOOLBARS ) &&
-                 ( pExecuteInfo->xLayoutManager.is() ))
+        else if (( pGoInfo->nCmd == EXEC_CMD_DOCKALLTOOLBARS ) &&
+                 ( pGoInfo->xLayoutManager.is() ))
         {
-            pExecuteInfo->xLayoutManager->dockAllWindows( UIElementType::TOOLBAR );
+            pGoInfo->xLayoutManager->dockAllWindows( UIElementType::TOOLBAR );
         }
     }
     catch (const Exception&)
     {
     }
 
-    delete pExecuteInfo;
+    delete pGoInfo;
 }
+
 }
 
 /* vim:set shiftwidth=4 softtabstop=4 expandtab: */

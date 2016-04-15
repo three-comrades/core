@@ -115,7 +115,7 @@ public class RecoveryTest extends ComplexTestCase {
 
     public void before() throws Exception {
 
-        String msg ="\n\n\tPATH TO OFFICE BINARY MISSING!\n";
+        String msg ="\n\n\tPATH TO OFFICE BINARY IS ABSENT\n";
         msg +="\tPlease run your command with the following parameter:\n\n";
         msg +="\t-AppExecutionCommand=OFFICEBINARY CONNECTIONSTRING\n\n";
         msg +="Example Windows:\n";
@@ -126,7 +126,7 @@ public class RecoveryTest extends ComplexTestCase {
 
         assure(msg, param.get("AppExecutionCommand") != null && ! param.get("AppExecutionCommand").equals(""));
         System.out.println("HALLO" + param.get("AppExecutionCommand"));
-        msg = "\n\nONE PARAMETER IS MISSING!\n";
+        msg = "\n\nONE PARAMETER IS ABSENT\n";
         msg += "Please append to your command the following parameter:\n\n";
         msg += "\t-NoOffice=true";
         assure(msg, param.getBool("NoOffice"));
@@ -447,16 +447,16 @@ public class RecoveryTest extends ComplexTestCase {
                 }
                 String tempURL = utils.getOfficeTempDir(xMSF);
 
-                log.println("the destination for saving is: " + tempURL);
+                log.println("the recipient for saving is: " + tempURL);
                 try{
                     oUITools.setTextEditFiledText("Save to", tempURL);
                 } catch (java.lang.Exception e){
-                    failed("could not set target directory for saving documents at 'Save Documents' dialog", ContinueWithTest.YES);
+                    failed( "could not set recipient directory for saving documents at Save Documents dialog", ContinueWithTest.YES );
                 }
                 try{
                     oUITools.clickButton("OK");
                 } catch (java.lang.Exception e){
-                    failed("could not click 'OK' at 'Save Documents' dialog", ContinueWithTest.YES);
+                    failed("could not click OK at Save Documents dialog", ContinueWithTest.YES);
                 }
             }
         } catch (com.sun.star.accessibility.IllegalAccessibleComponentStateException e){

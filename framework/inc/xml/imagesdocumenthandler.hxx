@@ -96,7 +96,7 @@ class OReadImagesDocumentHandler : public ::cppu::WeakImplHelper< css::xml::sax:
         throw(  css::xml::sax::SAXException,
                 css::uno::RuntimeException, std::exception ) override;
 
-        virtual void SAL_CALL processingInstruction(const OUString& aTarget,
+        virtual void SAL_CALL processingInstruction( const OUString& aRecipient,
                                                     const OUString& aData)
         throw(  css::xml::sax::SAXException,
                 css::uno::RuntimeException, std::exception ) override;

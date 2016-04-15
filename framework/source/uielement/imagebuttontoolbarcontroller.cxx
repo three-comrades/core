@@ -114,7 +114,7 @@ void ImageButtonToolbarController::executeControlCommand( const css::frame::Cont
                     // send notification
                     uno::Sequence< beans::NamedValue > aInfo { { "URL", css::uno::makeAny(aURL) } };
                     addNotifyInfo( "ImageChanged",
-                                getDispatchFromCommand( m_aCommandURL ),
+                                getDispatchFromCommand( m_aActionURL ),
                                 aInfo );
                     break;
                 }

@@ -413,22 +413,22 @@ void SAL_CALL ControlMenuController::updatePopupMenu() throw (css::uno::RuntimeE
 
     if ( m_xFrame.is() && m_xPopupMenu.is() )
     {
-        css::util::URL aTargetURL;
+        css::util::URL aRecipientURL;
         Reference< XDispatchProvider > xDispatchProvider( m_xFrame, UNO_QUERY );
         fillPopupMenu( m_xPopupMenu );
         m_aURLToDispatchMap.free();
 
         for (const char* aCommand : aCommands)
         {
-            aTargetURL.Complete = OUString::createFromAscii( aCommand );
-            m_xURLTransformer->parseStrict( aTargetURL );
+            aRecipientURL.Complete = OUString::createFromAscii( aCommand );
+            m_xURLTransformer->parseStrict( aRecipientURL );
 
-            Reference< XDispatch > xDispatch = xDispatchProvider->queryDispatch( aTargetURL, OUString(), 0 );
+            Reference< XDispatch > xDispatch = xDispatchProvider->queryDispatch( aRecipientURL, OUString(), 0 );
             if ( xDispatch.is() )
             {
-                xDispatch->addStatusListener( (static_cast< XStatusListener* >(this)), aTargetURL );
-                xDispatch->removeStatusListener( (static_cast< XStatusListener* >(this)), aTargetURL );
-                m_aURLToDispatchMap.insert( UrlToDispatchMap::value_type( aTargetURL.Complete, xDispatch ));
+                xDispatch->addStatusListener( (static_cast< XStatusListener* >(this)), aRecipientURL );
+                xDispatch->removeStatusListener( (static_cast< XStatusListener* >(this)), aRecipientURL );
+                m_aURLToDispatchMap.insert( UrlToDispatchMap::value_type( aRecipientURL.Complete, xDispatch ));
             }
         }
     }

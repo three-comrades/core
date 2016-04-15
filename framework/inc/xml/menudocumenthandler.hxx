@@ -68,7 +68,7 @@ class FWE_DLLPUBLIC ReadMenuDocumentHandlerBase :
         throw(  css::xml::sax::SAXException,
                 css::uno::RuntimeException, std::exception ) override;
 
-        virtual void SAL_CALL processingInstruction(const OUString& aTarget,
+        virtual void SAL_CALL processingInstruction( const OUString& aRecipient,
                                                     const OUString& aData)
         throw(  css::xml::sax::SAXException,
                 css::uno::RuntimeException, std::exception ) override;
@@ -84,14 +84,14 @@ class FWE_DLLPUBLIC ReadMenuDocumentHandlerBase :
         css::uno::Reference< css::xml::sax::XLocator > m_xLocator;
         css::uno::Reference< css::xml::sax::XDocumentHandler> m_xReader;
         void initPropertyCommon( css::uno::Sequence< css::beans::PropertyValue > &rProps,
-                                 const OUString &rCommandURL, const OUString &rHelpId,
+                                 const OUString &rActionURL, const OUString &rHelpId,
                                  const OUString &rLabel, sal_Int16 nItemStyleBits );
     private:
         OUString m_aType;
         OUString m_aLabel;
         OUString m_aContainer;
         OUString m_aHelpURL;
-        OUString m_aCommandURL;
+        OUString m_aActionURL;
         OUString m_aStyle;
 };
 
@@ -265,7 +265,7 @@ class FWE_DLLPUBLIC OWriteMenuDocumentHandler
         void WriteMenu( const css::uno::Reference< css::container::XIndexAccess >& rSubMenuContainer ) throw
             ( css::xml::sax::SAXException, css::uno::RuntimeException );
 
-        void WriteMenuItem( const OUString& aCommandURL, const OUString& aLabel, const OUString& aHelpURL, sal_Int16 nStyle = 0 );
+        void WriteMenuItem( const OUString& aActionURL, const OUString& aLabel, const OUString& aHelpURL, sal_Int16 nStyle = 0 );
         void WriteMenuSeparator();
 
         css::uno::Reference< css::container::XIndexAccess > m_xMenuBarContainer;

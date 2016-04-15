@@ -55,18 +55,18 @@ const char URL_CLOSEFRAME[] = ".uno:CloseFrame";
 
 CloseDispatcher::CloseDispatcher(const css::uno::Reference< css::uno::XComponentContext >& rxContext ,
                                  const css::uno::Reference< css::frame::XFrame >&          xFrame ,
-                                 const OUString&                                           sTarget)
+                                 const OUString&                                           sRecipient )
     : m_xContext         (rxContext                                       )
     , m_aAsyncCallback(
         new vcl::EventPoster(LINK(this, CloseDispatcher, impl_asyncCallback)))
     , m_eOperation(E_CLOSE_DOC)
     , m_pSysWindow(nullptr)
 {
-    uno::Reference<frame::XFrame> xTarget = static_impl_searchRightTargetFrame(xFrame, sTarget);
-    m_xCloseFrame = xTarget;
+    uno::Reference< frame::XFrame > xRecipient = static_impl_lookForRecipientFrame( xFrame, sRecipient );
+    m_xCloseFrame = xRecipient;
 
-    // Try to retrieve the system window instance of the closing frame.
-    uno::Reference<awt::XWindow> xWindow = xTarget->getContainerWindow();
+    // Try to retrieve the instance of system window of the closing frame
+    uno::Reference<awt::XWindow> xWindow = xRecipient->getContainerWindow();
     if (xWindow.is())
     {
         vcl::Window* pWindow = VCLUnoHelper::GetWindow(xWindow);
@@ -556,23 +556,23 @@ void CloseDispatcher::implts_notifyResultListener(const css::uno::Reference< css
     xListener->dispatchFinished(aEvent);
 }
 
-css::uno::Reference< css::frame::XFrame > CloseDispatcher::static_impl_searchRightTargetFrame(const css::uno::Reference< css::frame::XFrame >& xFrame ,
-                                                                                              const OUString&                           sTarget)
+css::uno::Reference< css::frame::XFrame > CloseDispatcher::impl_lookForRecipientFrame(const css::uno::Reference< css::frame::XFrame >& xFrame ,
+                                                                                      const OUString& sRecipient )
 {
-    if (sTarget.equalsIgnoreAsciiCase("_self"))
+    if ( sRecipient.equalsIgnoreAsciiCase( "_self" ) )
         return xFrame;
 
-    OSL_ENSURE(sTarget.isEmpty(), "CloseDispatch used for unexpected target. Magic things will happen now .-)");
+    OSL_ENSURE( sRecipient.isEmpty(), "CloseDispatch used for unexpected recipient. Magic things will happen now .-)" );
 
-    css::uno::Reference< css::frame::XFrame > xTarget = xFrame;
+    css::uno::Reference< css::frame::XFrame > xRecipient = xFrame;
     while(true)
     {
-        // a) top frames wil be closed
-        if (xTarget->isTop())
-            return xTarget;
+        // a) close recipient frame if it's on top
+        if ( xRecipient->isTop() )
+            return xRecipient;
 
         // b) even child frame containing top level windows (e.g. query designer of database) will be closed
-        css::uno::Reference< css::awt::XWindow >    xWindow        = xTarget->getContainerWindow();
+        css::uno::Reference< css::awt::XWindow >    xWindow        = xRecipient->getContainerWindow();
         css::uno::Reference< css::awt::XTopWindow > xTopWindowCheck(xWindow, css::uno::UNO_QUERY);
         if (xTopWindowCheck.is())
         {
@@ -583,22 +583,19 @@ css::uno::Reference< css::frame::XFrame > CloseDispatcher::static_impl_searchRig
             //     a simple XWindow using the toolkit only .-(
             SolarMutexGuard aSolarLock;
             vcl::Window* pWindow = VCLUnoHelper::GetWindow( xWindow );
-            if (
-                (pWindow                  ) &&
-                (pWindow->IsSystemWindow())
-               )
-                return xTarget;
+            if ( pWindow  &&  pWindow->IsSystemWindow() )
+                return xRecipient;
         }
 
         // c) try to find better results on parent frame
         //    If no parent frame exists (because this frame is used outside the desktop tree)
         //    the given frame must be used directly.
-        css::uno::Reference< css::frame::XFrame > xParent(xTarget->getCreator(), css::uno::UNO_QUERY);
+        css::uno::Reference< css::frame::XFrame > xParent(xRecipient->getCreator(), css::uno::UNO_QUERY);
         if ( ! xParent.is())
-            return xTarget;
+            return xRecipient;
 
         // c1) check parent frame inside next loop ...
-        xTarget = xParent;
+        xRecipient = xParent;
     }
 }
 

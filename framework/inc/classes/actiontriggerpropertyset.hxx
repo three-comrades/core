@@ -106,7 +106,7 @@ class ActionTriggerPropertySet :  private cppu::BaseMutex,
 
         //  members
 
-        OUString                                    m_aCommandURL;
+        OUString                                    m_aActionURL;
         OUString                                    m_aHelpURL;
         OUString                                    m_aText;
         css::uno::Reference< css::awt::XBitmap >    m_xBitmap;

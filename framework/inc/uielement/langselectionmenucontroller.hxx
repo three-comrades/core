@@ -75,13 +75,13 @@ namespace framework
             };
 
             bool                                             m_bShowMenu;
-            OUString                                         m_aLangStatusCommandURL;
+            OUString                                         m_aLangStatusActionURL;
             css::uno::Reference< css::frame::XDispatch >     m_xLanguageDispatch;
-            OUString                                         m_aMenuCommandURL_Lang;
+            OUString                                         m_aMenuActionURL_Lang;
             css::uno::Reference< css::frame::XDispatch >     m_xMenuDispatch_Lang;
-            OUString                                         m_aMenuCommandURL_Font;
+            OUString                                         m_aMenuActionURL_Font;
             css::uno::Reference< css::frame::XDispatch >     m_xMenuDispatch_Font;
-            OUString                                         m_aMenuCommandURL_CharDlgForParagraph;
+            OUString                                         m_aMenuActionURL_CharDlgForParagraph;
             css::uno::Reference< css::frame::XDispatch >     m_xMenuDispatch_CharDlgForParagraph;
             OUString                                         m_aCurLang;
             SvtScriptType                                    m_nScriptType;

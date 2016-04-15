@@ -176,7 +176,7 @@ void AddonsToolBarManager::RefreshImages()
 
         if ( nId > 0 )
         {
-            OUString aCommandURL = m_pToolBar->GetItemCommand( nId );
+            OUString aActionURL = m_pToolBar->GetItemCommand( nId );
             OUString aImageId;
             AddonsParams* pRuntimeItemData = static_cast<AddonsParams*>(m_pToolBar->GetItemData( nId ));
             if ( pRuntimeItemData )
@@ -184,7 +184,7 @@ void AddonsToolBarManager::RefreshImages()
 
             m_pToolBar->SetItemImage(
                 nId,
-                RetrieveImage( m_xFrame, aImageId, aCommandURL, bBigImages )
+                RetrieveImage( m_xFrame, aImageId, aActionURL, bBigImages )
             );
         }
     }
@@ -226,13 +226,13 @@ void AddonsToolBarManager::FillToolbar( const Sequence< Sequence< PropertyValue 
         OUString   aTitle;
         OUString   aImageId;
         OUString   aContext;
-        OUString   aTarget;
+        OUString   aRecipient;
         OUString   aControlType;
         sal_uInt16 nWidth( 0 );
 
         const Sequence< PropertyValue >& rSeq = rAddonToolbar[n];
 
-        ToolBarMerger::ConvertSequenceToValues( rSeq, aURL, aTitle, aImageId, aTarget, aContext, aControlType, nWidth );
+        ToolBarMerger::ConvertSequenceToValues( rSeq, aURL, aTitle, aImageId, aRecipient, aContext, aControlType, nWidth );
 
         if ( IsCorrectContext( aModuleIdentifier, aContext ))
         {
@@ -267,7 +267,7 @@ void AddonsToolBarManager::FillToolbar( const Sequence< Sequence< PropertyValue 
                 // Create TbRuntimeItemData to hold additional information we will need in the future
                 AddonsParams* pRuntimeItemData = new AddonsParams;
                 pRuntimeItemData->aImageId  = aImageId;
-                pRuntimeItemData->aTarget   = aTarget;
+                pRuntimeItemData->aRecipient = aRecipient;
                 pRuntimeItemData->nWidth    = nWidth;
                 m_pToolBar->SetItemData( nId, pRuntimeItemData );
                 m_pToolBar->SetItemCommand( nId, aURL );
@@ -276,7 +276,7 @@ void AddonsToolBarManager::FillToolbar( const Sequence< Sequence< PropertyValue 
 
                 bool bMustBeInit( true );
 
-                // Support external toolbar controller for add-ons!
+                // Support external toolbar controller for add-ons
                 if ( m_xToolbarControllerFactory.is() &&
                      m_xToolbarControllerFactory->hasController( aURL, m_aModuleIdentifier ))
                 {
@@ -329,7 +329,7 @@ void AddonsToolBarManager::FillToolbar( const Sequence< Sequence< PropertyValue 
                     aPropValue.Name = "Frame";
                     aPropValue.Value <<= m_xFrame;
                     aArgs[0] <<= aPropValue;
-                    aPropValue.Name = "CommandURL";
+                    aPropValue.Name = "ActionURL";
                     aPropValue.Value <<= aURL;
                     aArgs[1] <<= aPropValue;
                     aPropValue.Name = "ServiceManager";

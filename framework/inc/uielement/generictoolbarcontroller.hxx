@@ -52,10 +52,10 @@ class GenericToolbarController : public svt::ToolboxController
 
         DECL_STATIC_LINK_TYPED( GenericToolbarController, ExecuteHdl_Impl, void*, void );
 
-        struct ExecuteInfo
+        struct GoInfo
         {
             css::uno::Reference< css::frame::XDispatch >     xDispatch;
-            css::util::URL                                   aTargetURL;
+            css::util::URL                                   aRecipientURL;
             css::uno::Sequence< css::beans::PropertyValue >  aArgs;
         };
 

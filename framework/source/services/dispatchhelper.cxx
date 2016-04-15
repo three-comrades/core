@@ -60,11 +60,11 @@ DispatchHelper::~DispatchHelper()
     @param sURL
                 describes the requested feature.
 
-    @param sTargetFrameName
+    @param sRecipientFrameName
                 points to the frame, which must be used (or may be created) for this dispatch.
 
-    @param nSearchFlags
-                in case the <var>sTargetFrameName</var> isn't unique, these flags regulate further searches.
+    @param nSearchOptions
+                in case the <var>sRecipientFrameName</var> isn't unique, these flags regulate further searches.
 
     @param lArguments
                 optional arguments for this request.
@@ -74,8 +74,8 @@ DispatchHelper::~DispatchHelper()
 css::uno::Any SAL_CALL DispatchHelper::executeDispatch(
                                 const css::uno::Reference< css::frame::XDispatchProvider >& xDispatchProvider ,
                                 const OUString&                                      sURL              ,
-                                const OUString&                                      sTargetFrameName  ,
-                                      sal_Int32                                             nSearchFlags      ,
+                                const OUString&                                      sRecipientFrameName  ,
+                                      sal_Int32                                             nSearchOptions      ,
                                 const css::uno::Sequence< css::beans::PropertyValue >&      lArguments        )
     throw(css::uno::RuntimeException, std::exception)
 {
@@ -102,7 +102,7 @@ css::uno::Any SAL_CALL DispatchHelper::executeDispatch(
     xParser->parseStrict(aURL);
 
     // search dispatcher
-    css::uno::Reference< css::frame::XDispatch >          xDispatch       = xDispatchProvider->queryDispatch(aURL, sTargetFrameName, nSearchFlags);
+    css::uno::Reference< css::frame::XDispatch >          xDispatch       = xDispatchProvider->queryDispatch(aURL, sRecipientFrameName, nSearchOptions);
     css::uno::Reference< css::frame::XNotifyingDispatch > xNotifyDispatch (xDispatch, css::uno::UNO_QUERY);
 
     // make sure that synchronous execution is used (if possible)

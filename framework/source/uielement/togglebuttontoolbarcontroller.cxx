@@ -146,7 +146,7 @@ void ToggleButtonToolbarController::executeControlCommand( const css::frame::Con
                     // send notification
                     uno::Sequence< beans::NamedValue > aInfo { { "List", css::uno::makeAny(aList) } };
                     addNotifyInfo( "ListChanged",
-                                getDispatchFromCommand( m_aCommandURL ),
+                                getDispatchFromCommand( m_aActionURL ),
                                 aInfo );
 
                     break;
@@ -171,7 +171,7 @@ void ToggleButtonToolbarController::executeControlCommand( const css::frame::Con
                         // send notification
                         uno::Sequence< beans::NamedValue > aInfo { { "ItemChecked", css::uno::makeAny(nPos) } };
                         addNotifyInfo( "Pos",
-                                    getDispatchFromCommand( m_aCommandURL ),
+                                    getDispatchFromCommand( m_aActionURL ),
                                     aInfo );
                     }
                     break;

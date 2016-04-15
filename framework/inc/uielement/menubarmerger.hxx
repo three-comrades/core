@@ -35,7 +35,7 @@ struct AddonMenuItem
 {
     OUString    aTitle;
     OUString    aURL;
-    OUString    aTarget;
+    OUString    aRecipient;
     OUString    aImageId;
     OUString    aContext;
     AddonMenuContainer aSubMenu;

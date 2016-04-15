@@ -19,7 +19,7 @@
 
 #include <framework/framelistanalyzer.hxx>
 
-#include <targets.h>
+#include <recipients.h>
 #include <properties.h>
 #include <services.h>
 
@@ -140,7 +140,7 @@ void FrameListAnalyzer::impl_analyze()
     if (
         ((m_eDetectMode & E_HELP)     == E_HELP                ) &&
         (m_xReferenceFrame.is()                                ) &&
-        (m_xReferenceFrame->getName() == SPECIALTARGET_HELPTASK)
+        (m_xReferenceFrame->getName() == SPECIAL_HELPTASK)
        )
     {
         m_bReferenceIsHelp = true;
@@ -176,8 +176,8 @@ void FrameListAnalyzer::impl_analyze()
             // a) Is it the special help task?
             //    Return it separated from any return list.
             if (
-                ((m_eDetectMode & E_HELP) == E_HELP      ) &&
-                (xFrame->getName()==SPECIALTARGET_HELPTASK)
+                 ((m_eDetectMode & E_HELP) == E_HELP      ) &&
+                 ( xFrame->getName() == SPECIAL_HELPTASK )
                )
             {
                 m_xHelp = xFrame;

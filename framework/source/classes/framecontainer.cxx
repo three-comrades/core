@@ -26,12 +26,12 @@
 
 namespace framework{
 
-/**-***************************************************************************************************************
+/**
     @short      initialize an empty container
     @descr      The container will be empty then - special features (e.g. the async quit mechanism) are disabled.
 
     @threadsafe not necessary - its not a singleton
- *****************************************************************************************************************/
+*/
 FrameContainer::FrameContainer()
 /*DEPRECATEME
         , m_bAsyncQuit   ( sal_False                                      ) // default must be "disabled"!
@@ -40,12 +40,12 @@ FrameContainer::FrameContainer()
 {
 }
 
-/**-***************************************************************************************************************
+/**
     @short      deinitialize may a filled container
     @descr      Special features (if the currently are running) will be disabled and we free all used other resources.
 
     @threadsafe not necessary - its not a singleton
- *****************************************************************************************************************/
+*/
 FrameContainer::~FrameContainer()
 {
     // Don't forget to free memory!
@@ -53,7 +53,7 @@ FrameContainer::~FrameContainer()
     m_xActiveFrame.clear();
 }
 
-/**-***************************************************************************************************************
+/**
     @short      append a new frame to the container
     @descr      We accept the incoming frame only, if it is a valid reference and doesn't exist already.
 
@@ -62,7 +62,7 @@ FrameContainer::~FrameContainer()
                     Must be a valid reference.
 
     @threadsafe yes
- *****************************************************************************************************************/
+*/
 void FrameContainer::append( const css::uno::Reference< css::frame::XFrame >& xFrame )
 {
     if (xFrame.is() && ! exist(xFrame))
@@ -72,7 +72,7 @@ void FrameContainer::append( const css::uno::Reference< css::frame::XFrame >& xF
     }
 }
 
-/**-***************************************************************************************************************
+/**
     @short      remove a frame from the container
     @descr      In case we remove the last frame and our internal special feature (the async quit mechanism)
                 was enabled by the desktop instance, we start it.
@@ -82,7 +82,7 @@ void FrameContainer::append( const css::uno::Reference< css::frame::XFrame >& xF
                     Must be a valid reference.
 
     @threadsafe yes
- *****************************************************************************************************************/
+*/
 void FrameContainer::remove( const css::uno::Reference< css::frame::XFrame >& xFrame )
 {
     SolarMutexGuard g;
@@ -98,7 +98,7 @@ void FrameContainer::remove( const css::uno::Reference< css::frame::XFrame >& xF
     }
 }
 
-/**-***************************************************************************************************************
+/**
     @short      check if the given frame currently exist inside the container
     @param      xFrame
                     reference to the queried frame
@@ -107,17 +107,17 @@ void FrameContainer::remove( const css::uno::Reference< css::frame::XFrame >& xF
                 <FALSE/> otherwise
 
     @threadsafe yes
- *****************************************************************************************************************/
+*/
 bool FrameContainer::exist( const css::uno::Reference< css::frame::XFrame >& xFrame ) const
 {
     SolarMutexGuard g;
     return( ::std::find( m_aContainer.begin(), m_aContainer.end(), xFrame ) != m_aContainer.end() );
 }
 
-/**-***************************************************************************************************************
+/**
     @short      delete all existing items of the container
     @threadsafe yes
- *****************************************************************************************************************/
+*/
 void FrameContainer::clear()
 {
     SolarMutexGuard g;
@@ -129,7 +129,7 @@ void FrameContainer::clear()
     m_xActiveFrame.clear();
 }
 
-/**-***************************************************************************************************************
+/**
     @short      returns count of all current existing frames
     @deprecated This value can't be guaranteed for multithreading environments.
                 So it will be marked as deprecated and should be replaced by "getAllElements()".
@@ -137,14 +137,14 @@ void FrameContainer::clear()
     @return     the count of existing container items
 
     @threadsafe yes
- *****************************************************************************************************************/
+*/
 sal_uInt32 FrameContainer::getCount() const
 {
     SolarMutexGuard g;
     return( (sal_uInt32)m_aContainer.size() );
 }
 
-/**-***************************************************************************************************************
+/**
     @short      returns one item of this container
     @deprecated This value can't be guaranteed for multithreading environments.
                 So it will be marked as deprecatedf and should be replaced by "getAllElements()".
@@ -155,7 +155,7 @@ sal_uInt32 FrameContainer::getCount() const
     @return     a reference to a frame inside the container, which match with given index
 
     @threadsafe yes
- *****************************************************************************************************************/
+*/
 css::uno::Reference< css::frame::XFrame > FrameContainer::operator[]( sal_uInt32 nIndex ) const
 {
 
@@ -176,21 +176,21 @@ css::uno::Reference< css::frame::XFrame > FrameContainer::operator[]( sal_uInt32
     return xFrame;
 }
 
-/**-***************************************************************************************************************
+/**
     @short      returns a snapshot of all currently existing frames inside this container
     @descr      Should be used to replace the deprecated functions getCount()/operator[]!
 
     @return     a list of all frame references inside this container
 
     @threadsafe yes
- *****************************************************************************************************************/
+*/
 css::uno::Sequence< css::uno::Reference< css::frame::XFrame > > FrameContainer::getAllElements() const
 {
     SolarMutexGuard g;
     return comphelper::containerToSequence(m_aContainer);
 }
 
-/**-***************************************************************************************************************
+/**
     @short      set the given frame as  the new active one inside this container
     @descr      We accept this frame only, if it's already a part of this container.
 
@@ -199,7 +199,7 @@ css::uno::Sequence< css::uno::Reference< css::frame::XFrame > > FrameContainer::
                     Must be a valid reference and already part of this container.
 
     @threadsafe yes
- *****************************************************************************************************************/
+*/
 void FrameContainer::setActive( const css::uno::Reference< css::frame::XFrame >& xFrame )
 {
     if ( !xFrame.is() || exist(xFrame) )
@@ -209,7 +209,7 @@ void FrameContainer::setActive( const css::uno::Reference< css::frame::XFrame >&
     }
 }
 
-/**-***************************************************************************************************************
+/**
     @short      return the current active frame of this container
     @descr      Value can be null in case the frame was removed from the container and nobody
                 from outside decide which of all others should be the new one...
@@ -218,29 +218,30 @@ void FrameContainer::setActive( const css::uno::Reference< css::frame::XFrame >&
                 Value can be NULL!
 
     @threadsafe yes
- *****************************************************************************************************************/
+*/
 css::uno::Reference< css::frame::XFrame > FrameContainer::getActive() const
 {
     SolarMutexGuard g;
     return m_xActiveFrame;
 }
 
-/**-***************************************************************************************************************
+/**
     @short      implements a simple search based on current container items
     @descr      It can be used for findFrame() and implements a deep down search.
 
     @param      sName
-                    target name, which is searched
+                    recipient name which is searched
 
     @return     reference to the found frame or NULL if not.
 
     @threadsafe yes
- *****************************************************************************************************************/
+*/
 css::uno::Reference< css::frame::XFrame > FrameContainer::searchOnAllChildrens( const OUString& sName ) const
 {
     SolarMutexGuard g;
-    // Step over all child frames. But if direct child isn't the right one search on his children first - before
-    // you go to next direct child of this container!
+
+    // Step over all child frames
+
     css::uno::Reference< css::frame::XFrame > xSearchedFrame;
     for( TFrameContainer::const_iterator pIterator=m_aContainer.begin(); pIterator!=m_aContainer.end(); ++pIterator )
     {
@@ -251,25 +252,28 @@ css::uno::Reference< css::frame::XFrame > FrameContainer::searchOnAllChildrens( 
         }
         else
         {
-            xSearchedFrame = (*pIterator)->findFrame( sName, css::frame::FrameSearchFlag::CHILDREN );
+            // a direct child isn't the one sought-for thus search on its children first - before
+            // moving to next direct child
+            xSearchedFrame = (*pIterator)->findFrame( sName, css::frame::FrameSearchOption::Children );
             if (xSearchedFrame.is())
                 break;
         }
     }
+
     return xSearchedFrame;
 }
 
-/**-***************************************************************************************************************
+/**
     @short      implements a simple search based on current container items
     @descr      It can be used for findFrame() and search on members of this container only!
 
     @param      sName
-                    target name, which is searched
+                    recipient name which is searched
 
     @return     reference to the found frame or NULL if not.
 
     @threadsafe yes
- *****************************************************************************************************************/
+*/
 css::uno::Reference< css::frame::XFrame > FrameContainer::searchOnDirectChildrens( const OUString& sName ) const
 {
     SolarMutexGuard g;

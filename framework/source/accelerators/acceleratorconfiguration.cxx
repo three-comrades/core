@@ -50,7 +50,7 @@
 #include <svtools/acceleratorexecute.hxx>
 
 #define PRESET_DEFAULT "default"
-#define TARGET_CURRENT "current"
+#define RECEIVER_CURRENT "current"
 
 namespace framework
 {
@@ -232,7 +232,7 @@ void SAL_CALL XMLBasedAcceleratorConfiguration::reload()
     css::uno::Reference< css::io::XStream > xStreamNoLang;
     {
         SolarMutexGuard g;
-        xStream = m_aPresetHandler.openTarget(TARGET_CURRENT); // open or create!
+        xStream = m_aPresetHandler.openRecipient( RECEIVER_CURRENT ); // open or create
         try
         {
             xStreamNoLang = m_aPresetHandler.openPreset(PRESET_DEFAULT);
@@ -273,7 +273,7 @@ void SAL_CALL XMLBasedAcceleratorConfiguration::store()
     css::uno::Reference< css::io::XStream > xStream;
     {
         SolarMutexGuard g;
-        xStream = m_aPresetHandler.openTarget(TARGET_CURRENT); // open or create!
+        xStream = m_aPresetHandler.openRecipient( RECEIVER_CURRENT ); // open or create
     }
 
     css::uno::Reference< css::io::XOutputStream > xOut;
@@ -299,7 +299,7 @@ void SAL_CALL XMLBasedAcceleratorConfiguration::storeToStorage(const css::uno::R
 {
     css::uno::Reference< css::io::XStream > xStream = StorageHolder::openSubStreamWithFallback(
                                                             xStorage,
-                                                            TARGET_CURRENT,
+                                                            RECEIVER_CURRENT,
                                                             css::embed::ElementModes::READWRITE,
                                                             false); // False => no fallback from read/write to readonly!
     css::uno::Reference< css::io::XOutputStream > xOut;
@@ -329,7 +329,7 @@ sal_Bool SAL_CALL XMLBasedAcceleratorConfiguration::isReadOnly()
     css::uno::Reference< css::io::XStream > xStream;
     {
         SolarMutexGuard g;
-        xStream = m_aPresetHandler.openTarget(TARGET_CURRENT); // open or create!
+        xStream = m_aPresetHandler.openRecipient( RECEIVER_CURRENT ); // open or create
     }
 
     css::uno::Reference< css::io::XOutputStream > xOut;
@@ -368,7 +368,7 @@ throw(css::uno::RuntimeException, std::exception)
 {
     {
         SolarMutexGuard g;
-        m_aPresetHandler.copyPresetToTarget(PRESET_DEFAULT, TARGET_CURRENT);
+        m_aPresetHandler.copyPresetToRecipient( PRESET_DEFAULT, RECEIVER_CURRENT );
     }
 
     reload();
@@ -509,11 +509,11 @@ OUString XMLBasedAcceleratorConfiguration::impl_ts_getLocale() const
     return sISOLocale;
 }
 
-/*******************************************************************************
+/*
 *
 * XCU based accelerator configuration
 *
-*******************************************************************************/
+*/
 
 XCUBasedAcceleratorConfiguration::XCUBasedAcceleratorConfiguration(const css::uno::Reference< css::uno::XComponentContext >& xContext)
                                 : m_xContext      (xContext                     )

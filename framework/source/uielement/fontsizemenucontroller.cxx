@@ -282,11 +282,11 @@ void SAL_CALL FontSizeMenuController::statusChanged( const FeatureStateEvent& Ev
 void FontSizeMenuController::impl_setPopupMenu()
 {
     Reference< XDispatchProvider > xDispatchProvider( m_xFrame, UNO_QUERY );
-    css::util::URL aTargetURL;
+    css::util::URL aURL;
     // Register for font name updates which gives us info about the current font!
-    aTargetURL.Complete = ".uno:CharFontName";
-    m_xURLTransformer->parseStrict( aTargetURL );
-    m_xCurrentFontDispatch = xDispatchProvider->queryDispatch( aTargetURL, OUString(), 0 );
+    aURL.Complete = ".uno:CharFontName";
+    m_xURLTransformer->parseStrict( aURL );
+    m_xCurrentFontDispatch = xDispatchProvider->queryDispatch( aURL, OUString(), 0 );
 }
 
 void SAL_CALL FontSizeMenuController::updatePopupMenu() throw ( css::uno::RuntimeException, std::exception )
@@ -296,15 +296,15 @@ void SAL_CALL FontSizeMenuController::updatePopupMenu() throw ( css::uno::Runtim
     throwIfDisposed();
 
     Reference< XDispatch > xDispatch( m_xCurrentFontDispatch );
-    css::util::URL aTargetURL;
-    aTargetURL.Complete = ".uno:CharFontName";
-    m_xURLTransformer->parseStrict( aTargetURL );
+    css::util::URL aURL;
+    aURL.Complete = ".uno:CharFontName";
+    m_xURLTransformer->parseStrict( aURL );
     aLock.clear();
 
     if ( xDispatch.is() )
     {
-        xDispatch->addStatusListener( (static_cast< XStatusListener* >(this)), aTargetURL );
-        xDispatch->removeStatusListener( (static_cast< XStatusListener* >(this)), aTargetURL );
+        xDispatch->addStatusListener( (static_cast< XStatusListener* >(this)), aURL );
+        xDispatch->removeStatusListener( (static_cast< XStatusListener* >(this)), aURL );
     }
 
     svt::PopupMenuControllerBase::updatePopupMenu();

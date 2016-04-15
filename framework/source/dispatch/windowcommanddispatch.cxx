@@ -18,7 +18,7 @@
  */
 
 #include <dispatch/windowcommanddispatch.hxx>
-#include <targets.h>
+#include <recipients.h>
 #include <services.h>
 
 #include <com/sun/star/frame/XDispatchProvider.hpp>
@@ -152,7 +152,7 @@ void WindowCommandDispatch::impl_dispatchCommand(const OUString& sCommand)
         aCommand.Complete = sCommand;
         xParser->parseStrict(aCommand);
 
-        css::uno::Reference< css::frame::XDispatch > xDispatch = xProvider->queryDispatch(aCommand, SPECIALTARGET_SELF, 0);
+        css::uno::Reference< css::frame::XDispatch > xDispatch = xProvider->queryDispatch(aCommand, SPECIAL_SELF, 0);
         if (xDispatch.is())
             xDispatch->dispatch(aCommand, css::uno::Sequence< css::beans::PropertyValue >());
     }

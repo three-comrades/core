@@ -34,7 +34,7 @@ struct AddonStatusbarItemData
 
 struct AddonStatusbarItem
 {
-    rtl::OUString     aCommandURL;
+    rtl::OUString     aActionURL;
     rtl::OUString     aLabel;
     rtl::OUString     aContext;
     StatusBarItemBits nItemBits;

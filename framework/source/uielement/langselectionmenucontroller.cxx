@@ -133,27 +133,27 @@ void LanguageSelectionMenuController::impl_setPopupMenu()
 {
     Reference< XDispatchProvider > xDispatchProvider( m_xFrame, UNO_QUERY );
 
-    css::util::URL aTargetURL;
+    css::util::URL aURL;
 
     // Register for language updates
-    aTargetURL.Complete = m_aLangStatusCommandURL;
-    m_xURLTransformer->parseStrict( aTargetURL );
-    m_xLanguageDispatch = xDispatchProvider->queryDispatch( aTargetURL, OUString(), 0 );
+    aURL.Complete = m_aLangStatusActionURL;
+    m_xURLTransformer->parseStrict( aURL );
+    m_xLanguageDispatch = xDispatchProvider->queryDispatch( aURL, OUString(), 0 );
 
     // Register for setting languages and opening language dialog
-    aTargetURL.Complete = m_aMenuCommandURL_Lang;
-    m_xURLTransformer->parseStrict( aTargetURL );
-    m_xMenuDispatch_Lang = xDispatchProvider->queryDispatch( aTargetURL, OUString(), 0 );
+    aURL.Complete = m_aMenuActionURL_Lang;
+    m_xURLTransformer->parseStrict( aURL );
+    m_xMenuDispatch_Lang = xDispatchProvider->queryDispatch( aURL, OUString(), 0 );
 
     // Register for opening character dialog
-    aTargetURL.Complete = m_aMenuCommandURL_Font;
-    m_xURLTransformer->parseStrict( aTargetURL );
-    m_xMenuDispatch_Font = xDispatchProvider->queryDispatch( aTargetURL, OUString(), 0 );
+    aURL.Complete = m_aMenuActionURL_Font;
+    m_xURLTransformer->parseStrict( aURL );
+    m_xMenuDispatch_Font = xDispatchProvider->queryDispatch( aURL, OUString(), 0 );
 
     // Register for opening character dialog with preselected paragraph
-    aTargetURL.Complete = m_aMenuCommandURL_CharDlgForParagraph;
-    m_xURLTransformer->parseStrict( aTargetURL );
-    m_xMenuDispatch_CharDlgForParagraph = xDispatchProvider->queryDispatch( aTargetURL, OUString(), 0 );
+    aURL.Complete = m_aMenuActionURL_CharDlgForParagraph;
+    m_xURLTransformer->parseStrict( aURL );
+    m_xMenuDispatch_CharDlgForParagraph = xDispatchProvider->queryDispatch( aURL, OUString(), 0 );
 }
 
 void LanguageSelectionMenuController::fillPopupMenu( Reference< css::awt::XPopupMenu >& rPopupMenu , const Mode eMode )
@@ -247,28 +247,28 @@ void SAL_CALL LanguageSelectionMenuController::updatePopupMenu() throw ( css::un
     // Force status update to get information about the current languages
     osl::ClearableMutexGuard aLock( m_aMutex );
     Reference< XDispatch > xDispatch( m_xLanguageDispatch );
-    css::util::URL aTargetURL;
-    aTargetURL.Complete = m_aLangStatusCommandURL;
-    m_xURLTransformer->parseStrict( aTargetURL );
+    css::util::URL aURL;
+    aURL.Complete = m_aLangStatusActionURL;
+    m_xURLTransformer->parseStrict( aURL );
     aLock.clear();
 
     if ( xDispatch.is() )
     {
-        xDispatch->addStatusListener( (static_cast< XStatusListener* >(this)), aTargetURL );
-        xDispatch->removeStatusListener( (static_cast< XStatusListener* >(this)), aTargetURL );
+        xDispatch->addStatusListener( (static_cast< XStatusListener* >(this)), aURL );
+        xDispatch->removeStatusListener( (static_cast< XStatusListener* >(this)), aURL );
     }
 
     // TODO: Fill menu with the information retrieved by the status update
 
-    if ( m_aCommandURL == ".uno:SetLanguageSelectionMenu" )
+    if ( m_aActionURL == ".uno:SetLanguageSelectionMenu" )
     {
         fillPopupMenu(m_xPopupMenu, MODE_SetLanguageSelectionMenu );
     }
-    else if ( m_aCommandURL == ".uno:SetLanguageParagraphMenu" )
+    else if ( m_aActionURL == ".uno:SetLanguageParagraphMenu" )
     {
         fillPopupMenu(m_xPopupMenu, MODE_SetLanguageParagraphMenu );
     }
-    else if ( m_aCommandURL == ".uno:SetLanguageAllTextMenu" )
+    else if ( m_aActionURL == ".uno:SetLanguageAllTextMenu" )
     {
         fillPopupMenu(m_xPopupMenu, MODE_SetLanguageAllTextMenu );
     }
@@ -286,10 +286,10 @@ void SAL_CALL LanguageSelectionMenuController::initialize( const Sequence< Any >
 
         if ( m_bInitialized )
         {
-            m_aLangStatusCommandURL               = ".uno:LanguageStatus";
-            m_aMenuCommandURL_Lang                = m_aLangStatusCommandURL;
-            m_aMenuCommandURL_Font                = ".uno:FontDialog";
-            m_aMenuCommandURL_CharDlgForParagraph = ".uno:FontDialogForParagraph";
+            m_aLangStatusActionURL               = ".uno:LanguageStatus";
+            m_aMenuActionURL_Lang                = m_aLangStatusActionURL;
+            m_aMenuActionURL_Font                = ".uno:FontDialog";
+            m_aMenuActionURL_CharDlgForParagraph = ".uno:FontDialogForParagraph";
         }
     }
 }

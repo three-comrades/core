@@ -23,62 +23,52 @@
 
  module com {  module sun {  module star {  module frame {
 
-/** these types describe the algorithm to be used to search a frame
+/** These constants describe the algorithm to be used to search a frame
 
     <p>
-    Such flags will be used on methods XFrame::findFrame(),
+    These options will be used with methods XFrame::findFrame(),
     XDispatchProvider::queryDispatch() or
-    XComponentLoader::loadComponentFromURL() if no special target
-    frame name (e.g. "_blank", "_self") is used.
+    XComponentLoader::loadComponentFromURL() if no special frame name
+    e.g. "_blank", "_self" is specified.
     </p>
 
     @see XFrame::findFrame()
     @see XDispatchProvider::queryDispatch()
     @see XComponentLoader::loadComponentFromURL()
  */
-published constants FrameSearchFlag
+published constants FrameSearchOption
 {
-    /** no longer supported
-
-        <p>
-        Using of this flag will do nothing. Use right combination of other flags
-        instead of this one.
-        </p>
-
-        @deprecated
-     */
-    const long AUTO = 0;
 
     /** allows search on the parent frames
      */
-    const long PARENT = 1;
+    const long Parent = 1 << 0;
 
-    /** includes the start frame himself
+    /** include the frame himself
      */
-    const long SELF = 2;
+    const long Self = 1 << 1;
 
-        /** includes all child frames of the start frame
+        /** include all child frames
 
             <p>
             Note: That means all direct children and of course her children too.
-                  Search doesn't stop at the next level inside the tree!
+                  Search doesn't stop at the next level inside the tree
             </p>
          */
-    const long CHILDREN = 4;
+    const long Children = 1 << 2;
 
     /** frame will be created if not found
      */
-    const long CREATE = 8;
+    const long Create = 1 << 3;
 
-        /** includes the direct siblings of the start frame
+        /** includes the direct siblings of the frame
 
             <p>
             Normally it's interpreted as search on the direct children of the parent
-            only. But in combination with e.g. the CHILDREN flag it can include all
-            children of it too.
+            only. But in combination with e.g. the Children option it can include all
+            childrens of it too.
             </p>
      */
-    const long SIBLINGS = 16;
+    const long Siblings = 1 << 4;
 
         /** allow the search outside the current sub task tree of the whole possible frame tree
 
@@ -87,23 +77,50 @@ published constants FrameSearchFlag
         will be reached. It doesn't influence a search from top to bottom.
         But it can be used at the root of the frame tree to search on direct children of it only.
         Because the direct children of the root node are the root's of the task sub trees, which
-        are top frames too. Instead of using the CHILDREN flag there, it's possible so to suppress
-        a deeper search so.
+        are top frames too. Instead of using the Children flag there, it's possible to suppress
+        a deeper search.
         </p>
      */
-    const long TASKS = 32;
+    const long Tasks = 1 << 5;
 
         /** includes all frames except frames in other tasks sub trees
-        but doesn't create any new frame
-     */
-    const long ALL = 23;
+            but doesn't create any new frame
+        */
+    const long All = Parent | Self | Children | Siblings;
 
-    /** searches in the whole hierarchy of frames
-        but doesn't create any new frame
+    /** searches in the whole hierarchy of frames but doesn't create any new frame
      */
-    const long GLOBAL = 55;
+    const long Global = All | Tasks;
+
+    const long FullMask = Tasks | Siblings | Create | Children | Self | Parent ;
 };
 
+/*
+    it is left for backward compatibility
+ */
+
+published constants FrameSearchFlag
+{
+    /**
+        <p>
+        Use of this flag does nothing. Choose combination of other flags
+        instead of this one.
+        </p>
+
+        @deprecated
+     */
+    const long AUTO = 0;
+
+    const long PARENT = 1;
+    const long SELF = 2;
+    const long CHILDREN = 4;
+    const long CREATE = 8;
+    const long SIBLINGS = 16;
+    const long TASKS = 32;
+
+    const long ALL = 23;
+    const long GLOBAL = 55;
+};
 
 }; }; }; };
 

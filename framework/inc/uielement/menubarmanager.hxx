@@ -177,7 +177,7 @@ class MenuBarManager : public css::frame::XStatusListener                ,
                              xMenuItemDispatch( rDispatch ) {}
 
             sal_uInt16                                                        nItemId;
-            OUString                                                          aTargetFrame;
+            OUString                                                          aFrame;
             OUString                                                          aMenuItemURL;
             css::uno::Reference< css::frame::XStatusListener >                xSubMenuManager;
             css::uno::Reference< css::frame::XDispatch >                      xMenuItemDispatch;

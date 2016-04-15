@@ -133,7 +133,7 @@ class AcceleratorConfigurationReader : public ::cppu::WeakImplHelper< css::xml::
             throw(css::xml::sax::SAXException,
                   css::uno::RuntimeException, std::exception ) override;
 
-        virtual void SAL_CALL processingInstruction(const OUString& sTarget,
+        virtual void SAL_CALL processingInstruction(const OUString& sRecipient,
                                                     const OUString& sData  )
             throw(css::xml::sax::SAXException,
                   css::uno::RuntimeException, std::exception ) override;

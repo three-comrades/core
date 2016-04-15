@@ -44,7 +44,7 @@ DEFINE_INIT_SERVICE                 (   Oxt_Handler,
                                         }
                                     )
 
-/*-************************************************************************************************************
+/*
     @short      standard ctor
     @descr      These initialize a new instance of this class with needed information for work.
 
@@ -53,15 +53,15 @@ DEFINE_INIT_SERVICE                 (   Oxt_Handler,
     @param      "xFactory", reference to service manager for creation of new services
     @onerror    Show an assertion and do nothing else.
     @threadsafe yes
-*//*-*************************************************************************************************************/
+*/
 Oxt_Handler::Oxt_Handler( const css::uno::Reference< css::lang::XMultiServiceFactory >& xFactory )
         :   m_xFactory          ( xFactory )
 {
 }
 
-/*-************************************************************************************************************
+/*
     @short      standard dtor
-*//*-*************************************************************************************************************/
+*/
 Oxt_Handler::~Oxt_Handler()
 {
     if ( m_xListener.is() )
@@ -73,7 +73,7 @@ Oxt_Handler::~Oxt_Handler()
     }
 }
 
-/*-************************************************************************************************************
+/*
     @interface  css::frame::XDispatch
 
     @short      try to load audio file
@@ -92,7 +92,7 @@ Oxt_Handler::~Oxt_Handler()
     @param      "lArguments", list of optional arguments.
     @onerror    We do nothing.
     @threadsafe yes
-*//*-*************************************************************************************************************/
+*/
 void SAL_CALL Oxt_Handler::dispatchWithNotification( const css::util::URL& aURL,
                                                      const css::uno::Sequence< css::beans::PropertyValue >&            /*lArguments*/,
                                                      const css::uno::Reference< css::frame::XDispatchResultListener >& xListener )
@@ -126,7 +126,7 @@ void SAL_CALL Oxt_Handler::dispatch( const css::util::URL&                      
     dispatchWithNotification( aURL, lArguments, css::uno::Reference< css::frame::XDispatchResultListener >() );
 }
 
-/*-************************************************************************************************************
+/*
     @interface  css::document::XExtendedFilterDetection
 
     @short      try to detect file (given as argument included in "lDescriptor")
@@ -146,7 +146,7 @@ void SAL_CALL Oxt_Handler::dispatch( const css::util::URL&                      
 
     @onerror    We return nothing.
     @threadsafe yes
-*//*-*************************************************************************************************************/
+*/
 OUString SAL_CALL Oxt_Handler::detect( css::uno::Sequence< css::beans::PropertyValue >& lDescriptor )
     throw( css::uno::RuntimeException, std::exception )
 {

@@ -59,7 +59,7 @@ void lcl_ConvertSequenceToValues(
     {
         aPropVal = rSequence[i];
         if ( aPropVal.Name == MERGE_STATUSBAR_URL )
-            aPropVal.Value >>= rItem.aCommandURL;
+            aPropVal.Value >>= rItem.aActionURL;
         else if ( aPropVal.Name == MERGE_STATUSBAR_TITLE )
             aPropVal.Value >>= rItem.aLabel;
         else if ( aPropVal.Name == MERGE_STATUSBAR_CONTEXT )
@@ -103,7 +103,7 @@ void lcl_CreateStatusbarItem( StatusBar* pStatusbar,
                             rAddonItem.nItemBits,
                             STATUSBAR_OFFSET,
                             nPos );
-    pStatusbar->SetItemCommand( nItemId, rAddonItem.aCommandURL );
+    pStatusbar->SetItemCommand( nItemId, rAddonItem.aActionURL );
     pStatusbar->SetQuickHelpText( nItemId, rAddonItem.aLabel );
     pStatusbar->SetAccessibleName( nItemId, rAddonItem.aLabel );
 

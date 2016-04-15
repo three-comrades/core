@@ -531,12 +531,12 @@ void MenuBarManager::RemoveListener()
             MenuItemHandler* pItemHandler = *p;
             if ( pItemHandler->xMenuItemDispatch.is() )
             {
-                URL aTargetURL;
-                aTargetURL.Complete = pItemHandler->aMenuItemURL;
-                m_xURLTransformer->parseStrict( aTargetURL );
+                URL aURL;
+                aURL.Complete = pItemHandler->aMenuItemURL;
+                m_xURLTransformer->parseStrict( aURL );
 
                 pItemHandler->xMenuItemDispatch->removeStatusListener(
-                    static_cast< XStatusListener* >( this ), aTargetURL );
+                    static_cast< XStatusListener* >( this ), aURL );
             }
 
             pItemHandler->xMenuItemDispatch.clear();
@@ -619,17 +619,17 @@ void SAL_CALL MenuBarManager::disposing( const EventObject& Source ) throw ( Run
     if ( pMenuItemDisposing )
     {
         // Release references to the dispatch object
-        URL aTargetURL;
-        aTargetURL.Complete = pMenuItemDisposing->aMenuItemURL;
+        URL aURL;
+        aURL.Complete = pMenuItemDisposing->aMenuItemURL;
 
         // Check reference of service manager before we use it. Reference could
         // be cleared due to RemoveListener call!
         if ( m_xContext.is() )
         {
-            m_xURLTransformer->parseStrict( aTargetURL );
+            m_xURLTransformer->parseStrict( aURL );
 
             pMenuItemDisposing->xMenuItemDispatch->removeStatusListener(
-                static_cast< XStatusListener* >( this ), aTargetURL );
+                static_cast< XStatusListener* >( this ), aURL );
             pMenuItemDisposing->xMenuItemDispatch.clear();
             if ( pMenuItemDisposing->xPopupMenu.is() )
             {
@@ -809,7 +809,7 @@ IMPL_LINK_TYPED( MenuBarManager, Activate, Menu *, pMenu, bool )
             }
         }
 
-        URL aTargetURL;
+        URL aURL;
 
         // Use provided dispatch provider => fallback to frame as dispatch provider
         Reference< XDispatchProvider > xDispatchProvider;
@@ -839,20 +839,20 @@ IMPL_LINK_TYPED( MenuBarManager, Activate, Menu *, pMenu, bool )
                         {
                             Reference< XDispatch > xMenuItemDispatch;
 
-                            aTargetURL.Complete = pMenuItemHandler->aMenuItemURL;
+                            aURL.Complete = pMenuItemHandler->aMenuItemURL;
 
-                            m_xURLTransformer->parseStrict( aTargetURL );
+                            m_xURLTransformer->parseStrict( aURL );
 
                             if ( bHasDisabledEntries )
                             {
-                                if ( aCmdOptions.Lookup( SvtCommandOptions::CMDOPTION_DISABLED, aTargetURL.Path ))
+                                if ( aCmdOptions.Lookup( SvtCommandOptions::CMDOPTION_DISABLED, aURL.Path ))
                                     pMenu->HideItem( pMenuItemHandler->nItemId );
                             }
 
                             if ( m_bIsBookmarkMenu )
-                                xMenuItemDispatch = xDispatchProvider->queryDispatch( aTargetURL, pMenuItemHandler->aTargetFrame, 0 );
+                                xMenuItemDispatch = xDispatchProvider->queryDispatch( aURL, pMenuItemHandler->aRecipientFrame, 0 );
                             else
-                                xMenuItemDispatch = xDispatchProvider->queryDispatch( aTargetURL, OUString(), 0 );
+                                xMenuItemDispatch = xDispatchProvider->queryDispatch( aURL, OUString(), 0 );
 
                             bool bPopupMenu( false );
                             if ( !pMenuItemHandler->xPopupMenuController.is() &&
@@ -874,13 +874,13 @@ IMPL_LINK_TYPED( MenuBarManager, Activate, Menu *, pMenu, bool )
                             if ( xMenuItemDispatch.is() )
                             {
                                 pMenuItemHandler->xMenuItemDispatch = xMenuItemDispatch;
-                                pMenuItemHandler->aMenuItemURL      = aTargetURL.Complete;
+                                pMenuItemHandler->aMenuItemURL      = aURL.Complete;
 
                                 if ( !bPopupMenu )
                                 {
-                                    xMenuItemDispatch->addStatusListener( static_cast< XStatusListener* >( this ), aTargetURL );
+                                    xMenuItemDispatch->addStatusListener( static_cast< XStatusListener* >( this ), aURL );
                                     if ( !m_bHasMenuBar )
-                                        xMenuItemDispatch->removeStatusListener( static_cast< XStatusListener* >( this ), aTargetURL );
+                                        xMenuItemDispatch->removeStatusListener( static_cast< XStatusListener* >( this ), aURL );
                                 }
                             }
                             else if ( !bPopupMenu )
@@ -898,13 +898,13 @@ IMPL_LINK_TYPED( MenuBarManager, Activate, Menu *, pMenu, bool )
                         // We need an update to reflect the current state
                         try
                         {
-                            aTargetURL.Complete = pMenuItemHandler->aMenuItemURL;
-                            m_xURLTransformer->parseStrict( aTargetURL );
+                            aURL.Complete = pMenuItemHandler->aMenuItemURL;
+                            m_xURLTransformer->parseStrict( aURL );
 
                             pMenuItemHandler->xMenuItemDispatch->addStatusListener(
-                                                                    static_cast< XStatusListener* >( this ), aTargetURL );
+                                                                    static_cast< XStatusListener* >( this ), aURL );
                             pMenuItemHandler->xMenuItemDispatch->removeStatusListener(
-                                                                    static_cast< XStatusListener* >( this ), aTargetURL );
+                                                                    static_cast< XStatusListener* >( this ), aURL );
                         }
                         catch ( const Exception& )
                         {
@@ -955,7 +955,7 @@ IMPL_LINK_NOARG_TYPED( MenuBarManager, AsyncSettingsHdl, Timer*, void)
 
 IMPL_LINK_TYPED( MenuBarManager, Select, Menu *, pMenu, bool )
 {
-    URL                     aTargetURL;
+    URL                     aURL;
     Sequence<PropertyValue> aArgs;
     Reference< XDispatch >  xDispatch;
 
@@ -997,8 +997,8 @@ IMPL_LINK_TYPED( MenuBarManager, Select, Menu *, pMenu, bool )
                 MenuItemHandler* pMenuItemHandler = GetMenuItemHandler( nCurItemId );
                 if ( pMenuItemHandler && pMenuItemHandler->xMenuItemDispatch.is() )
                 {
-                    aTargetURL.Complete = pMenuItemHandler->aMenuItemURL;
-                    m_xURLTransformer->parseStrict( aTargetURL );
+                    aURL.Complete = pMenuItemHandler->aMenuItemURL;
+                    m_xURLTransformer->parseStrict( aURL );
 
                     if ( m_bIsBookmarkMenu )
                     {
@@ -1017,7 +1017,7 @@ IMPL_LINK_TYPED( MenuBarManager, Select, Menu *, pMenu, bool )
     if ( xDispatch.is() )
     {
         SolarMutexReleaser aReleaser;
-        xDispatch->dispatch( aTargetURL, aArgs );
+        xDispatch->dispatch( aURL, aArgs );
     }
 
     if ( !m_bHasMenuBar )
@@ -1037,7 +1037,7 @@ bool MenuBarManager::MustBeHidden( PopupMenu* pPopupMenu, const Reference< XURLT
 {
     if ( pPopupMenu )
     {
-        URL               aTargetURL;
+        URL               aURL;
         SvtCommandOptions aCmdOptions;
 
         sal_uInt16 nCount = pPopupMenu->GetItemCount();
@@ -1059,10 +1059,10 @@ bool MenuBarManager::MustBeHidden( PopupMenu* pPopupMenu, const Reference< XURLT
                 }
                 else
                 {
-                    aTargetURL.Complete = pPopupMenu->GetItemCommand( nId );
-                    rTransformer->parseStrict( aTargetURL );
+                    aURL.Complete = pPopupMenu->GetItemCommand( nId );
+                    rTransformer->parseStrict( aURL );
 
-                    if ( aCmdOptions.Lookup( SvtCommandOptions::CMDOPTION_DISABLED, aTargetURL.Path ))
+                    if ( aCmdOptions.Lookup( SvtCommandOptions::CMDOPTION_DISABLED, aURL.Path ))
                         ++nHideCount;
                 }
             }
@@ -1607,7 +1607,7 @@ void MenuBarManager::FillMenu(
      for ( sal_Int32 n = 0; n < rItemContainer->getCount(); n++ )
     {
         Sequence< PropertyValue >       aProp;
-        OUString                   aCommandURL;
+        OUString                   aActionURL;
         OUString                   aLabel;
         OUString                   aHelpURL;
         OUString                   aModuleIdentifier( rModuleIdentifier );
@@ -1625,8 +1625,14 @@ void MenuBarManager::FillMenu(
                 for ( int i = 0; i < aProp.getLength(); i++ )
                 {
                     OUString aPropName = aProp[i].Name;
-                    if ( aPropName == "CommandURL" )
-                        aProp[i].Value >>= aCommandURL;
+                    if ( aPropName == "ActionURL" )
+                        aProp[i].Value >>= aActionURL;
+                    else if ( aPropName == "CommandURL" )
+                    {
+                        SAL_WARN( "framework", "\"CommandURL\" to \"ActionURL\" in MenuBarManager::FillMenu" );
+                        aProp[i].Value >>= aActionURL;
+                        aProp[i].Name = "ActionURL";
+                    }
                     else if ( aPropName == "HelpURL" )
                         aProp[i].Value >>= aHelpURL;
                     else if ( aPropName == "ItemDescriptorContainer" )
@@ -1650,7 +1656,7 @@ void MenuBarManager::FillMenu(
                 if ( nType == css::ui::ItemType::DEFAULT )
                 {
                     pMenu->InsertItem( nId, aLabel );
-                    pMenu->SetItemCommand( nId, aCommandURL );
+                    pMenu->SetItemCommand( nId, aActionURL );
 
                     if ( nStyle )
                     {
@@ -1941,7 +1947,7 @@ void MenuBarManager::Init(const Reference< XFrame >& rFrame,Menu* pAddonMenu,boo
                 if ( pAddonAttributes )
                 {
                     // read additional attributes from attributes struct and AddonMenu implementation will delete all attributes itself!!
-                    pMenuItemHandler->aTargetFrame = pAddonAttributes->aTargetFrame;
+                    pMenuItemHandler->aRecipientFrame = pAddonAttributes->aRecipientFrame;
                 }
 
                 pMenuItemHandler->aMenuItemURL = aItemCommand;

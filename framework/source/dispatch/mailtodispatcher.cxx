@@ -75,8 +75,8 @@ MailToDispatcher::~MailToDispatcher()
                 at the same implementation.
 */
 css::uno::Reference< css::frame::XDispatch > SAL_CALL MailToDispatcher::queryDispatch( const css::util::URL&  aURL    ,
-                                                                                       const OUString& /*sTarget*/ ,
-                                                                                             sal_Int32        /*nFlags*/  ) throw( css::uno::RuntimeException, std::exception )
+                                                                                       const OUString& /*sRecipient*/ ,
+                                                                                             sal_Int32        /*nOptions*/  ) throw( css::uno::RuntimeException, std::exception )
 {
     css::uno::Reference< css::frame::XDispatch > xDispatcher;
     if (aURL.Complete.startsWith("mailto:"))
@@ -96,7 +96,7 @@ css::uno::Sequence< css::uno::Reference< css::frame::XDispatch > > SAL_CALL Mail
         lDispatcher[i] = this->queryDispatch(
                             lDescriptor[i].FeatureURL,
                             lDescriptor[i].FrameName,
-                            lDescriptor[i].SearchFlags);
+                            lDescriptor[i].SearchOptions);
     }
     return lDispatcher;
 }

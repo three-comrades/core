@@ -40,7 +40,7 @@ using namespace com::sun::star::awt;
 // But don't forget to change values of follow defines, if you do something with this enum!
 enum EPROPERTIES
 {
-    HANDLE_COMMANDURL,
+    HANDLE_ACTIONURL,
     HANDLE_HELPURL,
     HANDLE_IMAGE,
     HANDLE_SUBCONTAINER,
@@ -169,8 +169,8 @@ throw( IllegalArgumentException )
 
     switch( nHandle )
     {
-        case HANDLE_COMMANDURL:
-            bReturn = impl_tryToChangeProperty( m_aCommandURL, aValue, aOldValue, aConvertedValue );
+        case HANDLE_ACTIONURL:
+            bReturn = impl_tryToChangeProperty( m_aActionURL, aValue, aOldValue, aConvertedValue );
             break;
 
         case HANDLE_HELPURL:
@@ -203,8 +203,8 @@ throw( Exception, std::exception )
     // Search for right handle ... and try to set property value.
     switch( nHandle )
     {
-        case HANDLE_COMMANDURL:
-            aValue >>= m_aCommandURL;
+        case HANDLE_ACTIONURL:
+            aValue >>= m_aActionURL;
             break;
 
         case HANDLE_HELPURL:
@@ -233,8 +233,8 @@ void SAL_CALL ActionTriggerPropertySet::getFastPropertyValue(
     // Search for right handle ... and try to get property value.
     switch( nHandle )
     {
-        case HANDLE_COMMANDURL:
-            aValue <<= m_aCommandURL;
+        case HANDLE_ACTIONURL:
+            aValue <<= m_aActionURL;
             break;
 
         case HANDLE_HELPURL:
@@ -282,7 +282,7 @@ void SAL_CALL ActionTriggerPropertySet::getFastPropertyValue(
 Reference< XPropertySetInfo > SAL_CALL ActionTriggerPropertySet::getPropertySetInfo()
 throw ( RuntimeException, std::exception )
 {
-    // Optimize this method !
+    // * Optimize this method *
     // We initialize a static variable only one time. And we don't must use a mutex at every call!
     // For the first call; pInfo is NULL - for the second call pInfo is different from NULL!
     static Reference< XPropertySetInfo >* pInfo = nullptr;
@@ -300,24 +300,23 @@ throw ( RuntimeException, std::exception )
         }
     }
 
-    return (*pInfo);
+    return *pInfo;
 }
 
 const Sequence< Property > ActionTriggerPropertySet::impl_getStaticPropertyDescriptor()
 {
     const Property pActionTriggerPropertys[] =
     {
-        Property( OUString( "CommandURL"    ), HANDLE_COMMANDURL   , cppu::UnoType<OUString>::get(), PropertyAttribute::TRANSIENT  ),
-        Property( OUString( "HelpURL"       ), HANDLE_HELPURL      , cppu::UnoType<OUString>::get(), PropertyAttribute::TRANSIENT  ),
-        Property( OUString( "Image"         ), HANDLE_IMAGE     , cppu::UnoType<XBitmap>::get(), PropertyAttribute::TRANSIENT  ),
-        Property( OUString( "SubContainer"  ), HANDLE_SUBCONTAINER , cppu::UnoType<OUString>::get(), PropertyAttribute::TRANSIENT  ),
-        Property( OUString( "Text"          ), HANDLE_TEXT         , cppu::UnoType<XInterface>::get(), PropertyAttribute::TRANSIENT  )
+        Property(  OUString( "ActionURL" ), HANDLE_ACTIONURL, cppu::UnoType<OUString>::get(), PropertyAttribute::TRANSIENT  ),
+        Property(  OUString( "HelpURL" ), HANDLE_HELPURL, cppu::UnoType<OUString>::get(), PropertyAttribute::TRANSIENT  ),
+        Property(  OUString( "Image" ), HANDLE_IMAGE, cppu::UnoType<XBitmap>::get(), PropertyAttribute::TRANSIENT  ),
+        Property(  OUString( "SubContainer" ), HANDLE_SUBCONTAINER, cppu::UnoType<OUString>::get(), PropertyAttribute::TRANSIENT  ),
+        Property(  OUString( "Text" ), HANDLE_TEXT, cppu::UnoType<XInterface>::get(), PropertyAttribute::TRANSIENT  )
     };
 
-    // Use it to initialize sequence!
+    // Use it to initialize sequence
     const Sequence< Property > seqActionTriggerPropertyDescriptor( pActionTriggerPropertys, PROPERTYCOUNT );
 
-    // Return "PropertyDescriptor"
     return seqActionTriggerPropertyDescriptor;
 }
 
@@ -331,7 +330,7 @@ throw( IllegalArgumentException )
     // Set default return value if method failed.
     bool bReturn = false;
     // Get new value from any.
-    // IllegalArgumentException() can be thrown!
+    // IllegalArgumentException() can be thrown
     OUString sValue;
     convertPropertyValue( sValue, aNewValue );
 
@@ -346,7 +345,7 @@ throw( IllegalArgumentException )
     }
     else
     {
-        // ... clear information of return parameter!
+        // ... clear information of return parameter
         aOldValue.clear         ();
         aConvertedValue.clear   ();
         // Return NOTHING - "value will not be change ..."

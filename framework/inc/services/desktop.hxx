@@ -66,7 +66,7 @@ enum ELoadState
     E_INTERACTION
 };
 
-/*-************************************************************************************************************
+/*
     @short      implement the topframe of frame tree
     @descr      This is the root of the frame tree. The desktop has no window, is not visible but he is the logical
                 "masternode" to build the hierarchy.
@@ -90,7 +90,7 @@ enum ELoadState
 
     @devstatus  ready to use
     @threadsafe yes
-*//*-*************************************************************************************************************/
+*/
 typedef cppu::WeakComponentImplHelper<
            css::lang::XServiceInfo              ,
            css::frame::XDesktop2                ,
@@ -219,8 +219,8 @@ class Desktop : private cppu::BaseMutex,
 
         //  XComponentLoader
         virtual css::uno::Reference< css::lang::XComponent >                        SAL_CALL loadComponentFromURL       ( const OUString&                                         sURL             ,
-                                                                                                                          const OUString&                                         sTargetFrameName ,
-                                                                                                                                sal_Int32                                                nSearchFlags     ,
+                                                                                                                          const OUString&                                         sRecipientFrameName ,
+                                                                                                                                sal_Int32                                                nSearchOptions     ,
                                                                                                                           const css::uno::Sequence< css::beans::PropertyValue >&         lArguments       ) throw( css::io::IOException                ,
                                                                                                                                                                                                                    css::lang::IllegalArgumentException ,
                                                                                                                                                                                                                    css::uno::RuntimeException, std::exception          ) override;
@@ -231,8 +231,8 @@ class Desktop : private cppu::BaseMutex,
 
         //  XDispatchProvider
         virtual css::uno::Reference< css::frame::XDispatch >                        SAL_CALL queryDispatch              ( const css::util::URL&                                          aURL             ,
-                                                                                                                          const OUString&                                         sTargetFrameName ,
-                                                                                                                                sal_Int32                                                nSearchFlags     ) throw( css::uno::RuntimeException, std::exception          ) override;
+                                                                                                                          const OUString&                                         sRecipientFrameName ,
+                                                                                                                                sal_Int32                                                nSearchOptions     ) throw( css::uno::RuntimeException, std::exception          ) override;
         virtual css::uno::Sequence< css::uno::Reference< css::frame::XDispatch > >  SAL_CALL queryDispatches            ( const css::uno::Sequence< css::frame::DispatchDescriptor >&    lQueries         ) throw( css::uno::RuntimeException, std::exception          ) override;
 
         // XDispatchProviderInterception
@@ -246,8 +246,8 @@ class Desktop : private cppu::BaseMutex,
 
         //   XFrame
         //  Attention: findFrame() is implemented only! Other methods make no sense for our desktop!
-        virtual css::uno::Reference< css::frame::XFrame >                           SAL_CALL findFrame                  ( const OUString&                                         sTargetFrameName ,
-                                                                                                                                sal_Int32                                                nSearchFlags     ) throw( css::uno::RuntimeException, std::exception          ) override;
+        virtual css::uno::Reference< css::frame::XFrame >                           SAL_CALL findFrame                  ( const OUString&                                         sRecipientFrameName ,
+                                                                                                                                sal_Int32                                                nSearchOptions     ) throw( css::uno::RuntimeException, std::exception          ) override;
         virtual void                                                                SAL_CALL initialize                 ( const css::uno::Reference< css::awt::XWindow >&                xWindow          ) throw( css::uno::RuntimeException, std::exception          ) override;
         virtual css::uno::Reference< css::awt::XWindow >                            SAL_CALL getContainerWindow         (                                                                                 ) throw( css::uno::RuntimeException, std::exception          ) override;
         virtual void                                                                SAL_CALL setCreator                 ( const css::uno::Reference< css::frame::XFramesSupplier >&      xCreator         ) throw( css::uno::RuntimeException, std::exception          ) override;
@@ -408,7 +408,7 @@ class Desktop : private cppu::BaseMutex,
         css::uno::Reference< css::frame::XFrames >                      m_xFramesHelper;          /// helper for XFrames, XIndexAccess, XElementAccess and implementation of a childcontainer!
         css::uno::Reference< css::frame::XDispatchProvider >            m_xDispatchHelper;        /// helper to dispatch something for new tasks, created by "_blank"!
         ELoadState                                                      m_eLoadState;             /// hold information about state of asynchron loading of component for loadComponentFromURL()!
-        css::uno::Reference< css::frame::XFrame >                       m_xLastFrame;             /// last target of "loadComponentFromURL()"!
+        css::uno::Reference< css::frame::XFrame >                       m_xLastFrame;             /// last frame of loadComponentFromURL()
         css::uno::Any                                                   m_aInteractionRequest;
         bool                                                            m_bSuspendQuickstartVeto; /// don't ask quickstart for a veto
         std::unique_ptr<SvtCommandOptions>                              m_xCommandOptions;        /// ref counted class to support disabling commands defined by configuration file

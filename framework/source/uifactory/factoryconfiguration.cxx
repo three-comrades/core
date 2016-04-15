@@ -44,9 +44,9 @@ using namespace com::sun::star::container;
 
 namespace framework
 {
-OUString getHashKeyFromStrings( const OUString& aCommandURL, const OUString& aModuleName )
+OUString getHashKeyFromStrings( const OUString& aActionURL, const OUString& aModuleName )
 {
-    OUStringBuffer aKey( aCommandURL );
+    OUStringBuffer aKey( aActionURL );
     aKey.append( "-" );
     aKey.append( aModuleName );
     return aKey.makeStringAndClear();
@@ -74,17 +74,17 @@ ConfigurationAccess_ControllerFactory::~ConfigurationAccess_ControllerFactory()
         xContainer->removeContainerListener(m_xConfigAccessListener);
 }
 
-OUString ConfigurationAccess_ControllerFactory::getServiceFromCommandModule( const OUString& rCommandURL, const OUString& rModule ) const
+OUString ConfigurationAccess_ControllerFactory::getServiceFromCommandModule( const OUString& rActionURL, const OUString& rModule ) const
 {
     osl::MutexGuard g(m_mutex);
-    MenuControllerMap::const_iterator pIter = m_aMenuControllerMap.find( getHashKeyFromStrings( rCommandURL, rModule ));
+    MenuControllerMap::const_iterator pIter = m_aMenuControllerMap.find( getHashKeyFromStrings( rActionURL, rModule ));
 
     if ( pIter != m_aMenuControllerMap.end() )
         return pIter->second.m_aImplementationName;
     else if ( !rModule.isEmpty() )
     {
         // Try to detect if we have a generic popup menu controller
-        pIter = m_aMenuControllerMap.find( getHashKeyFromStrings( rCommandURL, OUString() ));
+        pIter = m_aMenuControllerMap.find( getHashKeyFromStrings( rActionURL, OUString() ));
 
         if ( pIter != m_aMenuControllerMap.end() )
             return pIter->second.m_aImplementationName;
@@ -92,18 +92,19 @@ OUString ConfigurationAccess_ControllerFactory::getServiceFromCommandModule( con
 
     return OUString();
 }
-OUString ConfigurationAccess_ControllerFactory::getValueFromCommandModule( const OUString& rCommandURL, const OUString& rModule ) const
+
+OUString ConfigurationAccess_ControllerFactory::getValueFromCommandModule( const OUString& rActionURL, const OUString& rModule ) const
 {
     osl::MutexGuard g(m_mutex);
 
-    MenuControllerMap::const_iterator pIter = m_aMenuControllerMap.find( getHashKeyFromStrings( rCommandURL, rModule ));
+    MenuControllerMap::const_iterator pIter = m_aMenuControllerMap.find( getHashKeyFromStrings( rActionURL, rModule ));
 
     if ( pIter != m_aMenuControllerMap.end() )
         return pIter->second.m_aValue;
     else if ( !rModule.isEmpty() )
     {
         // Try to detect if we have a generic popup menu controller
-        pIter = m_aMenuControllerMap.find( getHashKeyFromStrings( rCommandURL, OUString() ));
+        pIter = m_aMenuControllerMap.find( getHashKeyFromStrings( rActionURL, OUString() ));
 
         if ( pIter != m_aMenuControllerMap.end() )
             return pIter->second.m_aValue;
@@ -113,23 +114,23 @@ OUString ConfigurationAccess_ControllerFactory::getValueFromCommandModule( const
 }
 
 void ConfigurationAccess_ControllerFactory::addServiceToCommandModule(
-    const OUString& rCommandURL,
+    const OUString& rActionURL,
     const OUString& rModule,
     const OUString& rServiceSpecifier )
 {
     osl::MutexGuard g(m_mutex);
 
-    OUString aHashKey = getHashKeyFromStrings( rCommandURL, rModule );
+    OUString aHashKey = getHashKeyFromStrings( rActionURL, rModule );
     m_aMenuControllerMap.insert( MenuControllerMap::value_type( aHashKey,ControllerInfo(rServiceSpecifier,OUString()) ));
 }
 
 void ConfigurationAccess_ControllerFactory::removeServiceFromCommandModule(
-    const OUString& rCommandURL,
+    const OUString& rActionURL,
     const OUString& rModule )
 {
     osl::MutexGuard g(m_mutex);
 
-    OUString aHashKey = getHashKeyFromStrings( rCommandURL, rModule );
+    OUString aHashKey = getHashKeyFromStrings( rActionURL, rModule );
     m_aMenuControllerMap.erase( aHashKey );
 }
 

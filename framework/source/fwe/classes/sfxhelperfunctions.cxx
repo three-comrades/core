@@ -43,7 +43,7 @@ pfunc_setToolBoxControllerCreator SAL_CALL SetToolBoxControllerCreator( pfunc_se
     return pOldSetToolBoxControllerCreator;
 }
 
-svt::ToolboxController* SAL_CALL CreateToolBoxController( const Reference< XFrame >& rFrame, ToolBox* pToolbox, unsigned short nID, const OUString& aCommandURL )
+svt::ToolboxController* SAL_CALL CreateToolBoxController( const Reference< XFrame >& rFrame, ToolBox* pToolbox, unsigned short nID, const OUString& aActionURL )
 {
     pfunc_setToolBoxControllerCreator pFactory = nullptr;
     {
@@ -52,7 +52,7 @@ svt::ToolboxController* SAL_CALL CreateToolBoxController( const Reference< XFram
     }
 
     if ( pFactory )
-        return (*pFactory)( rFrame, pToolbox, nID, aCommandURL );
+        return (*pFactory)( rFrame, pToolbox, nID, aActionURL );
     else
         return nullptr;
 }
@@ -65,7 +65,7 @@ pfunc_setStatusBarControllerCreator SAL_CALL SetStatusBarControllerCreator( pfun
     return pOldSetStatusBarControllerCreator;
 }
 
-svt::StatusbarController* SAL_CALL CreateStatusBarController( const Reference< XFrame >& rFrame, StatusBar* pStatusBar, unsigned short nID, const OUString& aCommandURL )
+svt::StatusbarController* SAL_CALL CreateStatusBarController( const Reference< XFrame >& rFrame, StatusBar* pStatusBar, unsigned short nID, const OUString& aActionURL )
 {
     pfunc_setStatusBarControllerCreator pFactory = nullptr;
     {
@@ -74,7 +74,7 @@ svt::StatusbarController* SAL_CALL CreateStatusBarController( const Reference< X
     }
 
     if ( pFactory )
-        return (*pFactory)( rFrame, pStatusBar, nID, aCommandURL );
+        return (*pFactory)( rFrame, pStatusBar, nID, aActionURL );
     else
         return nullptr;
 }

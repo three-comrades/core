@@ -151,10 +151,10 @@ void SAL_CALL SaxNamespaceFilter::ignorableWhitespace(const OUString& aWhitespac
 }
 
 void SAL_CALL SaxNamespaceFilter::processingInstruction(
-    const OUString& aTarget, const OUString& aData)
+    const OUString& aRecipient, const OUString& aData )
     throw(  SAXException, RuntimeException, std::exception )
 {
-    xDocumentHandler->processingInstruction( aTarget, aData );
+    xDocumentHandler->processingInstruction( aRecipient, aData );
 }
 
 void SAL_CALL SaxNamespaceFilter::setDocumentLocator(

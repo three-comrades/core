@@ -30,7 +30,7 @@ static const char MERGE_TOOLBAR_URL[]             = "URL";
 static const char MERGE_TOOLBAR_TITLE[]           = "Title";
 static const char MERGE_TOOLBAR_IMAGEID[]         = "ImageIdentifier";
 static const char MERGE_TOOLBAR_CONTEXT[]         = "Context";
-static const char MERGE_TOOLBAR_TARGET[]          = "Target";
+static const char MERGE_TOOLBAR_RECIPIENT[]       = "Recipient";
 static const char MERGE_TOOLBAR_CONTROLTYPE[]     = "ControlType";
 static const char MERGE_TOOLBAR_WIDTH[]           = "Width";
 
@@ -115,10 +115,10 @@ bool ToolBarMerger::ConvertSeqSeqToVector(
     {
         AddonToolbarItem aAddonToolbarItem;
         ConvertSequenceToValues( rSequence[i],
-                                 aAddonToolbarItem.aCommandURL,
+                                 aAddonToolbarItem.aActionURL,
                                  aAddonToolbarItem.aLabel,
                                  aAddonToolbarItem.aImageIdentifier,
-                                 aAddonToolbarItem.aTarget,
+                                 aAddonToolbarItem.aRecipient,
                                  aAddonToolbarItem.aContext,
                                  aAddonToolbarItem.aControlType,
                                  aAddonToolbarItem.nWidth );
@@ -138,10 +138,10 @@ bool ToolBarMerger::ConvertSeqSeqToVector(
      Provides a sequence of property values.
 
  @param
-     rCommandURL
+     rActionURL
 
      Contains the value of the property with
-     Name="CommandURL".
+     Name="ActionURL".
 
  @param
      rLabel
@@ -156,10 +156,10 @@ bool ToolBarMerger::ConvertSeqSeqToVector(
      Name="ImageIdentifier"
 
  @param
-     rTarget
+     rRecipient
 
      Contains the value of the property with
-     Name="Target"
+     Name="Recipient"
 
  @param
      rContext
@@ -180,10 +180,10 @@ bool ToolBarMerger::ConvertSeqSeqToVector(
 */
 void ToolBarMerger::ConvertSequenceToValues(
     const uno::Sequence< beans::PropertyValue >& rSequence,
-    OUString& rCommandURL,
+    OUString& rActionURL,
     OUString& rLabel,
     OUString& rImageIdentifier,
-    OUString& rTarget,
+    OUString& rRecipient,
     OUString& rContext,
     OUString& rControlType,
     sal_uInt16& rWidth )
@@ -191,22 +191,28 @@ void ToolBarMerger::ConvertSequenceToValues(
     for ( sal_Int32 i = 0; i < rSequence.getLength(); i++ )
     {
         if ( rSequence[i].Name == MERGE_TOOLBAR_URL )
-            rSequence[i].Value >>= rCommandURL;
+            rSequence[i].Value >>= rActionURL;
         else if ( rSequence[i].Name == MERGE_TOOLBAR_TITLE )
             rSequence[i].Value >>= rLabel;
         else if ( rSequence[i].Name == MERGE_TOOLBAR_IMAGEID )
             rSequence[i].Value >>= rImageIdentifier;
         else if ( rSequence[i].Name == MERGE_TOOLBAR_CONTEXT )
             rSequence[i].Value >>= rContext;
-        else if ( rSequence[i].Name == MERGE_TOOLBAR_TARGET )
-            rSequence[i].Value >>= rTarget;
+        else if ( rSequence[i].Name == MERGE_TOOLBAR_RECIPIENT )
+            rSequence[i].Value >>= rRecipient;
+        else if ( rSequence[i].Name == "Target" )
+        {
+            SAL_WARN( "framework", "\"Target\" into \"Recipient\" in ToolBarMerger" );
+            rSequence[i].Value >>= rRecipient;
+            rSequence[i].Name = MERGE_TOOLBAR_RECIPIENT;
+        }
         else if ( rSequence[i].Name == MERGE_TOOLBAR_CONTROLTYPE )
             rSequence[i].Value >>= rControlType;
         else if ( rSequence[i].Name == MERGE_TOOLBAR_WIDTH )
         {
             sal_Int32 aValue = 0;
             rSequence[i].Value >>= aValue;
-            rWidth = sal_uInt16( aValue );
+            rWidth = static_cast< sal_uInt16 >( aValue );
         }
     }
 }
@@ -454,16 +460,16 @@ bool ToolBarMerger::MergeItems(
             if ( nInsPos > sal_Int32( pToolbar->GetItemCount() ))
                 nInsPos = TOOLBOX_APPEND;
 
-            if ( rItem.aCommandURL == TOOLBOXITEM_SEPARATOR_STR )
+            if ( rItem.aActionURL == TOOLBOXITEM_SEPARATOR_STR )
                 pToolbar->InsertSeparator( sal_uInt16( nInsPos ));
             else
             {
-                CommandToInfoMap::iterator pIter = rCommandMap.find( rItem.aCommandURL );
+                CommandToInfoMap::iterator pIter = rCommandMap.find( rItem.aActionURL );
                 if ( pIter == rCommandMap.end())
                 {
                     CommandInfo aCmdInfo;
                     aCmdInfo.nId = rItemId;
-                    const CommandToInfoMap::value_type aValue( rItem.aCommandURL, aCmdInfo );
+                    const CommandToInfoMap::value_type aValue( rItem.aActionURL, aCmdInfo );
                     rCommandMap.insert( aValue );
                 }
                 else
@@ -602,7 +608,7 @@ bool ToolBarMerger::RemoveItems(
     const uno::Reference< uno::XComponentContext >& rxContext,
     const uno::Reference< frame::XFrame > & xFrame,
     ToolBox*               pToolbar,
-    const OUString& rCommandURL,
+    const OUString& rActionURL,
     sal_uInt16             nId,
     sal_uInt16             nWidth,
     const OUString& rControlType )
@@ -610,25 +616,25 @@ bool ToolBarMerger::RemoveItems(
     ::cppu::OWeakObject* pResult( nullptr );
 
     if ( rControlType == TOOLBARCONTROLLER_BUTTON )
-        pResult = new ButtonToolbarController( rxContext, pToolbar, rCommandURL );
+        pResult = new ButtonToolbarController( rxContext, pToolbar, rActionURL );
     else if ( rControlType == TOOLBARCONTROLLER_COMBOBOX )
-        pResult = new ComboboxToolbarController( rxContext, xFrame, pToolbar, nId, nWidth, rCommandURL );
+        pResult = new ComboboxToolbarController( rxContext, xFrame, pToolbar, nId, nWidth, rActionURL );
     else if ( rControlType == TOOLBARCONTROLLER_EDIT )
-        pResult = new EditToolbarController( rxContext, xFrame, pToolbar, nId, nWidth, rCommandURL );
+        pResult = new EditToolbarController( rxContext, xFrame, pToolbar, nId, nWidth, rActionURL );
     else if ( rControlType == TOOLBARCONTROLLER_SPINFIELD )
-        pResult = new SpinfieldToolbarController( rxContext, xFrame, pToolbar, nId, nWidth, rCommandURL );
+        pResult = new SpinfieldToolbarController( rxContext, xFrame, pToolbar, nId, nWidth, rActionURL );
     else if ( rControlType == TOOLBARCONTROLLER_IMGBUTTON )
-        pResult = new ImageButtonToolbarController( rxContext, xFrame, pToolbar, nId, rCommandURL );
+        pResult = new ImageButtonToolbarController( rxContext, xFrame, pToolbar, nId, rActionURL );
     else if ( rControlType == TOOLBARCONTROLLER_DROPDOWNBOX )
-        pResult = new DropdownToolbarController( rxContext, xFrame, pToolbar, nId, nWidth, rCommandURL );
+        pResult = new DropdownToolbarController( rxContext, xFrame, pToolbar, nId, nWidth, rActionURL );
     else if ( rControlType == TOOLBARCONTROLLER_DROPDOWNBTN )
         pResult = new ToggleButtonToolbarController( rxContext, xFrame, pToolbar, nId,
-                                                     ToggleButtonToolbarController::STYLE_DROPDOWNBUTTON, rCommandURL );
+                                                     ToggleButtonToolbarController::STYLE_DROPDOWNBUTTON, rActionURL );
     else if ( rControlType == TOOLBARCONTROLLER_TOGGLEDDBTN )
         pResult = new ToggleButtonToolbarController( rxContext, xFrame, pToolbar, nId,
-                                                     ToggleButtonToolbarController::STYLE_TOGGLE_DROPDOWNBUTTON, rCommandURL );
+                                                     ToggleButtonToolbarController::STYLE_TOGGLE_DROPDOWNBUTTON, rActionURL );
     else
-        pResult = new GenericToolbarController( rxContext, xFrame, pToolbar, nId, rCommandURL );
+        pResult = new GenericToolbarController( rxContext, xFrame, pToolbar, nId, rActionURL );
 
     return pResult;
 }
@@ -636,7 +642,7 @@ bool ToolBarMerger::RemoveItems(
 void ToolBarMerger::CreateToolbarItem( ToolBox* pToolbar, sal_uInt16 nPos, sal_uInt16 nItemId, const AddonToolbarItem& rItem )
 {
     pToolbar->InsertItem( nItemId, rItem.aLabel, ToolBoxItemBits::NONE, nPos );
-    pToolbar->SetItemCommand( nItemId, rItem.aCommandURL );
+    pToolbar->SetItemCommand( nItemId, rItem.aActionURL );
     pToolbar->SetQuickHelpText( nItemId, rItem.aLabel );
     pToolbar->SetItemText( nItemId, rItem.aLabel );
     pToolbar->EnableItem( nItemId );
@@ -645,7 +651,7 @@ void ToolBarMerger::CreateToolbarItem( ToolBox* pToolbar, sal_uInt16 nPos, sal_u
     // Use the user data to store add-on specific data with the toolbar item
     AddonsParams* pAddonParams = new AddonsParams;
     pAddonParams->aImageId     = rItem.aImageIdentifier;
-    pAddonParams->aTarget      = rItem.aTarget;
+    pAddonParams->aRecipient   = rItem.aRecipient;
     pAddonParams->aControlType = rItem.aControlType;
     pAddonParams->nWidth       = rItem.nWidth;
     pToolbar->SetItemData( nItemId, pAddonParams );

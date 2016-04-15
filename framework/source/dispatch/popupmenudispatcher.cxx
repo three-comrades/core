@@ -160,8 +160,8 @@ throw( css::uno::Exception, css::uno::RuntimeException, std::exception)
 css::uno::Reference< css::frame::XDispatch >
 SAL_CALL PopupMenuDispatcher::queryDispatch(
     const css::util::URL&  rURL    ,
-    const OUString& sTarget ,
-    sal_Int32              nFlags  )
+    const OUString& sRecipient ,
+    sal_Int32              nOptions  )
 throw( css::uno::RuntimeException, std::exception )
 {
     css::uno::Reference< css::frame::XDispatch > xDispatch;
@@ -207,7 +207,7 @@ throw( css::uno::RuntimeException, std::exception )
 
                 // Ask popup menu dispatch provider for dispatch object
                 if ( xDispatchProvider.is() )
-                    xDispatch = xDispatchProvider->queryDispatch( rURL, sTarget, nFlags );
+                    xDispatch = xDispatchProvider->queryDispatch( rURL, sRecipient, nOptions );
             }
             catch ( const RuntimeException& )
             {
@@ -233,7 +233,7 @@ throw( css::uno::RuntimeException, std::exception )
         lDispatcher[i] = this->queryDispatch(
                             lDescriptor[i].FeatureURL,
                             lDescriptor[i].FrameName,
-                            lDescriptor[i].SearchFlags);
+                            lDescriptor[i].SearchOptions);
     }
     return lDispatcher;
 }

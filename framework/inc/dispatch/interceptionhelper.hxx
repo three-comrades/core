@@ -182,32 +182,31 @@ class InterceptionHelper : public  ::cppu::WeakImplHelper<
             @param  aURL
                         describes the requested dispatch functionality.
 
-            @param  sTargetFrameName
-                        the name of the target frame or a special name like "_blank", "_top" ...
+            @param  sRecipientFrameName
+                        the name of the recipient frame or a special name like "_blank", "_top" ...
                         Won't be used here ... but may by one of our registered interceptor objects
                         or our slave.
 
-            @param  nSearchFlags
-                        optional search parameter for targeting, if sTargetFrameName isn't a special one.
+            @param  nSearchOptions
+                        optional parameter to look if sRecipientFrameName is a special one
 
             @return A valid dispatch object, if any interceptor or at least our slave is interested on the given URL;
                     or NULL otherwise.
          */
-        virtual css::uno::Reference< css::frame::XDispatch > SAL_CALL queryDispatch(const css::util::URL&  aURL            ,
-                                                                                    const OUString& sTargetFrameName,
-                                                                                          sal_Int32        nSearchFlags    )
+        virtual css::uno::Reference< css::frame::XDispatch > SAL_CALL queryDispatch(const css::util::URL&  aURL,
+                                                                                    const OUString& sRecipientFrameName,
+                                                                                          sal_Int32        nSearchOptions    )
             throw(css::uno::RuntimeException, std::exception) override;
 
         // XDispatchProvider
 
         /** @short implements an optimized queryDispatch() for remote.
 
-            @descr It capsulate more than one queryDispatch() requests and return a lits of dispatch objects
-                   as result. Because both lists (in and out) correspond together, it's not allowed to
-                   pack it - means suppress NULL references!
+            @descr It capsulates more than one queryDispatch() requests and return a lits of dispatch objects.
+                   Because both lists (in and out) correspond together, it wouldn't pack them - means suppress null-references
 
             @param lDescriptor
-                    a list of queryDispatch() arguments.
+                    a list of queryDispatch() arguments
 
             @return A list of dispatch objects.
          */
@@ -219,15 +218,13 @@ class InterceptionHelper : public  ::cppu::WeakImplHelper<
         /** @short      register an interceptor.
 
             @descr      Somebody can register himself to intercept all or some special dispatches.
-                        It's depend from his supported interfaces. If he implement XInterceptorInfo
-                        he his called for some special URLs only - otherwise we call it for every request!
-
-            @attention  We don't check for double registrations here!
+                        It depends on its supported interfaces. If it implements XInterceptorInfo
+                        it is called for special URLs only and otherwise for every one
 
             @param      xInterceptor
                         reference to interceptor, which wish to be registered here.
 
-            @throw      A RuntimeException if the given reference is NULL!
+            @throw      A RuntimeException if the given reference is null
          */
         virtual void SAL_CALL registerDispatchProviderInterceptor(const css::uno::Reference< css::frame::XDispatchProviderInterceptor >& xInterceptor)
             throw(css::uno::RuntimeException, std::exception) override;

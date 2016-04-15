@@ -20,7 +20,7 @@
 #include <helper/persistentwindowstate.hxx>
 #include <helper/tagwindowasmodified.hxx>
 #include <helper/titlebarupdate.hxx>
-#include <loadenv/targethelper.hxx>
+#include <loadenv/deliveryhelper.hxx>
 #include <taskcreatordefs.hxx>
 
 #include <com/sun/star/frame/Frame.hpp>
@@ -141,18 +141,18 @@ css::uno::Reference< css::uno::XInterface > SAL_CALL TaskCreatorService::createI
     OUString                           sFrameName                    = lArgs.getUnpackedValueOrDefault(ARGUMENT_FRAMENAME                    , OUString()                          );
     bool                                  bVisible                      = lArgs.getUnpackedValueOrDefault(ARGUMENT_MAKEVISIBLE                  , false );
     bool                                  bCreateTopWindow              = lArgs.getUnpackedValueOrDefault(ARGUMENT_CREATETOPWINDOW              , true );
-    // only possize=[0,0,0,0] triggers default handling of vcl !
+    // only possize=[0,0,0,0] triggers default handling of vcl
     css::awt::Rectangle                       aPosSize                      = lArgs.getUnpackedValueOrDefault(ARGUMENT_POSSIZE                      , css::awt::Rectangle(0, 0, 0, 0)            );
     css::uno::Reference< css::awt::XWindow >  xContainerWindow              = lArgs.getUnpackedValueOrDefault(ARGUMENT_CONTAINERWINDOW              , css::uno::Reference< css::awt::XWindow >() );
     bool                                  bSupportPersistentWindowState = lArgs.getUnpackedValueOrDefault(ARGUMENT_SUPPORTPERSISTENTWINDOWSTATE , false );
     bool                                  bEnableTitleBarUpdate         = lArgs.getUnpackedValueOrDefault(ARGUMENT_ENABLE_TITLEBARUPDATE        , true );
 
-    // We use FrameName property to set it as API name of the new created frame later.
-    // But those frame names must be different from the set of special target names as e.g. _blank, _self etcpp !
+    // We use FrameName property to set it as API name of the fresh created frame later.
+    // But those names are different from the set of special cases like _blank, _self etc.
     OUString sRightName = impl_filterNames(sFrameName);
 
-    // if no external frame window was given ... create a new one.
-    if ( ! xContainerWindow.is())
+    // if no external frame window was given ... create a new one
+    if ( ! xContainerWindow.is() )
     {
         css::uno::Reference< css::awt::XWindow > xParentWindow;
         if (xParentFrame.is())
@@ -358,7 +358,7 @@ void TaskCreatorService::implts_establishTitleBarUpdate( const css::uno::Referen
 OUString TaskCreatorService::impl_filterNames( const OUString& sName )
 {
     OUString sFiltered;
-    if (TargetHelper::isValidNameForFrame(sName))
+    if ( DeliveryHelper::isValidNameForFrame(sName) )
         sFiltered = sName;
     return sFiltered;
 }

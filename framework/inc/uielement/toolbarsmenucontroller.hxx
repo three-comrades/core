@@ -73,10 +73,10 @@ namespace framework
             // XEventListener
             virtual void SAL_CALL disposing( const css::lang::EventObject& Source ) throw ( css::uno::RuntimeException, std::exception ) override;
 
-            struct ExecuteInfo
+            struct GoInfo
             {
-                css::uno::Reference< css::frame::XDispatch >     xDispatch;
-                css::util::URL                                                aTargetURL;
+                css::uno::Reference< css::frame::XDispatch >  xDispatch;
+                css::util::URL  aRecipientURL;
                 css::uno::Sequence< css::beans::PropertyValue >  aArgs;
             };
 
@@ -85,8 +85,8 @@ namespace framework
         private:
             void fillPopupMenu( css::uno::Reference< css::awt::XPopupMenu >& rPopupMenu );
             css::uno::Sequence< css::uno::Sequence< css::beans::PropertyValue > > getLayoutManagerToolbars( const css::uno::Reference< css::frame::XLayoutManager >& rLayoutManager );
-            css::uno::Reference< css::frame::XDispatch > getDispatchFromCommandURL( const OUString& rCommandURL );
-            void addCommand( css::uno::Reference< css::awt::XPopupMenu >& rPopupMenu, const OUString& rCommandURL, const OUString& aLabel );
+            css::uno::Reference< css::frame::XDispatch > getDispatchFromActionURL( const OUString& rActionURL );
+            void addCommand( css::uno::Reference< css::awt::XPopupMenu >& rPopupMenu, const OUString& rActionURL, const OUString& aLabel );
             bool isContextSensitiveToolbarNonVisible() { return m_bResetActive;}
 
             css::uno::Reference< css::uno::XComponentContext >        m_xContext;

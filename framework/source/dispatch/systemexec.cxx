@@ -80,7 +80,7 @@ css::uno::Sequence< css::uno::Reference< css::frame::XDispatch > > SAL_CALL Syst
         lDispatcher[i] = this->queryDispatch(
                             lDescriptor[i].FeatureURL,
                             lDescriptor[i].FrameName,
-                            lDescriptor[i].SearchFlags);
+                            lDescriptor[i].SearchOptions);
     }
     return lDispatcher;
 }

@@ -21,7 +21,6 @@
 
 #include <loadenv/loadenv.hxx>
 
-#include <loadenv/targethelper.hxx>
 #include <pattern/frame.hxx>
 
 #include <classes/resource.hrc>
@@ -217,8 +216,8 @@ public:
     enum EFailureSafeResult
     {
         E_COPIED,
-        E_ORIGINAL_FILE_MISSING,
-        E_WRONG_TARGET_PATH
+        E_ORIGINAL_FILE_IS_ABSENT,
+        E_RECIPIENT_PATH_DOES_NOT_EXIST
     };
 
     // TODO document me
@@ -904,9 +903,9 @@ private:
     void impl_flushALLConfigChanges();
 
     // TODO document me
-    AutoRecovery::EFailureSafeResult implts_copyFile(const OUString& sSource    ,
-                                                     const OUString& sTargetPath,
-                                                     const OUString& sTargetName);
+    AutoRecovery::EFailureSafeResult implts_copyFile( const OUString& sOrigin,
+                                                      const OUString& sPathOfCopy,
+                                                      const OUString& sNameOfCopy );
 
     /** @short  converts m_eJob into a job description, which
                 can be used to inform an outside listener
@@ -3435,25 +3434,25 @@ void AutoRecovery::implts_openOneDoc(const OUString&               sURL       ,
             )
         {
             // create a frame
-            Reference< XFrame > xTargetFrame = xDesktop->findFrame( SPECIALTARGET_BLANK, 0 );
-            aCleanup.push_back( xTargetFrame.get() );
+            Reference< XFrame > xRecipientFrame = xDesktop->findFrame( SPECIAL_BLANK, 0 );
+            aCleanup.push_back( xRecipientFrame.get() );
 
             // create a view to the document
             Reference< XController2 > xController;
             if ( viewName->getLength() )
             {
-                xController.set( xModel->createViewController( *viewName, Sequence< css::beans::PropertyValue >(), xTargetFrame ), UNO_SET_THROW );
+                xController.set( xModel->createViewController( *viewName, Sequence< css::beans::PropertyValue >(), xRecipientFrame ), UNO_SET_THROW );
             }
             else
             {
-                xController.set( xModel->createDefaultViewController( xTargetFrame ), UNO_SET_THROW );
+                xController.set( xModel->createDefaultViewController( xRecipientFrame ), UNO_SET_THROW );
             }
 
             // introduce model/view/controller to each other
             xController->attachModel( xModel.get() );
             xModel->connectController( xController.get() );
-            xTargetFrame->setComponent( xController->getComponentWindow(), xController.get() );
-            xController->attachFrame( xTargetFrame );
+            xRecipientFrame->setComponent( xController->getComponentWindow(), xController.get() );
+            xController->attachFrame( xRecipientFrame );
             xModel->setCurrentController( xController.get() );
         }
 
@@ -3874,7 +3873,7 @@ void AutoRecovery::implts_backupWorkingEntry(const DispatchParams& aParams)
             continue;
 
         OUString sSourceURL;
-        // Prefer temp file. It contains the changes against the original document!
+        // Prefer temp file. It contains changes since the original document
         if (!rInfo.OldTempURL.isEmpty())
             sSourceURL = rInfo.OldTempURL;
         else if (!rInfo.NewTempURL.isEmpty())
@@ -3886,7 +3885,7 @@ void AutoRecovery::implts_backupWorkingEntry(const DispatchParams& aParams)
 
         INetURLObject aParser(sSourceURL);
         // AutoRecovery::EFailureSafeResult eResult =
-        implts_copyFile(sSourceURL, aParams.m_sSavePath, aParser.getName());
+        implts_copyFile( sSourceURL, aParams.m_sSavePath, aParser.getName() );
 
         // TODO: Check eResult and react for errors (InteractionHandler!?)
         // Currently we ignore it ...
@@ -3918,25 +3917,25 @@ void AutoRecovery::implts_cleanUpWorkingEntry(const DispatchParams& aParams)
     }
 }
 
-AutoRecovery::EFailureSafeResult AutoRecovery::implts_copyFile(const OUString& sSource    ,
-                                                               const OUString& sTargetPath,
-                                                               const OUString& sTargetName)
+AutoRecovery::EFailureSafeResult AutoRecovery::implts_copyFile( const OUString& sOrigin,
+                                                                const OUString& sPathOfCopy,
+                                                                const OUString& sNameOfCopy )
 {
     // create content for the parent folder and call transfer on that content with the source content
     // and the destination file name as parameters
 
     css::uno::Reference< css::ucb::XCommandEnvironment > xEnvironment;
 
-    ::ucbhelper::Content aSourceContent;
-    ::ucbhelper::Content aTargetContent;
+    ::ucbhelper::Content aContentFrom;
+    ::ucbhelper::Content aContentTo;
 
     try
     {
-        aTargetContent = ::ucbhelper::Content(sTargetPath, xEnvironment, m_xContext);
+        aContentTo = ::ucbhelper::Content( sPathOfCopy, xEnvironment, m_xContext );
     }
     catch(const css::uno::Exception&)
     {
-        return AutoRecovery::E_WRONG_TARGET_PATH;
+        return AutoRecovery::E_RECIPIENT_PATH_DOES_NOT_EXIST;
     }
 
     sal_Int32 nNameClash;
@@ -3944,14 +3943,14 @@ AutoRecovery::EFailureSafeResult AutoRecovery::implts_copyFile(const OUString& s
 
     try
     {
-        bool bSuccess = ::ucbhelper::Content::create(sSource, xEnvironment, m_xContext, aSourceContent);
-        if (!bSuccess)
-            return AutoRecovery::E_ORIGINAL_FILE_MISSING;
-        aTargetContent.transferContent(aSourceContent, ::ucbhelper::InsertOperation_COPY, sTargetName, nNameClash);
+        bool bSuccess = ::ucbhelper::Content::create( sOrigin, xEnvironment, m_xContext, aContentFrom );
+        if ( !bSuccess )
+            return AutoRecovery::E_ORIGINAL_FILE_IS_ABSENT;
+        aContentTo.transferContent( aContentFrom, ::ucbhelper::InsertOperation_COPY, sNameOfCopy, nNameClash );
     }
     catch(const css::uno::Exception&)
     {
-        return AutoRecovery::E_ORIGINAL_FILE_MISSING;
+        return AutoRecovery::E_ORIGINAL_FILE_IS_ABSENT;
     }
 
     return AutoRecovery::E_COPIED;

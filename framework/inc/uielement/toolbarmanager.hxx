@@ -107,7 +107,7 @@ class ToolBarManager : public ToolbarManager_Base
             EXEC_CMD_COUNT
         };
 
-        struct ExecuteInfo
+        struct GoInfo
         {
             OUString                                            aToolbarResName;
             ExecuteCommand                                      nCmd;

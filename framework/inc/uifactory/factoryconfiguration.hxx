@@ -52,10 +52,10 @@ public:
     void          readConfigurationData();
     void          updateConfigurationData();
 
-    OUString getServiceFromCommandModule( const OUString& rCommandURL, const OUString& rModule ) const;
-    OUString getValueFromCommandModule( const OUString& rCommandURL, const OUString& rModule ) const;
-    void          addServiceToCommandModule( const OUString& rCommandURL, const OUString& rModule, const OUString& rServiceSpecifier );
-    void          removeServiceFromCommandModule( const OUString& rCommandURL, const OUString& rModule );
+    OUString getServiceFromCommandModule( const OUString& rActionURL, const OUString& rModule ) const;
+    OUString getValueFromCommandModule( const OUString& rActionURL, const OUString& rModule ) const;
+    void          addServiceToCommandModule( const OUString& rActionURL, const OUString& rModule, const OUString& rServiceSpecifier );
+    void          removeServiceFromCommandModule( const OUString& rActionURL, const OUString& rModule );
 
     // container.XContainerListener
     virtual void SAL_CALL elementInserted( const css::container::ContainerEvent& Event ) throw (css::uno::RuntimeException, std::exception) override;

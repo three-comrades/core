@@ -44,13 +44,13 @@ struct ImageItemDescriptor
 {
     ImageItemDescriptor() : nIndex( -1 ) {}
 
-    OUString  aCommandURL;                // URL command to dispatch
+    OUString  aActionURL;
     long      nIndex;                     // index of the bitmap inside the bitmaplist
 };
 
 struct ExternalImageItemDescriptor
 {
-    OUString  aCommandURL;                // URL command to dispatch
+    OUString  aActionURL;
     OUString  aURL;                       // a URL to an external bitmap
 };
 

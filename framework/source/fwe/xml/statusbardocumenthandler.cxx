@@ -81,7 +81,7 @@ namespace framework
 {
 
 // Property names of a menu/menu item ItemDescriptor
-static const char ITEM_DESCRIPTOR_COMMANDURL[]  = "CommandURL";
+static const char ITEM_DESCRIPTOR_ACTIONURL[]   = "ActionURL";
 static const char ITEM_DESCRIPTOR_HELPURL[]     = "HelpURL";
 static const char ITEM_DESCRIPTOR_OFFSET[]      = "Offset";
 static const char ITEM_DESCRIPTOR_STYLE[]       = "Style";
@@ -90,7 +90,7 @@ static const char ITEM_DESCRIPTOR_TYPE[]        = "Type";
 
 static void ExtractStatusbarItemParameters(
     const Sequence< PropertyValue >& rProp,
-    OUString&                        rCommandURL,
+    OUString&                        rActionURL,
     OUString&                        rHelpURL,
     sal_Int16&                       rOffset,
     sal_Int16&                       rStyle,
@@ -98,10 +98,10 @@ static void ExtractStatusbarItemParameters(
 {
     for ( sal_Int32 i = 0; i < rProp.getLength(); i++ )
     {
-        if ( rProp[i].Name == ITEM_DESCRIPTOR_COMMANDURL )
+        if ( rProp[i].Name == ITEM_DESCRIPTOR_ACTIONURL )
         {
-            rProp[i].Value >>= rCommandURL;
-            rCommandURL = rCommandURL.intern();
+            rProp[i].Value >>= rActionURL;
+            rActionURL = rActionURL.intern();
         }
         else if ( rProp[i].Name == ITEM_DESCRIPTOR_HELPURL )
         {
@@ -193,7 +193,7 @@ throw(  SAXException, RuntimeException, std::exception )
         ( !m_bStatusBarStartFound && m_bStatusBarEndFound )     )
     {
         OUString aErrorMessage = getErrorLineString();
-        aErrorMessage += "No matching start or end element 'statusbar' found!";
+        aErrorMessage += "there's no boundary `statusbar' exists";
         throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
     }
 }
@@ -214,7 +214,7 @@ throw(  SAXException, RuntimeException, std::exception )
                 if ( m_bStatusBarStartFound )
                 {
                     OUString aErrorMessage = getErrorLineString();
-                    aErrorMessage += "Element 'statusbar:statusbar' cannot be embedded into 'statusbar:statusbar'!";
+                    aErrorMessage += "embed statusbar:statusbar into statusbar:statusbar? no way";
                     throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
                 }
 
@@ -227,23 +227,23 @@ throw(  SAXException, RuntimeException, std::exception )
                 if ( !m_bStatusBarStartFound )
                 {
                     OUString aErrorMessage = getErrorLineString();
-                    aErrorMessage += "Element 'statusbar:statusbaritem' must be embedded into element 'statusbar:statusbar'!";
+                    aErrorMessage += "statusbar:statusbaritem is not embedded into statusbar:statusbar";
                     throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
                 }
 
                 if ( m_bStatusBarItemStartFound )
                 {
                     OUString aErrorMessage = getErrorLineString();
-                    aErrorMessage += "Element statusbar:statusbaritem is not a container!";
+                    aErrorMessage += "element statusbar:statusbaritem is not a container";
                     throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
                 }
 
-                OUString    aCommandURL;
+                OUString    aActionURL;
                 OUString    aHelpURL;
                 sal_Int16   nItemBits( ItemStyle::ALIGN_CENTER|ItemStyle::DRAW_IN3D );
                 sal_Int16   nWidth( 0 );
                 sal_Int16   nOffset( STATUSBAR_OFFSET );
-                bool    bCommandURL( false );
+                bool    bHasActionURL( false );
 
                 m_bStatusBarItemStartFound = true;
                 for ( sal_Int16 n = 0; n < xAttribs->getLength(); n++ )
@@ -255,8 +255,8 @@ throw(  SAXException, RuntimeException, std::exception )
                         {
                             case SB_ATTRIBUTE_URL:
                             {
-                                bCommandURL = true;
-                                aCommandURL = xAttribs->getValueByIndex( n );
+                                aActionURL = xAttribs->getValueByIndex( n );
+                                bHasActionURL = true;
                             }
                             break;
 
@@ -279,7 +279,7 @@ throw(  SAXException, RuntimeException, std::exception )
                                 else
                                 {
                                     OUString aErrorMessage = getErrorLineString();
-                                    aErrorMessage += "Attribute statusbar:align must have one value of 'left','right' or 'center'!";
+                                    aErrorMessage += "attribute statusbar:align may be either `left', `right' or `center'";
                                     throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
                                 }
                             }
@@ -304,7 +304,7 @@ throw(  SAXException, RuntimeException, std::exception )
                                 else
                                 {
                                     OUString aErrorMessage = getErrorLineString();
-                                    aErrorMessage += "Attribute statusbar:autosize must have value 'true' or 'false'!";
+                                    aErrorMessage += "attribute statusbar:style may be either `in', `out' or `flat'";
                                     throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
                                 }
                             }
@@ -319,7 +319,7 @@ throw(  SAXException, RuntimeException, std::exception )
                                 else
                                 {
                                     OUString aErrorMessage = getErrorLineString();
-                                    aErrorMessage += "Attribute statusbar:autosize must have value 'true' or 'false'!";
+                                    aErrorMessage += "attribute statusbar:autosize may be either `true' or `false'";
                                     throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
                                 }
                             }
@@ -334,7 +334,7 @@ throw(  SAXException, RuntimeException, std::exception )
                                 else
                                 {
                                     OUString aErrorMessage = getErrorLineString();
-                                    aErrorMessage += "Attribute statusbar:ownerdraw must have value 'true' or 'false'!";
+                                    aErrorMessage += "attribute statusbar:ownerdraw may be either `true' or `false'";
                                     throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
                                 }
                             }
@@ -364,31 +364,31 @@ throw(  SAXException, RuntimeException, std::exception )
                     }
                 } // for
 
-                if ( !bCommandURL )
+                if ( !bHasActionURL )
                 {
                     OUString aErrorMessage = getErrorLineString();
-                    aErrorMessage += "Required attribute statusbar:url must have a value!";
+                    aErrorMessage += "no value for statusbar:url";
                     throw SAXException( aErrorMessage, Reference< XInterface >(), Any() );
                 }
-                        else
-                        {
-                            Sequence< PropertyValue > aStatusbarItemProp( 6 );
-                            aStatusbarItemProp[0].Name = ITEM_DESCRIPTOR_COMMANDURL;
-                            aStatusbarItemProp[1].Name = ITEM_DESCRIPTOR_HELPURL;
-                            aStatusbarItemProp[2].Name = ITEM_DESCRIPTOR_OFFSET;
-                            aStatusbarItemProp[3].Name = ITEM_DESCRIPTOR_STYLE;
-                            aStatusbarItemProp[4].Name = ITEM_DESCRIPTOR_WIDTH;
-                            aStatusbarItemProp[5].Name = ITEM_DESCRIPTOR_TYPE;
+                else
+                {
+                    Sequence< PropertyValue > aStatusbarItemProp( 6 );
+                    aStatusbarItemProp[0].Name = ITEM_DESCRIPTOR_ACTIONURL;
+                    aStatusbarItemProp[1].Name = ITEM_DESCRIPTOR_HELPURL;
+                    aStatusbarItemProp[2].Name = ITEM_DESCRIPTOR_OFFSET;
+                    aStatusbarItemProp[3].Name = ITEM_DESCRIPTOR_STYLE;
+                    aStatusbarItemProp[4].Name = ITEM_DESCRIPTOR_WIDTH;
+                    aStatusbarItemProp[5].Name = ITEM_DESCRIPTOR_TYPE;
 
-                            aStatusbarItemProp[0].Value <<= aCommandURL;
-                            aStatusbarItemProp[1].Value <<= aHelpURL;
-                            aStatusbarItemProp[2].Value <<= nOffset;
-                            aStatusbarItemProp[3].Value <<= nItemBits;
-                            aStatusbarItemProp[4].Value <<= nWidth;
-                            aStatusbarItemProp[5].Value = makeAny( css::ui::ItemType::DEFAULT );
+                    aStatusbarItemProp[0].Value <<= aActionURL;
+                    aStatusbarItemProp[1].Value <<= aHelpURL;
+                    aStatusbarItemProp[2].Value <<= nOffset;
+                    aStatusbarItemProp[3].Value <<= nItemBits;
+                    aStatusbarItemProp[4].Value <<= nWidth;
+                    aStatusbarItemProp[5].Value = makeAny( css::ui::ItemType::DEFAULT );
 
-                            m_aStatusBarItems->insertByIndex( m_aStatusBarItems->getCount(), makeAny( aStatusbarItemProp ) );
-                       }
+                    m_aStatusBarItems->insertByIndex( m_aStatusBarItems->getCount(), makeAny( aStatusbarItemProp ) );
+               }
             }
             break;
 
@@ -451,7 +451,7 @@ throw(  SAXException, RuntimeException, std::exception )
 }
 
 void SAL_CALL OReadStatusBarDocumentHandler::processingInstruction(
-    const OUString& /*aTarget*/, const OUString& /*aData*/ )
+    const OUString& /*aRecipient*/, const OUString& /*aData*/ )
 throw(  SAXException, RuntimeException, std::exception )
 {
 }
@@ -536,7 +536,7 @@ void OWriteStatusBarDocumentHandler::WriteStatusBarDocument() throw
         aAny = m_aStatusBarItems->getByIndex( nItemPos );
         if ( aAny >>= aProps )
         {
-            OUString    aCommandURL;
+            OUString    aActionURL;
             OUString    aHelpURL;
             sal_Int16   nStyle( ItemStyle::ALIGN_CENTER|ItemStyle::DRAW_IN3D );
             sal_Int16   nWidth( 0 );
@@ -544,14 +544,14 @@ void OWriteStatusBarDocumentHandler::WriteStatusBarDocument() throw
 
             ExtractStatusbarItemParameters(
                 aProps,
-                aCommandURL,
+                aActionURL,
                 aHelpURL,
                 nOffset,
                 nStyle,
                 nWidth );
 
-            if ( !aCommandURL.isEmpty() )
-                WriteStatusBarItem( aCommandURL, aHelpURL, nOffset, nStyle, nWidth );
+            if ( !aActionURL.isEmpty() )
+                WriteStatusBarItem( aActionURL, aHelpURL, nOffset, nStyle, nWidth );
         }
     }
 
@@ -564,7 +564,7 @@ void OWriteStatusBarDocumentHandler::WriteStatusBarDocument() throw
 //  protected member functions
 
 void OWriteStatusBarDocumentHandler::WriteStatusBarItem(
-    const OUString& rCommandURL,
+    const OUString& rActionURL,
     const OUString& /*rHelpURL*/,
     sal_Int16            nOffset,
     sal_Int16            nStyle,
@@ -580,7 +580,7 @@ throw ( SAXException, RuntimeException )
     }
 
     // save required attribute (URL)
-    pList->AddAttribute( m_aAttributeURL, m_aAttributeType, rCommandURL );
+    pList->AddAttribute( m_aAttributeURL, m_aAttributeType, rActionURL );
 
     // alignment
     if ( nStyle & ItemStyle::ALIGN_RIGHT )

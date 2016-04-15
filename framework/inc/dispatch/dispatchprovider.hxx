@@ -62,8 +62,8 @@ enum EDispatchHelper
                             - a task can have a beamer as direct child
                             - a normal frame never can create a new one by himself
 
-    @attention      Use this class as member only! Never use it as baseclass.
-                    XInterface will be ambigous and we hold a weakreference to our OWNER - not to our SUPERCLASS!
+    @attention      Use this class as a member only, not as a parent.
+                    XInterface will be ambigous and we hold a weakreference to OWNER - not to SUPERCLASS
 
     @base           OWeakObject
                         provides ref count and weak mechanism
@@ -88,31 +88,30 @@ class DispatchProvider: public ::cppu::WeakImplHelper< css::frame::XDispatchProv
         DispatchProvider( const css::uno::Reference< css::uno::XComponentContext >&     xContext ,
                           const css::uno::Reference< css::frame::XFrame >&              xFrame   );
 
-        virtual css::uno::Reference< css::frame::XDispatch > SAL_CALL                       queryDispatch  ( const css::util::URL&                                       aURL             ,
-                                                                                                             const OUString&                                      sTargetFrameName ,
-                                                                                                                   sal_Int32                                             nSearchFlags     ) throw( css::uno::RuntimeException, std::exception ) override;
+        virtual css::uno::Reference< css::frame::XDispatch > SAL_CALL queryDispatch  ( const css::util::URL&  aURL ,
+                                                                                       const OUString&  sRecipientFrameName ,
+                                                                                             sal_Int32  nSearchOptions ) throw( css::uno::RuntimeException, std::exception ) override;
         virtual css::uno::Sequence< css::uno::Reference< css::frame::XDispatch > > SAL_CALL queryDispatches( const css::uno::Sequence< css::frame::DispatchDescriptor >& lDescriptions    ) throw( css::uno::RuntimeException, std::exception ) override;
 
     /* helper */
     protected:
-        // Let him protected! So nobody can use us as base ...
         virtual ~DispatchProvider();
 
     private:
-        css::uno::Reference< css::frame::XDispatch > implts_getOrCreateDispatchHelper   (       EDispatchHelper                            eHelper                       ,
-                                                                                          const css::uno::Reference< css::frame::XFrame >& xOwner                        ,
-                                                                                          const OUString&                           sTarget = OUString()   ,
-                                                                                                sal_Int32                                  nSearchFlags = 0              );
-        bool                                         implts_isLoadableContent           ( const css::util::URL&                            aURL                          );
-        css::uno::Reference< css::frame::XDispatch > implts_queryDesktopDispatch        ( const css::uno::Reference< css::frame::XFrame >&  xDesktop                      ,
-                                                                                          const css::util::URL&                            aURL                          ,
-                                                                                          const OUString&                           sTargetFrameName              ,
-                                                                                                sal_Int32                                  nSearchFlags                  );
-        css::uno::Reference< css::frame::XDispatch > implts_queryFrameDispatch          ( const css::uno::Reference< css::frame::XFrame >&  xFrame                        ,
-                                                                                          const css::util::URL&                            aURL                          ,
-                                                                                          const OUString&                           sTargetFrameName              ,
-                                                                                                sal_Int32                                  nSearchFlags                  );
-        css::uno::Reference< css::frame::XDispatch > implts_searchProtocolHandler       ( const css::util::URL&                            aURL                          );
+        css::uno::Reference< css::frame::XDispatch > implts_getOrCreateDispatchHelper   (       EDispatchHelper eHelper ,
+                                                                                          const css::uno::Reference< css::frame::XFrame >&  xOwner ,
+                                                                                          const OUString&  sRecipient = OUString() ,
+                                                                                                sal_Int32  nSearchOptions = 0 );
+        bool                                         implts_isLoadableContent           ( const css::util::URL&  aURL );
+        css::uno::Reference< css::frame::XDispatch > implts_queryDesktopDispatch        ( const css::uno::Reference< css::frame::XFrame >&  xDesktop ,
+                                                                                          const css::util::URL&  aURL ,
+                                                                                          const OUString&  sRecipientFrameName ,
+                                                                                                sal_Int32  nSearchOptions );
+        css::uno::Reference< css::frame::XDispatch > implts_queryFrameDispatch          ( const css::uno::Reference< css::frame::XFrame >&  xFrame ,
+                                                                                          const css::util::URL&  aURL ,
+                                                                                          const OUString&  sRecipientFrameName ,
+                                                                                                sal_Int32  nSearchOptions );
+        css::uno::Reference< css::frame::XDispatch > implts_searchProtocolHandler       ( const css::util::URL&  aURL );
 
 }; // class DispatchProvider
 
