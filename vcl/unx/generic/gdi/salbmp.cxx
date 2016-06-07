@@ -149,7 +149,7 @@ BitmapBuffer* X11SalBitmap::ImplCreateDIB(
         if( pDIB )
         {
             const sal_uInt16 nColors = ( nBitCount <= 8 ) ? ( 1 << nBitCount ) : 0;
-
+            pDIB->mnColorChannelBitCount = nBitCount;
             pDIB->mnFormat = ScanlineFormat::NONE;
 
             switch( nBitCount )
@@ -260,6 +260,7 @@ BitmapBuffer* X11SalBitmap::ImplCreateDIB(
             aSrcBuf.mnWidth = nWidth;
             aSrcBuf.mnHeight = nHeight;
             aSrcBuf.mnBitCount = pImage->bits_per_pixel;
+            aSrcBuf.mnColorChannelBitCount = aSrcBuf.mnBitCount;
             aSrcBuf.mnScanlineSize = pImage->bytes_per_line;
             aSrcBuf.mpBits = reinterpret_cast<sal_uInt8*>(pImage->data);
 
@@ -846,6 +847,11 @@ sal_uInt16 X11SalBitmap::GetBitCount() const
         nBitCount = 0;
 
     return nBitCount;
+}
+
+sal_uInt16 X11SalBitmap::GetColorChannelBitCount() const
+{
+    return GetBitCount();
 }
 
 BitmapBuffer* X11SalBitmap::AcquireBuffer( BitmapAccessMode /*nMode*/ )

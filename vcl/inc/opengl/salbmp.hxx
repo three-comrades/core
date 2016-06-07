@@ -70,6 +70,7 @@ public:
 
     Size            GetSize() const override;
     sal_uInt16      GetBitCount() const override;
+    sal_uInt16      GetColorChannelBitCount() const override;
 
     BitmapBuffer   *AcquireBuffer( BitmapAccessMode nMode ) override;
     void            ReleaseBuffer( BitmapBuffer* pBuffer, BitmapAccessMode nMode ) override;
