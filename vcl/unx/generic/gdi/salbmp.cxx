@@ -130,6 +130,7 @@ BitmapBuffer* X11SalBitmap::ImplCreateDIB(
         || nBitCount ==  8
         || nBitCount == 16
         || nBitCount == 24
+        || nBitCount == 32
         , "Unsupported BitCount!"
     );
 
@@ -184,12 +185,16 @@ BitmapBuffer* X11SalBitmap::ImplCreateDIB(
                     break;
                 }
 #endif
-                default:
-                    nBitCount = 24;
-                    SAL_FALLTHROUGH;
+                case 32:
+                    pDIB->mnFormat |= ScanlineFormat::N32BitTcBgra;
+                    break;
                 case 24:
                     pDIB->mnFormat |= ScanlineFormat::N24BitTcBgr;
-                break;
+                    break;
+                default:
+                    pDIB->mnFormat |= ScanlineFormat::N24BitTcBgr;
+                    nBitCount = 24;
+                    break;
             }
 
             pDIB->mnWidth = rSize.Width();
