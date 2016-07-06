@@ -372,7 +372,6 @@ bool CommonSalLayout::LayoutText(ImplLayoutArgs& rArgs)
                 int32_t nYOffset =  pHbPositions[i].y_offset >> 6;
                 int32_t nXAdvance = pHbPositions[i].x_advance >> 6;
                 int32_t nYAdvance = pHbPositions[i].y_advance >> 6;
-
                 Point aNewPos = Point(aCurrPos.X() + nXOffset, -(aCurrPos.Y() + nYOffset));
                 // Definiton of glyphitem may have to change to support system graphics lib
                 const GlyphItem aGI(nCharPos, nGlyphIndex, aNewPos, nGlyphFlags, nXAdvance, nXOffset);

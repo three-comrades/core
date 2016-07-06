@@ -42,6 +42,7 @@
 
 #include <cairo.h>
 #include <cairo-ft.h>
+#include "CommonSalLayout.hxx"
 
 CairoTextRender::CairoTextRender()
     : mnTextColor(MAKE_SALCOLOR(0x00, 0x00, 0x00)) //black
@@ -506,7 +507,14 @@ SalLayout* CairoTextRender::GetTextLayout( ImplLayoutArgs& rArgs, int nFallbackL
         }
         else
 #endif
-            pLayout = new ServerFontLayout( *mpServerFont[ nFallbackLevel ] );
+            if(getenv("SAL_USE_COMMON_LAYOUT"))
+            {
+                pLayout = new CommonSalLayout( *mpServerFont[ nFallbackLevel ] );
+            }
+            else
+            {
+                pLayout = new ServerFontLayout( *mpServerFont[ nFallbackLevel ] );
+            }
     }
 
     return pLayout;
