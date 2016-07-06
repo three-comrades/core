@@ -152,7 +152,7 @@ namespace
     }
 }
 
-void CairoTextRender::DrawServerFontLayout( const ServerFontLayout& rLayout )
+void CairoTextRender::DrawServerFontLayout( const GenericSalLayout& rLayout, const ServerFont& rServerFont )
 {
     std::vector<cairo_glyph_t> cairo_glyphs;
     std::vector<int> glyph_extrarotation;
@@ -185,8 +185,7 @@ void CairoTextRender::DrawServerFontLayout( const ServerFontLayout& rLayout )
     if (cairo_glyphs.empty())
         return;
 
-    ServerFont& rFont = rLayout.GetServerFont();
-    const FontSelectPattern& rFSD = rFont.GetFontSelData();
+    const FontSelectPattern& rFSD = rServerFont.GetFontSelData();
     int nHeight = rFSD.mnHeight;
     int nWidth = rFSD.mnWidth ? rFSD.mnWidth : nHeight;
     if (nWidth == 0 || nHeight == 0)
@@ -220,11 +219,11 @@ void CairoTextRender::DrawServerFontLayout( const ServerFontLayout& rLayout )
         SALCOLOR_GREEN(mnTextColor)/255.0,
         SALCOLOR_BLUE(mnTextColor)/255.0);
 
-    FT_Face aFace = rFont.GetFtFace();
+    FT_Face aFace = rServerFont.GetFtFace();
     CairoFontsCache::CacheId aId;
     aId.maFace = aFace;
-    aId.mpOptions = rFont.GetFontOptions().get();
-    aId.mbEmbolden = rFont.NeedsArtificialBold();
+    aId.mpOptions = rServerFont.GetFontOptions().get();
+    aId.mbEmbolden = rServerFont.NeedsArtificialBold();
 
     cairo_matrix_t m;
 
@@ -244,12 +243,12 @@ void CairoTextRender::DrawServerFontLayout( const ServerFontLayout& rLayout )
         cairo_font_face_t* font_face = static_cast<cairo_font_face_t*>(CairoFontsCache::FindCachedFont(aId));
         if (!font_face)
         {
-            const FontConfigFontOptions *pOptions = rFont.GetFontOptions().get();
+            const FontConfigFontOptions *pOptions = rServerFont.GetFontOptions().get();
             void *pPattern = pOptions ? pOptions->GetPattern(aFace, aId.mbEmbolden) : nullptr;
             if (pPattern)
                 font_face = cairo_ft_font_face_create_for_pattern(static_cast<FcPattern*>(pPattern));
             if (!font_face)
-                font_face = cairo_ft_font_face_create_for_ft_face(reinterpret_cast<FT_Face>(aFace), rFont.GetLoadFlags());
+                font_face = cairo_ft_font_face_create_for_ft_face(reinterpret_cast<FT_Face>(aFace), rServerFont.GetLoadFlags());
             CairoFontsCache::CacheFont(font_face, aId);
         }
         cairo_set_font_face(cr, font_face);
@@ -304,7 +303,7 @@ void CairoTextRender::DrawServerFontLayout( const ServerFontLayout& rLayout )
             cairo_matrix_translate(&m, xdiff, ydiff);
         }
 
-        if (rFont.NeedsArtificialItalic())
+        if (rServerFont.NeedsArtificialItalic())
         {
             cairo_matrix_t shear;
             cairo_matrix_init_identity(&shear);

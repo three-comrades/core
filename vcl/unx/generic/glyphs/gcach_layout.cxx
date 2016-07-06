@@ -47,7 +47,7 @@ ServerFontLayout::ServerFontLayout( ServerFont& rFont )
 
 void ServerFontLayout::DrawText( SalGraphics& rSalGraphics ) const
 {
-    rSalGraphics.DrawServerFontLayout( *this );
+    rSalGraphics.DrawServerFontLayout( *this, mrServerFont );
 }
 
 bool ServerFontLayout::LayoutText( ImplLayoutArgs& rArgs )
