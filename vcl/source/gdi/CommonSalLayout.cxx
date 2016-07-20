@@ -57,7 +57,7 @@ static hb_blob_t *getFontTable(hb_face_t* /*face*/, hb_tag_t nTableTag, void* pU
 
     hb_blob_t* pBlob = nullptr;
     if (pBuffer != nullptr)
-#if defined(_WIN32)
+#if defined(_WIN32) || defined(MACOSX) || defined(IOS)
         pBlob = hb_blob_create(reinterpret_cast<const char*>(pBuffer), nLength, HB_MEMORY_MODE_READONLY,
                                const_cast<unsigned char*>(pBuffer), [](void* data){ delete[] reinterpret_cast<unsigned char*>(data); } );
 #else
