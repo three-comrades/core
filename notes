@@ -5,3 +5,8 @@ Habe initial als dropcap uebersetzt
 Keep the current template size -> hier: wirklich template size?
 -> okay? // set the attributes of the context for the Draw object
 Make the Draw object of the table known.
+numbering that is valid in the context
+close all attributes ('beenden')
+htmlctxt: Bereich
+    Zeichen-Ebene -> character layer?
+    Attributierung
