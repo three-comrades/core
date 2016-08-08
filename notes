@@ -1,0 +1,7 @@
+htmlbas.cxx: "Standard", "Modul"?
+htmlcss1.cxx: wird noch umgeschossen
+Alle "template" checken -> wahrscheinlich page style, weil tatseachlich einmal Seitenvorlage vorkommt
+Habe initial als dropcap uebersetzt
+Keep the current template size -> hier: wirklich template size?
+-> okay? // set the attributes of the context for the Draw object
+Make the Draw object of the table known.
